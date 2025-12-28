@@ -16,15 +16,35 @@ PanelWindow {
     exclusiveZone: implicitHeight
 
     // Bar height matching AGS bar
-    implicitHeight: 40
+    implicitHeight: 32
 
     // Background color
     color: Colors.background
 
-    // Bar content area
-    Rectangle {
+    // Main layout container
+    Item {
         anchors.fill: parent
-        color: "transparent"
+
+        // Left section (empty for now)
+        Item {
+            id: leftSection
+            anchors.left: parent.left
+            anchors.leftMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width / 3
+        }
+
+        // Center section - Workspaces
+        Workspaces {
+            anchors.centerIn: parent
+        }
+
+        // Right section - Clock
+        Clock {
+            anchors.right: parent.right
+            anchors.rightMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+        }
 
         // Bottom border line
         Rectangle {
