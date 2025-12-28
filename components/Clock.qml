@@ -4,8 +4,8 @@ import "../theme"
 BarGroup {
     id: clockContainer
 
-    implicitWidth: timeText.width + 24
-    implicitHeight: 32
+    implicitWidth: timeText.width + 20
+    implicitHeight: 24 
 
     property string currentTime: Qt.formatTime(new Date(), "HH:mm")
 

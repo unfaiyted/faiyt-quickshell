@@ -15,7 +15,7 @@ PanelWindow {
     // Reserve space so windows don't overlap
     exclusiveZone: implicitHeight
 
-    // Bar height matching AGS bar
+    // Bar height
     implicitHeight: 32
 
     // Background color
@@ -25,25 +25,35 @@ PanelWindow {
     Item {
         anchors.fill: parent
 
-        // Left section (empty for now)
-        Item {
-            id: leftSection
+        // Left section - Window Title
+        WindowTitle {
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            width: parent.width / 3
         }
 
-        // Center section - Workspaces
-        Workspaces {
+        // Center section
+        Row {
             anchors.centerIn: parent
+            spacing: 8
+
+            // Center-Left: System Resources + Music
+            SystemResources {}
+            Music {}
+
+            // Center-Middle: Workspaces
+            Workspaces {}
         }
 
-        // Right section - Clock
-        Clock {
+        // Right section - Battery + Clock
+        Row {
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+
+            Battery {}
+            Clock {}
         }
 
         // Bottom border line

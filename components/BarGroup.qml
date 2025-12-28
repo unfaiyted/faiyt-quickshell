@@ -5,7 +5,7 @@ Rectangle {
     id: barGroup
 
     color: Colors.backgroundElevated
-    radius: 12
+    radius: 10 
 
     // Default property allows children to be added directly
     default property alias content: container.data

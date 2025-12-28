@@ -7,8 +7,8 @@ Rectangle {
 
     color: Colors.backgroundElevated
     radius: 16
-    implicitWidth: row.width + 16
-    implicitHeight: 32
+    implicitWidth: row.width + 12
+    implicitHeight: 20 
 
     // Helper function to check if workspace is occupied
     function isWorkspaceOccupied(wsId) {
@@ -31,8 +31,8 @@ Rectangle {
 
             Rectangle {
                 id: wsIndicator
-                width: 24
-                height: 24
+                width: 22
+                height: 22
                 radius: 12
 
                 required property int index
