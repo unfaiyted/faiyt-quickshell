@@ -1,0 +1,4 @@
+module wallpaper
+singleton WallpaperState 1.0 WallpaperState.qml
+WallpaperWindow 1.0 WallpaperWindow.qml
+WallpaperItem 1.0 WallpaperItem.qml

@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import "../../theme"
 import "modules"
 
@@ -19,6 +20,9 @@ PanelWindow {
     margins.top: 8     // Below the bar
     exclusiveZone: 0
     color: "transparent"
+
+    // Keyboard focus for Escape key
+    WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     // Hide window when not expanded (after animation completes)
     visible: expanded || slideAnimation.running
@@ -118,6 +122,19 @@ PanelWindow {
                 color: "transparent"
                 border.width: 1
                 border.color: Colors.border
+            }
+        }
+    }
+
+    // Keyboard handler for Escape (at window level for reliable focus)
+    FocusScope {
+        anchors.fill: parent
+        focus: leftSidebar.expanded
+
+        Keys.onPressed: function(event) {
+            if (event.key === Qt.Key_Escape) {
+                SidebarState.leftOpen = false
+                event.accepted = true
             }
         }
     }

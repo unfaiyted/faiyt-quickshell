@@ -1,6 +1,7 @@
 import QtQuick
 import "../../../theme"
 import ".."
+import "../../wallpaper"
 
 BarGroup {
     id: utilities
@@ -25,6 +26,13 @@ BarGroup {
             icon: "󰴱"
             tooltip: "Color Picker"
             command: ["hyprpicker", "-a"]
+        }
+
+        // Wallpaper button
+        UtilityButton {
+            icon: "󰸉"
+            tooltip: "Wallpapers"
+            onActivate: function() { WallpaperState.toggle() }
         }
     }
 }

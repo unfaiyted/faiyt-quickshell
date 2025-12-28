@@ -9,6 +9,7 @@ Item {
     property string icon: ""
     property string tooltip: ""
     property var command: []
+    property var onActivate: null  // Optional function callback
 
     width: 20
     height: 20
@@ -31,6 +32,12 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: proc.running = true
+        onClicked: {
+            if (utilBtn.onActivate) {
+                utilBtn.onActivate()
+            } else if (utilBtn.command.length > 0) {
+                proc.running = true
+            }
+        }
     }
 }
