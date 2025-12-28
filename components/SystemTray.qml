@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Services.SystemTray
 import "../theme"
 
@@ -20,6 +21,7 @@ BarGroup {
             model: SystemTray.items
 
             Image {
+                id: trayIcon
                 width: 16
                 height: 16
                 source: modelData.icon
@@ -27,13 +29,24 @@ BarGroup {
 
                 MouseArea {
                     anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
                     cursorShape: Qt.PointingHandCursor
                     onClicked: (mouse) => {
                         if (mouse.button === Qt.LeftButton) {
-                            modelData.activate()
+                            if (modelData.onlyMenu && modelData.hasMenu) {
+                                // Some tray items only have a menu
+                                let pos = QsWindow.window.contentItem.mapFromItem(trayIcon, mouse.x, mouse.y)
+                                modelData.display(QsWindow.window, pos.x, pos.y)
+                            } else {
+                                modelData.activate()
+                            }
                         } else if (mouse.button === Qt.MiddleButton) {
                             modelData.secondaryActivate()
+                        } else if (mouse.button === Qt.RightButton) {
+                            if (modelData.hasMenu) {
+                                let pos = QsWindow.window.contentItem.mapFromItem(trayIcon, mouse.x, mouse.y)
+                                modelData.display(QsWindow.window, pos.x, pos.y)
+                            }
                         }
                     }
                 }
