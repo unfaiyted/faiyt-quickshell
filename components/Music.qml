@@ -10,9 +10,9 @@ BarGroup {
     implicitHeight: 24
 
     // Only show if there's a player
-    visible: Mpris.players.count > 0
+    visible: Mpris.players.values.length > 0
 
-    property var player: Mpris.players.count > 0 ? Mpris.players.get(0) : null
+    property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
     property string trackTitle: player ? (player.trackTitle || "") : ""
     property string trackArtist: player ? (player.trackArtist || "") : ""
     property string trackAlbum: player ? (player.trackAlbum || "") : ""
