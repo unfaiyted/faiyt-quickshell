@@ -1,0 +1,18 @@
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+build/
+*.qmlc
+qmlcache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
