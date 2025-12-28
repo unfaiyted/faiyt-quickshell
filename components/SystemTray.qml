@@ -21,8 +21,11 @@ BarGroup {
             model: SystemTray.items.values
 
             Item {
+                id: trayItemContainer
                 width: 16
                 height: 16
+
+                property var trayData: modelData
 
                 Image {
                     id: trayIcon
@@ -38,24 +41,22 @@ BarGroup {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: (mouse) => {
                         if (mouse.button === Qt.LeftButton) {
-                            if (modelData.onlyMenu && modelData.hasMenu) {
-                                let pos = QsWindow.window.contentItem.mapFromItem(trayIcon, mouse.x, mouse.y)
-                                modelData.display(QsWindow.window, pos.x, pos.y)
+                            if (trayData.onlyMenu && trayData.hasMenu) {
+                                trayMenu.visible = !trayMenu.visible
                             } else {
-                                modelData.activate()
+                                trayData.activate()
                             }
                         } else if (mouse.button === Qt.MiddleButton) {
-                            modelData.secondaryActivate()
+                            trayData.secondaryActivate()
                         } else if (mouse.button === Qt.RightButton) {
-                            if (modelData.hasMenu) {
-                                let pos = QsWindow.window.contentItem.mapFromItem(trayIcon, mouse.x, mouse.y)
-                                modelData.display(QsWindow.window, pos.x, pos.y)
+                            if (trayData.hasMenu) {
+                                trayMenu.visible = !trayMenu.visible
                             }
                         }
                     }
                 }
 
-                // Tooltip popup
+                // Tooltip popup (only show when menu is not visible)
                 PopupWindow {
                     id: tooltip
                     anchor.window: QsWindow.window
@@ -66,7 +67,7 @@ BarGroup {
                     anchor.edges: Edges.Bottom
                     anchor.gravity: Edges.Bottom
 
-                    visible: mouseArea.containsMouse
+                    visible: mouseArea.containsMouse && !trayMenu.visible
 
                     implicitWidth: tooltipContent.width
                     implicitHeight: tooltipContent.height
@@ -87,7 +88,7 @@ BarGroup {
                             spacing: 2
 
                             Text {
-                                text: modelData.title || modelData.id || "Unknown"
+                                text: trayData.title || trayData.id || "Unknown"
                                 color: Colors.foreground
                                 font.pixelSize: 11
                                 font.bold: true
@@ -95,14 +96,29 @@ BarGroup {
                             }
 
                             Text {
-                                visible: modelData.tooltipTitle && modelData.tooltipTitle.length > 0
-                                text: modelData.tooltipTitle
+                                visible: trayData.tooltipTitle && trayData.tooltipTitle.length > 0
+                                text: trayData.tooltipTitle
                                 color: Colors.muted
                                 font.pixelSize: 10
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
                     }
+                }
+
+                // Custom styled menu
+                TrayMenu {
+                    id: trayMenu
+                    menu: trayData.menu
+                    trayItem: trayData
+
+                    anchor.window: QsWindow.window
+                    anchor.onAnchoring: {
+                        const pos = trayIcon.mapToItem(QsWindow.window.contentItem, 0, trayIcon.height + 4)
+                        anchor.rect = Qt.rect(pos.x, pos.y, trayIcon.width, 1)
+                    }
+                    anchor.edges: Edges.Bottom
+                    anchor.gravity: Edges.Bottom
                 }
             }
         }
