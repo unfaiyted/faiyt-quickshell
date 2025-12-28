@@ -1,0 +1,4 @@
+module bar.corners
+
+BarCornerLeft 1.0 BarCornerLeft.qml
+BarCornerRight 1.0 BarCornerRight.qml

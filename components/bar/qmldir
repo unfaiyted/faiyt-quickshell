@@ -1,0 +1,4 @@
+module bar
+
+Bar 1.0 Bar.qml
+BarGroup 1.0 BarGroup.qml

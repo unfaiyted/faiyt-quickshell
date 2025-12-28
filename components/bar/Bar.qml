@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
-import "../theme"
+import "../../theme"
+import "modules"
 
 PanelWindow {
     id: bar
@@ -67,7 +68,7 @@ PanelWindow {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 1
+            height: 0
             color: Colors.border
         }
     }

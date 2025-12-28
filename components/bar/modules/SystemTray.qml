@@ -1,7 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
-import "../theme"
+import "../../../theme"
+import ".."
 
 BarGroup {
     id: tray

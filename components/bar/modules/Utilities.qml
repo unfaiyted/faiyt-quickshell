@@ -1,5 +1,6 @@
 import QtQuick
-import "../theme"
+import "../../../theme"
+import ".."
 
 BarGroup {
     id: utilities

@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Io
-import "../theme"
+import "../../../theme"
+import ".."
 
 Item {
     id: utilBtn

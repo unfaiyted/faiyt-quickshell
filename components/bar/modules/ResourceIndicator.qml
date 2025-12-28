@@ -1,5 +1,6 @@
 import QtQuick
-import "../theme"
+import "../../../theme"
+import ".."
 
 Item {
     id: indicator

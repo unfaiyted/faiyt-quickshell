@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Hyprland
-import "../theme"
+import "../../../theme"
+import ".."
 
 Rectangle {
     id: workspacesContainer
@@ -8,7 +9,7 @@ Rectangle {
     color: Colors.backgroundElevated
     radius: 16
     implicitWidth: row.width + 12
-    implicitHeight: 20 
+    implicitHeight: 24 
 
     // Helper function to check if workspace is occupied
     function isWorkspaceOccupied(wsId) {

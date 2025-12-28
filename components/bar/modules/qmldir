@@ -1,0 +1,15 @@
+module bar.modules
+
+Clock 1.0 Clock.qml
+Battery 1.0 Battery.qml
+Music 1.0 Music.qml
+Network 1.0 Network.qml
+Weather 1.0 Weather.qml
+SystemTray 1.0 SystemTray.qml
+TrayMenu 1.0 TrayMenu.qml
+Workspaces 1.0 Workspaces.qml
+WindowTitle 1.0 WindowTitle.qml
+SystemResources 1.0 SystemResources.qml
+ResourceIndicator 1.0 ResourceIndicator.qml
+Utilities 1.0 Utilities.qml
+UtilityButton 1.0 UtilityButton.qml

@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
-import "../theme"
+import "../../../theme"
+import ".."
 
 PopupWindow {
     id: menuPopup

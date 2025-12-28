@@ -1,7 +1,8 @@
 //@ pragma UseQApplication
 import QtQuick
 import Quickshell
-import "components"
+import "components/bar"
+import "components/bar/corners"
 
 ShellRoot {
     Bar {}

@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell.Hyprland
-import "../theme"
+import "../../../theme"
+import ".."
 
 BarGroup {
     id: windowTitle
 
     implicitWidth: content.width + 20
-    implicitHeight: 24
+    implicitHeight: 20 
 
     property string title: Hyprland.activeToplevel
         ? Hyprland.activeToplevel.title
