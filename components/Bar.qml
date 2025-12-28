@@ -43,17 +43,23 @@ PanelWindow {
 
             // Center-Middle: Workspaces
             Workspaces {}
+
+            // Center-Right: Utilities
+            Utilities {}
         }
 
-        // Right section - Battery + Clock
+        // Right section
         Row {
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
+            SystemTray {}
+            Network {}
             Battery {}
             Clock {}
+            Weather {}
         }
 
         // Bottom border line

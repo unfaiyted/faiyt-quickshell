@@ -4,4 +4,6 @@ import "components"
 
 ShellRoot {
     Bar {}
+    BarCornerLeft {}
+    BarCornerRight {}
 }
