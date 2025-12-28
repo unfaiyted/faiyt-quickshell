@@ -6,6 +6,7 @@ import "components/bar/corners"
 import "components/sidebar"
 import "components/notifications"
 import "components/wallpaper"
+import "components/launcher"
 
 ShellRoot {
     Bar {}
@@ -16,4 +17,5 @@ ShellRoot {
     SidebarRight {}
     NotificationPopups {}
     WallpaperWindow {}
+    LauncherWindow {}
 }

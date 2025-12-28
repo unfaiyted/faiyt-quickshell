@@ -1,0 +1,7 @@
+module evaluators
+MathEvaluator 1.0 MathEvaluator.qml
+PercentageEvaluator 1.0 PercentageEvaluator.qml
+UnitEvaluator 1.0 UnitEvaluator.qml
+BaseEvaluator 1.0 BaseEvaluator.qml
+TimeEvaluator 1.0 TimeEvaluator.qml
+ColorEvaluator 1.0 ColorEvaluator.qml

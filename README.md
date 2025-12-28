@@ -67,6 +67,37 @@ Developer tools panel with search and category filtering:
 - Disk Usage - Check disk space
 - Network Info - View network interfaces
 
+### Launcher
+Application launcher with instant evaluators and multiple search modes:
+
+**Search Types:**
+- **Apps** (`app:`, `a:`) - Search and launch desktop applications
+- **Commands** (`cmd:`, `$:`, `>:`) - Run shell commands with history
+- **System** (`sys:`) - Power actions (shutdown, reboot, suspend, lock, logout)
+
+**Instant Evaluators:**
+Real-time calculations displayed on the right side of the input as you type:
+
+| Type | Examples | Output |
+|------|----------|--------|
+| Math | `5 + 3`, `2^8`, `(10+5)*2` | `= 8`, `= 256`, `= 30` |
+| Percentage | `20% of 150`, `15% off 80` | `= 30`, `= 68` |
+| Units | `100km to miles`, `72f to c` | `= 62.14 miles`, `= 22.22°C` |
+| Base | `255 to hex`, `0xFF` | `= 0xFF`, `= 255 (dec)` |
+| Time | `2h 30m to minutes` | `= 150 min` |
+| Color | `#eb6f92`, `red to rgb` | Shows color swatch + formats |
+
+**Features:**
+- Press Enter to copy evaluator result to clipboard
+- Click on result to copy
+- Color swatch preview for color conversions
+- "Copied!" feedback animation
+
+**Keyboard Navigation:**
+- `↑`/`↓` or `Ctrl+K`/`Ctrl+J` - Navigate results
+- `Enter` - Activate selected / Copy eval result
+- `Escape` - Close launcher
+
 ### Notification Popups
 Toast notifications that appear when notifications arrive:
 - Stack from top-right corner (up to 5)
@@ -83,6 +114,7 @@ Toast notifications that appear when notifications arrive:
 - Pipewire (for audio controls)
 - NetworkManager (for WiFi controls)
 - BlueZ (for Bluetooth controls)
+- wl-clipboard (`wl-copy`) for launcher evaluator clipboard
 
 ## Installation
 
@@ -144,27 +176,66 @@ faiyt-qs/
 │   │       ├── Calendar.qml
 │   │       ├── Tools.qml
 │   │       └── ToolItem.qml
+│   ├── launcher/
+│   │   ├── LauncherState.qml    # Singleton launcher state + IPC
+│   │   ├── LauncherWindow.qml   # Launcher overlay window
+│   │   ├── LauncherEntry.qml    # Search input with evaluators
+│   │   ├── ResultItem.qml       # Search result item
+│   │   ├── Evaluator.qml        # Evaluator manager
+│   │   ├── results/             # Search providers
+│   │   │   ├── AppResults.qml
+│   │   │   ├── CommandResults.qml
+│   │   │   └── SystemResults.qml
+│   │   └── evaluators/          # Instant evaluators
+│   │       ├── MathEvaluator.qml
+│   │       ├── PercentageEvaluator.qml
+│   │       ├── UnitEvaluator.qml
+│   │       ├── BaseEvaluator.qml
+│   │       ├── TimeEvaluator.qml
+│   │       └── ColorEvaluator.qml
 │   └── notifications/
 │       ├── NotificationServer.qml  # Singleton notification daemon
 │       └── NotificationPopups.qml  # Popup windows
+├── scripts/
+│   └── toggle-launcher.sh       # IPC toggle script
 └── README.md
 ```
 
 ## Configuration
 
-### Sidebar Keybindings (Hyprland)
+### Keybindings (Hyprland)
 
 Add to your `hyprland.conf`:
 
 ```conf
+# Toggle launcher
+bind = SUPER, Space, exec, qs ipc call launcher toggle
+
 # Toggle right sidebar
-bind = SUPER, N, exec, quickshell -c 'SidebarState.rightOpen = !SidebarState.rightOpen'
+bind = SUPER, N, exec, qs ipc call sidebar toggleRight
 
 # Toggle left sidebar
-bind = SUPER, T, exec, quickshell -c 'SidebarState.leftOpen = !SidebarState.leftOpen'
+bind = SUPER, T, exec, qs ipc call sidebar toggleLeft
 ```
 
 Or use the bar's utility buttons to toggle sidebars.
+
+### IPC Commands
+
+The shell exposes IPC handlers for external control:
+
+```bash
+# Launcher
+qs ipc call launcher toggle      # Toggle launcher
+qs ipc call launcher show        # Show launcher
+qs ipc call launcher hide        # Hide launcher
+qs ipc call launcher search "firefox"  # Open with search query
+
+# Sidebars
+qs ipc call sidebar toggleLeft   # Toggle left sidebar
+qs ipc call sidebar toggleRight  # Toggle right sidebar
+qs ipc call sidebar closeAll     # Close all sidebars
+```
 
 ## Theme (Rosé Pine)
 
