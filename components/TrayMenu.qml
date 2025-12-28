@@ -8,9 +8,38 @@ PopupWindow {
     property var menu: null
     property var trayItem: null
 
+    signal menuClosed()
+
+    // Notify when menu is hidden
+    onVisibleChanged: {
+        if (!visible) {
+            menuClosed()
+        }
+    }
+
     implicitWidth: menuContent.width
     implicitHeight: menuContent.height
     color: "transparent"
+
+    // Fullscreen click catcher overlay
+    PopupWindow {
+        id: clickCatcher
+        anchor.window: QsWindow.window
+        anchor.rect: Qt.rect(0, 0, 1, 1)
+        anchor.edges: Edges.Top | Edges.Left
+
+        visible: menuPopup.visible
+
+        // Cover entire screen
+        implicitWidth: Screen.width
+        implicitHeight: Screen.height
+        color: "transparent"
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: menuPopup.visible = false
+        }
+    }
 
     QsMenuOpener {
         id: menuOpener
@@ -125,11 +154,4 @@ PopupWindow {
         }
     }
 
-    // Close menu when clicking outside
-    MouseArea {
-        parent: menuPopup.contentItem
-        anchors.fill: parent
-        z: -1
-        onClicked: menuPopup.visible = false
-    }
 }

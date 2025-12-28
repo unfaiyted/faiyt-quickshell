@@ -9,6 +9,24 @@ BarGroup {
     implicitWidth: trayRow.width + 16
     implicitHeight: 24
 
+    // Track currently open menu
+    property var activeMenu: null
+
+    function closeAllMenus() {
+        if (activeMenu) {
+            activeMenu.visible = false
+            activeMenu = null
+        }
+    }
+
+    function openMenu(menu) {
+        if (activeMenu && activeMenu !== menu) {
+            activeMenu.visible = false
+        }
+        activeMenu = menu
+        menu.visible = true
+    }
+
     // Only show if there are tray items
     visible: SystemTray.items.values.length > 0
 
@@ -42,15 +60,25 @@ BarGroup {
                     onClicked: (mouse) => {
                         if (mouse.button === Qt.LeftButton) {
                             if (trayData.onlyMenu && trayData.hasMenu) {
-                                trayMenu.visible = !trayMenu.visible
+                                if (trayMenu.visible) {
+                                    tray.closeAllMenus()
+                                } else {
+                                    tray.openMenu(trayMenu)
+                                }
                             } else {
+                                tray.closeAllMenus()
                                 trayData.activate()
                             }
                         } else if (mouse.button === Qt.MiddleButton) {
+                            tray.closeAllMenus()
                             trayData.secondaryActivate()
                         } else if (mouse.button === Qt.RightButton) {
                             if (trayData.hasMenu) {
-                                trayMenu.visible = !trayMenu.visible
+                                if (trayMenu.visible) {
+                                    tray.closeAllMenus()
+                                } else {
+                                    tray.openMenu(trayMenu)
+                                }
                             }
                         }
                     }
@@ -119,6 +147,12 @@ BarGroup {
                     }
                     anchor.edges: Edges.Bottom
                     anchor.gravity: Edges.Bottom
+
+                    onMenuClosed: {
+                        if (tray.activeMenu === trayMenu) {
+                            tray.activeMenu = null
+                        }
+                    }
                 }
             }
         }
