@@ -10,7 +10,7 @@ BarGroup {
     implicitHeight: 24
 
     // Only show if there are tray items
-    visible: SystemTray.items.count > 0
+    visible: SystemTray.items.values.length > 0
 
     Row {
         id: trayRow
@@ -18,7 +18,7 @@ BarGroup {
         spacing: 6
 
         Repeater {
-            model: SystemTray.items
+            model: SystemTray.items.values
 
             Image {
                 id: trayIcon
