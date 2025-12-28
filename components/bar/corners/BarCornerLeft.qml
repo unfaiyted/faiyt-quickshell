@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../../theme"
+import "../../sidebar"
 
 PanelWindow {
     id: cornerLeft
@@ -11,7 +12,7 @@ PanelWindow {
     }
 
     // Position below the bar
-    margins.top:0 
+    margins.top:0
 
     implicitWidth: 24
     implicitHeight: 24
@@ -37,5 +38,12 @@ PanelWindow {
         }
 
         Component.onCompleted: requestPaint()
+    }
+
+    // Click to toggle left sidebar
+    MouseArea {
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+        onClicked: SidebarState.toggleLeft()
     }
 }

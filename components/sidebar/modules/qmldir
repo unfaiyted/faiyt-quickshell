@@ -1,0 +1,11 @@
+module modules
+TabBar 1.0 TabBar.qml
+Header 1.0 Header.qml
+QuickToggles 1.0 QuickToggles.qml
+Notifications 1.0 Notifications.qml
+AudioControl 1.0 AudioControl.qml
+BluetoothPanel 1.0 BluetoothPanel.qml
+WiFiPanel 1.0 WiFiPanel.qml
+Tools 1.0 Tools.qml
+ToolItem 1.0 ToolItem.qml
+Calendar 1.0 Calendar.qml

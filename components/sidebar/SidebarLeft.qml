@@ -1,0 +1,124 @@
+import QtQuick
+import Quickshell
+import "../../theme"
+import "modules"
+
+PanelWindow {
+    id: leftSidebar
+
+    anchors {
+        top: true
+        bottom: true
+        left: true
+    }
+
+    property bool expanded: SidebarState.leftOpen
+
+    // Fixed width - includes padding space
+    implicitWidth: 396  // 380 + 8 left + 8 right padding
+    margins.top: 8     // Below the bar
+    exclusiveZone: 0
+    color: "transparent"
+
+    // Hide window when not expanded (after animation completes)
+    visible: expanded || slideAnimation.running
+
+    // Dark background to match overlay (fills entire window including padding)
+    Rectangle {
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.3)
+    }
+
+    // Clip container for smooth slide animation
+    Item {
+        anchors.fill: parent
+        anchors.margins: 8  // Internal padding
+        clip: true
+
+        // Sliding content panel
+        Rectangle {
+            id: contentPanel
+            width: parent.width
+            height: parent.height
+            radius: 16
+            color: Colors.background
+
+            // Slide from left: -width (hidden) to 0 (visible)
+            x: leftSidebar.expanded ? 0 : -width
+
+            Behavior on x {
+                NumberAnimation {
+                    id: slideAnimation
+                    duration: 250
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            // Content with fade
+            Item {
+                anchors.fill: parent
+                opacity: leftSidebar.expanded ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+                }
+
+                Column {
+                    anchors.fill: parent
+                    spacing: 0
+
+                    // Header
+                    Item {
+                        width: parent.width
+                        height: 56
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 16
+                            spacing: 12
+
+                            Text {
+                                text: "󰦖"
+                                font.family: "Symbols Nerd Font"
+                                font.pixelSize: 24
+                                color: Colors.primary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: "Tools"
+                                font.pixelSize: 18
+                                font.bold: true
+                                color: Colors.foreground
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            height: 1
+                            color: Colors.border
+                        }
+                    }
+
+                    // Tools module
+                    Tools {
+                        width: parent.width
+                        height: parent.height - 56
+                    }
+                }
+            }
+
+            // Subtle border
+            Rectangle {
+                anchors.fill: parent
+                radius: 16
+                color: "transparent"
+                border.width: 1
+                border.color: Colors.border
+            }
+        }
+    }
+}
