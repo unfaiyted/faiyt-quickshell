@@ -19,7 +19,12 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
   - Network download speed (% of max bandwidth)
   - Network upload speed (% of max bandwidth)
 - **Battery** - Battery level with charging indicator
-- **Music** - MPRIS media player controls (play/pause, track info)
+- **Music** - MPRIS media player with interactive tooltip:
+  - Album art display with fallback placeholder
+  - Track info (title, artist, album)
+  - Seekable progress bar with time display
+  - Playback controls (previous, play/pause, next)
+  - Click outside to dismiss
 - **System Tray** - Application tray icons with tooltips and menus
 - **Network** - Connection status indicator
 - **Weather** - Current weather display
