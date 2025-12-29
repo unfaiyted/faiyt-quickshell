@@ -6,9 +6,18 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
 
 ### Top Bar
 - **Clock** - Time display with click to open calendar
-- **Workspaces** - Hyprland workspace indicators with click navigation
-- **Window Title** - Active window name display
-- **System Resources** - CPU, RAM, and temperature monitors
+- **Workspaces** - Hyprland workspace indicators with:
+  - Click to switch workspace
+  - Hover for live window preview tooltip
+  - Click windows in tooltip to focus them
+  - Middle-click windows to close them
+- **Window Title** - Active window name with app icon
+- **System Resources** - Resource monitors with circular progress and nerd font icons:
+  - RAM usage with used/total details
+  - Swap usage
+  - CPU usage with load average
+  - Network download speed (% of max bandwidth)
+  - Network upload speed (% of max bandwidth)
 - **Battery** - Battery level with charging indicator
 - **Music** - MPRIS media player controls (play/pause, track info)
 - **System Tray** - Application tray icons with tooltips and menus
@@ -112,18 +121,42 @@ Screenshot and screen recording functionality with area selection:
 - Copied to clipboard automatically
 
 **Screen Recording:**
-- Click the recording button to start (red pulsing indicator when active)
+- Left-click the recording button to start (red pulsing indicator when active)
+- Right-click to select recording mode before starting
 - Select area with slurp
 - Click again to stop recording
-- Saved to `~/Videos/Recordings/` as VP9/MKV
+- Saved to `~/Videos/Recordings/` as MP4 (NVENC hardware encoding)
 - File path copied to clipboard on completion
 - Desktop notification on save
+
+**Recording Modes** (right-click menu):
+- **Standard** - Regular MP4 recording with hardware H.264
+- **High Quality** - 60fps, high bitrate for YouTube uploads
+- **GIF** - Records at 15fps, auto-converts to optimized GIF
 
 **Recording Targets:**
 - `selection` - Record selected area (default)
 - `eDP-1` - Record primary display
 - `HDMI-A-1` - Record external display
 - `stop` - Stop current recording
+
+### Overview Mode
+Full-screen workspace overview with live window previews:
+
+- **2x5 Workspace Grid** - Shows all 10 workspaces at once
+- **Live Window Previews** - Real-time screencopy of all windows
+- **App Icons** - Centered icon overlay on each window
+- **Keyboard Navigation**:
+  - Arrow keys or `hjkl` - Move between workspaces
+  - Number keys `1-9`, `0` - Jump to specific workspace
+  - `Enter` - Activate selected workspace
+  - `Escape` - Close overview
+- **Mouse Actions**:
+  - Click workspace - Switch to it
+  - Click window - Focus and close overview
+  - Middle-click window - Close window
+  - Drag window - Move to different workspace
+- **Click outside** to close
 
 ### Notification Popups
 Toast notifications that appear when notifications arrive:
@@ -234,16 +267,28 @@ faiyt-qs/
 │   │       ├── BaseEvaluator.qml
 │   │       ├── TimeEvaluator.qml
 │   │       └── ColorEvaluator.qml
-│   └── notifications/
-│       ├── NotificationServer.qml  # Singleton notification daemon
-│       └── NotificationPopups.qml  # Popup windows
+│   ├── notifications/
+│   │   ├── NotificationServer.qml  # Singleton notification daemon
+│   │   └── NotificationPopups.qml  # Popup windows
+│   └── overview/
+│       ├── Overview.qml          # Main overview entry with IPC
+│       ├── OverviewState.qml     # Singleton state
+│       ├── OverviewWidget.qml    # Workspace grid layout
+│       ├── OverviewWindow.qml    # Individual window preview
+│       └── HyprlandData.qml      # Hyprctl data singleton
 ├── scripts/
-│   ├── screen-capture.sh        # Screenshot and recording script
-│   └── slurp-to-file.sh         # Helper for area selection
+│   └── screen-capture.sh        # Screenshot and recording script
 └── README.md
 ```
 
 ## Configuration
+
+### Environment Variables
+
+```bash
+# Set max network speed for system resources (in Mbps)
+export QS_NET_SPEED_MBPS=930
+```
 
 ### Keybindings (Hyprland)
 
@@ -252,6 +297,9 @@ Add to your `hyprland.conf`:
 ```conf
 # Toggle launcher
 bind = SUPER, Space, exec, qs ipc call launcher toggle
+
+# Toggle overview
+bind = SUPER, Tab, exec, qs ipc call overview toggle
 
 # Toggle right sidebar
 bind = SUPER, N, exec, qs ipc call sidebar toggleRight
@@ -288,6 +336,19 @@ qs ipc call recording start selection  # Start recording selected area
 qs ipc call recording start eDP-1      # Start recording primary display
 qs ipc call recording stop       # Stop current recording
 qs ipc call recording status     # Check if recording (returns "recording" or "idle")
+qs ipc call recording setMode record      # Set to standard mode
+qs ipc call recording setMode record-hq   # Set to high quality mode
+qs ipc call recording setMode record-gif  # Set to GIF mode
+qs ipc call recording getMode    # Get current recording mode
+
+# Overview
+qs ipc call overview toggle      # Toggle overview mode
+qs ipc call overview open        # Open overview
+qs ipc call overview close       # Close overview
+
+# System Resources
+qs ipc call sysresources setNetSpeed 930  # Set max network speed in Mbps
+qs ipc call sysresources getNetSpeed      # Get current max network speed
 ```
 
 ## Theme (Rosé Pine)

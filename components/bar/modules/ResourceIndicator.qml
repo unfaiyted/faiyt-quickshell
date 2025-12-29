@@ -7,17 +7,19 @@ Item {
     id: indicator
 
     property string label: ""
+    property string icon: ""  // Nerd font icon
     property int value: 0
     property color indicatorColor: Colors.foreground
     property string tooltipText: ""  // Optional extra info for tooltip
 
-    width: 20
-    height: 20
+    width: 24
+    height: 24
 
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
     }
 
     // Tooltip popup
@@ -39,7 +41,7 @@ Item {
 
         Rectangle {
             id: tooltipContent
-            width: tooltipColumn.width + 25
+            width: Math.max(tooltipColumn.width + 25, 80)
             height: tooltipColumn.height + 12
             color: Colors.surface
             radius: 6
@@ -71,7 +73,9 @@ Item {
                     text: indicator.tooltipText
                     color: Colors.muted
                     font.pixelSize: 9
+                    horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
+                    lineHeight: 1.2
                 }
             }
         }
@@ -134,12 +138,12 @@ Item {
         Component.onCompleted: requestPaint()
     }
 
-    // Value text
+    // Icon text (nerd font)
     Text {
         anchors.centerIn: parent
-        text: indicator.value
-        font.pixelSize: 8
-        font.bold: true
+        text: indicator.icon
+        font.pixelSize: 12
+        font.family: "Symbols Nerd Font"
         color: indicator.indicatorColor
     }
 }
