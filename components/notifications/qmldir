@@ -1,3 +1,4 @@
 module notifications
 singleton NotificationState 1.0 NotificationServer.qml
 NotificationPopups 1.0 NotificationPopups.qml
+NotificationItem 1.0 NotificationItem.qml

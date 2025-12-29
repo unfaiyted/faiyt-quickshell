@@ -1,60 +1,120 @@
+pragma ComponentBehavior: Bound
 pragma Singleton
+
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
 
-// Singleton notification server - only one can exist
 Singleton {
-    id: notificationState
+    id: root
 
     property bool doNotDisturb: false
-    property var popupNotifications: []
+    property list<Notif> notifications
 
-    // The actual notification server
+    // Default timeout settings
+    readonly property int defaultTimeoutMs: 5000
+    readonly property int defaultUrgentTimeoutMs: 10000
+
     NotificationServer {
         id: server
+        keepOnReload: false
+        actionsSupported: true
+        bodyHyperlinksSupported: true
+        bodyImagesSupported: true
+        bodyMarkupSupported: true
+        imageSupported: true
 
         onNotification: notification => {
-            // Always track notifications for the panel
             notification.tracked = true
 
-            // Add to popup queue if not in DND mode
-            if (!notificationState.doNotDisturb) {
-                let popups = notificationState.popupNotifications.slice()
-                popups.unshift(notification)
-                // Limit to 5 popups at a time
-                if (popups.length > 5) {
-                    popups = popups.slice(0, 5)
+            // Skip popups if DND is enabled (but still track)
+            if (root.doNotDisturb) return
+
+            const notifObj = notifComponent.createObject(root, {
+                notification: notification
+            })
+            root.notifications.push(notifObj)
+        }
+    }
+
+    // Expose tracked notifications for sidebar
+    property alias trackedNotifications: server.trackedNotifications
+
+    // Notification wrapper component
+    component Notif: QtObject {
+        id: notif
+        required property Notification notification
+
+        readonly property string summary: notification.summary
+        readonly property string body: notification.body
+        readonly property string appIcon: notification.appIcon
+        readonly property string appName: notification.appName
+        readonly property string image: notification.image
+        readonly property int urgency: notification.urgency
+        readonly property var actions: notification.actions
+
+        function remove() {
+            const idx = root.notifications.indexOf(notif)
+            if (idx !== -1) {
+                root.notifications.splice(idx, 1)
+            }
+        }
+
+        function dismiss() {
+            notification.dismiss()
+            remove()
+        }
+
+        readonly property Timer timer: Timer {
+            running: true
+            interval: {
+                if (notif.notification.expireTimeout > 0) {
+                    return notif.notification.expireTimeout
                 }
-                notificationState.popupNotifications = popups
+                if (notif.urgency === NotificationUrgency.Critical) {
+                    return root.defaultUrgentTimeoutMs
+                }
+                return root.defaultTimeoutMs
+            }
+            onTriggered: {
+                notif.remove()
+            }
+        }
+
+        readonly property Connections conn: Connections {
+            target: notif.notification.Retainable
+            function onDropped(): void {
+                const idx = root.notifications.indexOf(notif)
+                if (idx !== -1) {
+                    root.notifications.splice(idx, 1)
+                }
+            }
+            function onAboutToDestroy(): void {
+                notif.destroy()
             }
         }
     }
 
-    // Expose the tracked notifications
-    property alias trackedNotifications: server.trackedNotifications
-
-    // Remove a notification from popup list
-    function dismissPopup(notification) {
-        let popups = notificationState.popupNotifications.filter(n => n !== notification)
-        notificationState.popupNotifications = popups
+    Component {
+        id: notifComponent
+        Notif {}
     }
 
-    // Clear all popups
-    function clearPopups() {
-        notificationState.popupNotifications = []
-    }
-
-    // Get notification count
+    // Helper functions
     function count() {
         return server.trackedNotifications.values.length
     }
 
-    // Clear all tracked notifications
     function clearAll() {
         let notifs = server.trackedNotifications.values
         for (let i = notifs.length - 1; i >= 0; i--) {
             notifs[i].dismiss()
+        }
+    }
+
+    function clearPopups() {
+        while (notifications.length > 0) {
+            notifications[0].remove()
         }
     }
 }
