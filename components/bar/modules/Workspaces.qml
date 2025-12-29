@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Hyprland
 import "../../../theme"
 import ".."
@@ -9,12 +10,11 @@ Rectangle {
     color: Colors.backgroundElevated
     radius: 16
     implicitWidth: row.width + 12
-    implicitHeight: 24 
+    implicitHeight: 24
 
     // Helper function to check if workspace is occupied
     function isWorkspaceOccupied(wsId) {
-        for (let i = 0; i < Hyprland.workspaces.length; i++) {
-            let ws = Hyprland.workspaces[i];
+        for (let ws of Hyprland.workspaces.values) {
             if (ws.id === wsId) {
                 return true;
             }
@@ -57,9 +57,35 @@ Rectangle {
                 }
 
                 MouseArea {
+                    id: wsMouseArea
                     anchors.fill: parent
+                    hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: Hyprland.dispatch("workspace " + wsIndicator.wsId)
+                }
+
+                // Tooltip for each workspace indicator
+                PopupWindow {
+                    id: wsTooltip
+                    anchor.window: QsWindow.window
+                    anchor.onAnchoring: {
+                        const pos = wsIndicator.mapToItem(QsWindow.window.contentItem, 0, wsIndicator.height)
+                        anchor.rect = Qt.rect(pos.x, pos.y, wsIndicator.width, 7)
+                    }
+                    anchor.edges: Edges.Bottom
+                    anchor.gravity: Edges.Bottom
+
+                    visible: wsMouseArea.containsMouse && wsIndicator.isOccupied
+
+                    implicitWidth: tooltipContent.width
+                    implicitHeight: tooltipContent.height
+                    color: "transparent"
+
+                    WorkspaceTooltip {
+                        id: tooltipContent
+                        workspaceId: wsIndicator.wsId
+                        isVisible: wsTooltip.visible
+                    }
                 }
             }
         }

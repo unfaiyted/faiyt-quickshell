@@ -69,7 +69,7 @@ BarGroup {
         anchor.window: QsWindow.window
         anchor.onAnchoring: {
             const pos = weather.mapToItem(QsWindow.window.contentItem, 0, weather.height)
-            anchor.rect = Qt.rect(pos.x, pos.y, weather.width, 1)
+            anchor.rect = Qt.rect(pos.x - 70, pos.y, weather.width, 7)
         }
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom

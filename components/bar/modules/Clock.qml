@@ -50,7 +50,7 @@ BarGroup {
         anchor.window: QsWindow.window
         anchor.onAnchoring: {
             const pos = clockContainer.mapToItem(QsWindow.window.contentItem, 0, clockContainer.height)
-            anchor.rect = Qt.rect(pos.x, pos.y, clockContainer.width, 1)
+            anchor.rect = Qt.rect(pos.x, pos.y, clockContainer.width, 7)
         }
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom
