@@ -33,20 +33,31 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        // Center section
-        Row {
+        // Center-Middle: Workspaces (always perfectly centered)
+        Workspaces {
+            id: workspaces
             anchors.centerIn: parent
+        }
+
+        // Center-Left: System Resources (anchored to left of Workspaces)
+        Row {
+            anchors.right: workspaces.left
+            anchors.rightMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
-            // Center-Left: System Resources + Music
             SystemResources {}
-            Music {}
+        }
 
-            // Center-Middle: Workspaces
-            Workspaces {}
+        // Center-Right: Utilities + Music (anchored to right of Workspaces)
+        Row {
+            anchors.left: workspaces.right
+            anchors.leftMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
 
-            // Center-Right: Utilities
             Utilities {}
+            Music {}
         }
 
         // Right section
