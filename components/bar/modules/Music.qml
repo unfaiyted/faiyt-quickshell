@@ -13,7 +13,52 @@ BarGroup {
     // Only show if there's a player
     visible: Mpris.players.values.length > 0
 
-    property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
+    // Track the last active player (most recently playing)
+    property string lastActivePlayerId: ""
+
+    // Get the active player (prefer last active, then playing, then any with track)
+    function getActivePlayer() {
+        let players = Mpris.players.values
+        if (players.length === 0) return null
+
+        // Check if any player just started playing (switch to it)
+        for (let p of players) {
+            if (p && p.isPlaying) {
+                // A player is playing - make it the last active
+                lastActivePlayerId = p.identity || p.name || ""
+                return p
+            }
+        }
+
+        // No player is currently playing - stick with last active player if available
+        if (lastActivePlayerId) {
+            for (let p of players) {
+                if (p && (p.identity === lastActivePlayerId || p.name === lastActivePlayerId)) {
+                    return p
+                }
+            }
+        }
+
+        // Fallback: return first player with a track
+        for (let p of players) {
+            if (p && p.trackTitle) return p
+        }
+
+        // Last fallback: first player
+        return players[0]
+    }
+
+    // Active player - auto-switches only when a new player starts playing
+    property var player: getActivePlayer()
+
+    // Timer to check for player state changes
+    Timer {
+        interval: 500
+        running: Mpris.players.values.length > 0
+        repeat: true
+        onTriggered: musicModule.player = getActivePlayer()
+    }
+
     property string trackTitle: player ? (player.trackTitle || "") : ""
     property string trackArtist: player ? (player.trackArtist || "") : ""
     property string trackAlbum: player ? (player.trackAlbum || "") : ""
@@ -107,7 +152,7 @@ BarGroup {
         }
     }
 
-    // Click-away overlay
+    // Click-away overlay with ESC key and distance-based auto-close
     PopupWindow {
         id: clickAwayOverlay
         anchor.window: QsWindow.window
@@ -120,9 +165,50 @@ BarGroup {
         height: Screen.height
         color: "transparent"
 
+        // Take focus when visible to receive key events
+        onVisibleChanged: {
+            if (visible) {
+                overlayFocusScope.forceActiveFocus()
+            }
+        }
+
+        FocusScope {
+            id: overlayFocusScope
+            anchors.fill: parent
+            focus: true
+
+            Keys.onEscapePressed: tooltip.hide()
+        }
+
         MouseArea {
             anchors.fill: parent
+            hoverEnabled: true
+
+            // Close on click
             onClicked: tooltip.hide()
+
+            // Track mouse position for distance-based auto-close
+            onPositionChanged: function(mouse) {
+                if (!tooltip.visible) return
+
+                // Get tooltip position
+                const tooltipPos = musicModule.mapToItem(null, 0, musicModule.height)
+                const tooltipX = tooltipPos.x
+                const tooltipY = tooltipPos.y + 7  // Account for anchor offset
+                const tooltipWidth = 280
+                const tooltipHeight = 200  // Approximate
+
+                // Calculate distance from mouse to tooltip bounds
+                const distX = mouse.x < tooltipX ? tooltipX - mouse.x :
+                              mouse.x > tooltipX + tooltipWidth ? mouse.x - (tooltipX + tooltipWidth) : 0
+                const distY = mouse.y < tooltipY ? tooltipY - mouse.y :
+                              mouse.y > tooltipY + tooltipHeight ? mouse.y - (tooltipY + tooltipHeight) : 0
+
+                // Close if mouse is more than 150px away from tooltip
+                if (distX > 150 || distY > 150) {
+                    tooltip.hide()
+                }
+            }
         }
     }
 
