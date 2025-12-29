@@ -8,7 +8,7 @@ BarGroup {
     id: network
 
     implicitWidth: networkText.width + 16
-    implicitHeight: 24
+    implicitHeight: 30 
 
     property string status: "?"
     property bool connected: false

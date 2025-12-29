@@ -17,7 +17,7 @@ PanelWindow {
     exclusiveZone: implicitHeight
 
     // Bar height
-    implicitHeight: 32
+    implicitHeight: 40 
 
     // Background color
     color: Colors.background

@@ -8,7 +8,7 @@ BarGroup {
     id: tray
 
     implicitWidth: trayRow.width + 16
-    implicitHeight: 24
+    implicitHeight: 30 
 
     // Track currently open menu
     property var activeMenu: null

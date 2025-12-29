@@ -8,6 +8,7 @@ import "components/sidebar"
 import "components/notifications"
 import "components/wallpaper"
 import "components/launcher"
+import "components/overview"
 
 ShellRoot {
     id: root
@@ -31,4 +32,5 @@ ShellRoot {
     NotificationPopups {}
     WallpaperWindow {}
     LauncherWindow {}
+    Overview {}
 }

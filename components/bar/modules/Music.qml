@@ -8,7 +8,7 @@ BarGroup {
     id: musicModule
 
     implicitWidth: content.width + 16
-    implicitHeight: 24
+    implicitHeight: 30 
 
     // Only show if there's a player
     visible: Mpris.players.values.length > 0

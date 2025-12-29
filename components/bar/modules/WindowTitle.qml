@@ -7,7 +7,7 @@ BarGroup {
     id: windowTitle
 
     implicitWidth: content.width + 20
-    implicitHeight: 20 
+    implicitHeight: 30 
 
     property string title: Hyprland.activeToplevel
         ? Hyprland.activeToplevel.title

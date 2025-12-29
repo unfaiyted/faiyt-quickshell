@@ -8,7 +8,7 @@ BarGroup {
     id: utilities
 
     implicitWidth: utilRow.width + 16
-    implicitHeight: 24
+    implicitHeight: 30 
 
     Row {
         id: utilRow

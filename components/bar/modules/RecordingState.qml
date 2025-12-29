@@ -9,6 +9,9 @@ Singleton {
     // Recording state
     property bool isRecording: false
 
+    // Recording mode: "record", "record-hq", "record-gif"
+    property string recordingMode: "record"
+
     // Script path - using home directory
     property string homeDir: Quickshell.env("HOME") || "/home/faiyt"
     property string scriptPath: homeDir + "/codebase/faiyt-qs/scripts/screen-capture.sh"
@@ -39,6 +42,18 @@ Singleton {
         function status(): string {
             return recordingState.isRecording ? "recording" : "idle"
         }
+
+        function setMode(mode: string): string {
+            if (mode === "record" || mode === "record-hq" || mode === "record-gif") {
+                recordingState.recordingMode = mode
+                return "mode set to: " + mode
+            }
+            return "invalid mode: " + mode
+        }
+
+        function getMode(): string {
+            return recordingState.recordingMode
+        }
     }
 
     // Poll recording status every 500ms
@@ -62,83 +77,10 @@ Singleton {
         }
     }
 
-    // Helper script path for slurp
-    property string slurpScriptPath: homeDir + "/codebase/faiyt-qs/scripts/slurp-to-file.sh"
-
-    // Clear temp file before running slurp
-    Process {
-        id: clearTempFile
-        command: ["rm", "-f", "/tmp/qs-slurp-geometry.txt"]
-
-        onExited: function(exitCode, exitStatus) {
-            console.log("Cleared temp file, launching slurp via hyprctl...")
-            slurpProc.running = true
-        }
-    }
-
-    // Use hyprctl to run slurp in Hyprland's context
-    Process {
-        id: slurpProc
-        command: ["hyprctl", "dispatch", "exec", slurpScriptPath]
-
-        onExited: function(exitCode, exitStatus) {
-            console.log("hyprctl dispatch exited:", exitCode)
-            // Wait a moment for slurp to complete and write file
-            slurpWaitTimer.start()
-        }
-    }
-
-    Timer {
-        id: slurpWaitTimer
-        interval: 100
-        repeat: true
-        property int attempts: 0
-
-        onTriggered: {
-            attempts++
-            // Check if geometry file exists and has content
-            geometryReader.running = true
-            if (attempts > 100) { // 10 second timeout
-                console.log("Slurp timeout")
-                stop()
-            }
-        }
-    }
-
-    // Read the geometry from temp file
-    Process {
-        id: geometryReader
-        command: ["cat", "/tmp/qs-slurp-geometry.txt"]
-
-        stdout: SplitParser {
-            onRead: data => {
-                var geo = data.trim()
-                if (geo !== "" && geo.indexOf(",") !== -1) {
-                    console.log("Got geometry:", geo)
-                    slurpWaitTimer.stop()
-                    slurpWaitTimer.attempts = 0
-                    recordProc.geometry = geo
-                }
-            }
-        }
-    }
-
-    // Recording control process
+    // Recording control process - uses hyprctl dispatch exec to run script
+    // This ensures slurp runs in the proper Hyprland context
     Process {
         id: recordProc
-        property string geometry: ""
-        property string action: ""
-        // Use wf-recorder directly with geometry, or script for other actions
-        command: {
-            if (geometry !== "") {
-                return ["wf-recorder", "-g", geometry, "-f",
-                    homeDir + "/Videos/Recordings/" + Qt.formatDateTime(new Date(), "yyyy-MM-dd_hh-mm-ss") + ".mkv",
-                    "-c", "libvpx-vp9", "--pixel-format", "yuv420p"]
-            } else if (action !== "") {
-                return [scriptPath, "record", action]
-            }
-            return []
-        }
 
         stdout: SplitParser {
             onRead: data => console.log("recordProc stdout:", data)
@@ -148,29 +90,20 @@ Singleton {
             onRead: data => console.log("recordProc stderr:", data)
         }
 
-        onGeometryChanged: {
-            if (geometry !== "") {
-                console.log("Starting wf-recorder with geometry:", geometry)
-                running = true
-            }
-        }
-
-        onActionChanged: {
-            if (action !== "") {
-                console.log("Starting recording with action:", action)
-                running = true
-            }
-        }
-
         onStarted: {
-            console.log("recordProc started successfully")
+            console.log("recordProc started")
         }
 
         onExited: function(exitCode, exitStatus) {
-            console.log("Recording process exited:", exitCode, exitStatus)
-            geometry = ""
-            action = ""
+            console.log("Recording dispatch exited:", exitCode, exitStatus)
         }
+    }
+
+    function launchRecording(target) {
+        var cmd = scriptPath + " " + recordingMode + " " + target
+        console.log("Launching recording command:", cmd)
+        recordProc.command = ["hyprctl", "dispatch", "exec", cmd]
+        recordProc.running = true
     }
 
     // Check if recording is active
@@ -197,16 +130,8 @@ Singleton {
         }
 
         var t = target || "selection"
-        console.log("Starting recording:", t)
-
-        if (t === "selection") {
-            // Clear temp file and use slurp to get geometry
-            console.log("Launching slurp for selection...")
-            clearTempFile.running = true
-        } else {
-            // For monitor targets, use the script directly
-            recordProc.action = t
-        }
+        console.log("Starting recording:", recordingMode, t)
+        launchRecording(t)
     }
 
     // Stop recording process

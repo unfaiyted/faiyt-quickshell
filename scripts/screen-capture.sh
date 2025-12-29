@@ -16,14 +16,14 @@ Commands:
       HDMI-A-1            - Screenshot HDMI-A-1 display
       both                - Screenshot both displays
 
-  record <target>        Start/stop recording
+  record <target>        Start/stop recording (MP4, NVENC H.264)
     Targets:
       selection           - Record selected area
       eDP-1              - Record eDP-1 display
       HDMI-A-1           - Record HDMI-A-1 display
       stop               - Stop current recording
 
-  record-hq <target>     Start/stop high-quality recording (for YouTube)
+  record-hq <target>     Start/stop high-quality recording (60fps, high bitrate)
     Targets:
       selection           - Record selected area in high quality
       eDP-1              - Record eDP-1 display in high quality
@@ -41,10 +41,10 @@ Commands:
 
   convert <format>       Convert recordings
     Formats:
-      webm               - Convert MKV files to WebM
-      iphone             - Convert MKV files for iPhone
-      youtube            - Convert MKV files for YouTube (high quality)
-      gif                - Convert MKV/MP4 files to GIF
+      webm               - Convert MP4 files to WebM
+      iphone             - Convert MP4 files for iPhone
+      youtube            - Convert MP4 files for YouTube (high quality)
+      gif                - Convert MP4 files to GIF
 
 Examples:
   $SCRIPT_NAME screenshot selection
@@ -72,69 +72,40 @@ wf-recorder_check() {
   fi
 }
 
-# Function to record with standard settings
+# Function to record with standard settings (hardware-accelerated H.264 for Discord/Slack compatibility)
 record_video() {
   local output_file="$1"
   shift
-  
-  wf-recorder "$@" -f "$output_file" -c libvpx-vp9 --pixel-format yuv420p -F "eq=brightness=0.12:contrast=1.1"
+
+  # Use NVENC for NVIDIA GPUs
+  wf-recorder "$@" -f "$output_file" -c h264_nvenc --pixel-format yuv420p
 }
 
+# High quality recording for YouTube (hardware-accelerated)
 record_high_quality() {
   local output_file="$1"
   shift
-  
-  # High quality settings for YouTube uploads
-  # - h264_vaapi for hardware encoding (if available) or libx264 for software
-  # - yuv420p pixel format for maximum compatibility
-  # - High bitrate (8000k) for quality
-  # - GOP size of 30 for better seeking
-  # - Preset 'slow' for better compression efficiency
-  # - CRF 18 for high quality (lower = better quality, 0-51 scale)
-  # - Audio at 192k bitrate
-  # - 60 FPS for smooth motion
-  # - No color filters to maintain original colors
-  
-  # Check if VAAPI hardware encoding is available
-  if vainfo &>/dev/null && wf-recorder --help | grep -q "h264_vaapi"; then
-    # Use hardware encoding for better performance
-    wf-recorder "$@" -f "$output_file" \
-      -c h264_vaapi \
-      -p "preset=slow" \
-      -p "crf=18" \
-      -r 60 \
-      -b 8000000 \
-      -B 192000 \
-      --pixel-format yuv420p \
-      -g 30
-  else
-    # Fallback to software encoding
-    wf-recorder "$@" -f "$output_file" \
-      -c libx264 \
-      -p "preset=slow" \
-      -p "crf=18" \
-      -r 60 \
-      -b 8000000 \
-      -B 192000 \
-      --pixel-format yuv420p \
-      -g 30
-  fi
+
+  # Use NVENC for NVIDIA GPUs with high quality settings
+  wf-recorder "$@" -f "$output_file" \
+    -c h264_nvenc \
+    -r 60 \
+    -b 12000000 \
+    -B 192000 \
+    --pixel-format yuv420p
 }
 
 record_gif() {
   local output_file="$1"
   shift
-  
-  # Record temporary video first (MKV format for better quality)
-  local temp_video="/tmp/gif_recording_$(date +%s).mkv"
+
+  # Record temporary video first
+  local temp_video="/tmp/gif_recording_$(date +%s).mp4"
   echo "$temp_video" >/tmp/gif_temp_video.txt
-  
-  # GIF-optimized recording settings:
-  # - Lower framerate (15 fps) for smaller file size
-  # - No audio recording
-  # - Standard codec for compatibility
+
+  # GIF-optimized recording (15 fps, no audio) - Use NVENC for NVIDIA GPUs
   wf-recorder "$@" -f "$temp_video" \
-    -c libvpx-vp9 \
+    -c h264_nvenc \
     -r 15 \
     --pixel-format yuv420p \
     --no-audio
@@ -174,7 +145,7 @@ TARGET="$2"
 
 # Set up file paths
 IMG="${HOME}/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%m-%s).png"
-VID="${HOME}/Videos/Recordings/$(date +%Y-%m-%d_%H-%m-%s).mkv"
+VID="${HOME}/Videos/Recordings/$(date +%Y-%m-%d_%H-%m-%s).mp4"
 
 case "$COMMAND" in
   "screenshot")
@@ -325,20 +296,19 @@ case "$COMMAND" in
         RECORDING_DIR="${HOME}/Videos/Recordings"
         CONVERTED=0
         TOTAL=0
-        
-        for mkv_file in "${RECORDING_DIR}"/*.mkv; do
-          if [ -f "$mkv_file" ]; then
+
+        for mp4_file in "${RECORDING_DIR}"/*.mp4; do
+          if [ -f "$mp4_file" ]; then
             TOTAL=$((TOTAL+1))
-            webm_file="${mkv_file%.mkv}.webm"
-            
+            webm_file="${mp4_file%.mp4}.webm"
+
             # Check if webm version doesn't already exist
             if [ ! -f "$webm_file" ]; then
-              # Simpler ffmpeg command with basic settings
-              ffmpeg -y -i "$mkv_file" -c:v libvpx -b:v 1M -c:a libvorbis "$webm_file" 2>/tmp/ffmpeg_error.log
-              
+              ffmpeg -y -i "$mp4_file" -c:v libvpx -b:v 1M -c:a libvorbis "$webm_file" 2>/tmp/ffmpeg_error.log
+
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
-                notify-send "Converted to WebM" "$(basename "$mkv_file")"
+                notify-send "Converted to WebM" "$(basename "$mp4_file")"
               else
                 error=$(cat /tmp/ffmpeg_error.log | tail -n 5)
                 notify-send "Conversion Failed" "Error: $error"
@@ -346,11 +316,11 @@ case "$COMMAND" in
             fi
           fi
         done
-        
+
         if [ $TOTAL -eq 0 ]; then
-          notify-send "WebM Conversion" "No MKV files found in Recordings folder"
+          notify-send "WebM Conversion" "No MP4 files found in Recordings folder"
         else
-          notify-send "WebM Conversion Complete" "Converted $CONVERTED out of $TOTAL MKV files"
+          notify-send "WebM Conversion Complete" "Converted $CONVERTED out of $TOTAL MP4 files"
         fi
         ;;
 
@@ -366,28 +336,27 @@ case "$COMMAND" in
         SKIPPED_IPHONE=0
         SKIPPED_EXISTING=0
         TOTAL_FILES=0
-        
-        for mkv_file in "${RECORDING_DIR}"/*.mkv; do
-          if [ -f "$mkv_file" ]; then
+
+        for mp4_file in "${RECORDING_DIR}"/*.mp4; do
+          if [ -f "$mp4_file" ]; then
             TOTAL_FILES=$((TOTAL_FILES+1))
-            base_filename=$(basename "$mkv_file")
-            
+            base_filename=$(basename "$mp4_file")
+
             # Skip files with "iphone" in the filename
             if [[ $base_filename == *"iphone"* ]]; then
               SKIPPED_IPHONE=$((SKIPPED_IPHONE+1))
               continue
             fi
-            
-            iphone_file="${mkv_file%.mkv}-iphone.mp4"
-            
+
+            iphone_file="${mp4_file%.mp4}-iphone.mp4"
+
             # Check if iPhone version doesn't already exist
             if [ ! -f "$iphone_file" ]; then
-              # Simpler ffmpeg command for iPhone compatibility
-              ffmpeg -y -i "$mkv_file" -vcodec h264 -acodec aac "$iphone_file" 2>/tmp/ffmpeg_error.log
-              
+              ffmpeg -y -i "$mp4_file" -vcodec h264 -acodec aac "$iphone_file" 2>/tmp/ffmpeg_error.log
+
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
-                notify-send "Converted for iPhone" "$(basename "$mkv_file")"
+                notify-send "Converted for iPhone" "$(basename "$mp4_file")"
               else
                 error=$(cat /tmp/ffmpeg_error.log | tail -n 5)
                 notify-send "Conversion Failed" "Error: $error"
@@ -397,9 +366,9 @@ case "$COMMAND" in
             fi
           fi
         done
-        
+
         if [ $TOTAL_FILES -eq 0 ]; then
-          notify-send "iPhone Conversion" "No MKV files found in Recordings folder"
+          notify-send "iPhone Conversion" "No MP4 files found in Recordings folder"
         else
           notify-send "iPhone Conversion Complete" "Converted: $CONVERTED files
 Skipped (already iPhone): $SKIPPED_IPHONE files
@@ -420,36 +389,24 @@ Total files checked: $TOTAL_FILES"
         SKIPPED_YOUTUBE=0
         SKIPPED_EXISTING=0
         TOTAL_FILES=0
-        
-        # Process both MKV and MP4 files
-        for video_file in "${RECORDING_DIR}"/*.{mkv,mp4}; do
+
+        for video_file in "${RECORDING_DIR}"/*.mp4; do
           if [ -f "$video_file" ]; then
             TOTAL_FILES=$((TOTAL_FILES+1))
             base_filename=$(basename "$video_file")
-            
+
             # Skip files already marked as YouTube uploads
             if [[ $base_filename == *"youtube"* ]]; then
               SKIPPED_YOUTUBE=$((SKIPPED_YOUTUBE+1))
               continue
             fi
-            
-            # Create YouTube optimized filename
-            youtube_file="${video_file%.*}-youtube.mp4"
-            
+
+            youtube_file="${video_file%.mp4}-youtube.mp4"
+
             # Check if YouTube version doesn't already exist
             if [ ! -f "$youtube_file" ]; then
               notify-send "Converting for YouTube" "Processing: $(basename "$video_file")"
-              
-              # YouTube recommended settings:
-              # - H.264 codec with High profile
-              # - 1080p or source resolution
-              # - 60fps or source framerate
-              # - High bitrate for quality (8-12 Mbps for 1080p60)
-              # - AAC audio at 384kbps
-              # - yuv420p pixel format for compatibility
-              # - Keyframe interval of 2 seconds (GOP)
-              # - No filters to preserve original colors
-              
+
               ffmpeg -y -i "$video_file" \
                 -c:v libx264 \
                 -profile:v high \
@@ -460,7 +417,7 @@ Total files checked: $TOTAL_FILES"
                 -b:a 384k \
                 -movflags +faststart \
                 "$youtube_file" 2>/tmp/ffmpeg_error.log
-              
+
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
                 file_size=$(du -h "$youtube_file" | cut -f1)
@@ -474,9 +431,9 @@ Total files checked: $TOTAL_FILES"
             fi
           fi
         done
-        
+
         if [ $TOTAL_FILES -eq 0 ]; then
-          notify-send "YouTube Conversion" "No video files found in Recordings folder"
+          notify-send "YouTube Conversion" "No MP4 files found in Recordings folder"
         else
           notify-send "YouTube Conversion Complete" "Converted: $CONVERTED files
 Skipped (already YouTube): $SKIPPED_YOUTUBE files
@@ -497,42 +454,34 @@ Total files checked: $TOTAL_FILES"
         SKIPPED_GIF=0
         SKIPPED_EXISTING=0
         TOTAL_FILES=0
-        
-        # Process both MKV and MP4 files
-        for video_file in "${RECORDING_DIR}"/*.{mkv,mp4}; do
+
+        for video_file in "${RECORDING_DIR}"/*.mp4; do
           if [ -f "$video_file" ]; then
             TOTAL_FILES=$((TOTAL_FILES+1))
             base_filename=$(basename "$video_file")
-            
-            # Skip files already GIFs
-            if [[ $base_filename == *.gif ]]; then
-              SKIPPED_GIF=$((SKIPPED_GIF+1))
-              continue
-            fi
-            
-            # Create GIF filename
-            gif_file="${video_file%.*}.gif"
-            
+
+            gif_file="${video_file%.mp4}.gif"
+
             # Check if GIF version doesn't already exist
             if [ ! -f "$gif_file" ]; then
               notify-send "Converting to GIF" "Processing: $(basename "$video_file")"
-              
+
               # Get video dimensions for scaling
               width=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=s=x:p=0 "$video_file")
-              
+
               # Scale down if wider than 800px to keep file size reasonable
               if [ "$width" -gt 800 ]; then
                 scale_filter="scale=800:-1:flags=lanczos,"
               else
                 scale_filter=""
               fi
-              
+
               # Create high-quality GIF with optimized palette
               ffmpeg -i "$video_file" \
                 -vf "${scale_filter}fps=15,split[s0][s1];[s0]palettegen=max_colors=256:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
                 -loop 0 \
                 "$gif_file" 2>/tmp/ffmpeg_error.log
-              
+
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
                 file_size=$(du -h "$gif_file" | cut -f1)
@@ -546,12 +495,11 @@ Total files checked: $TOTAL_FILES"
             fi
           fi
         done
-        
+
         if [ $TOTAL_FILES -eq 0 ]; then
-          notify-send "GIF Conversion" "No video files found in Recordings folder"
+          notify-send "GIF Conversion" "No MP4 files found in Recordings folder"
         else
           notify-send "GIF Conversion Complete" "Converted: $CONVERTED files
-Skipped (already GIF): $SKIPPED_GIF files
 Skipped (has GIF version): $SKIPPED_EXISTING files
 Total files checked: $TOTAL_FILES"
         fi

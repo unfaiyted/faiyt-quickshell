@@ -7,7 +7,7 @@ BarGroup {
     id: sysResources
 
     implicitWidth: row.width + 16
-    implicitHeight: 24
+    implicitHeight: 30
 
     property int ramUsage: 0
     property int cpuUsage: 0

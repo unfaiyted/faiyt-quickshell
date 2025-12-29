@@ -8,7 +8,7 @@ BarGroup {
     id: clockContainer
 
     implicitWidth: timeText.width + 20
-    implicitHeight: 24
+    implicitHeight: 30 
 
     property date now: new Date()
     property string currentTime: Qt.formatTime(now, "HH:mm")
