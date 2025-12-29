@@ -17,7 +17,7 @@ PanelWindow {
 
     // Fixed width - includes padding space
     implicitWidth: 396  // 380 + 8 left + 8 right padding
-    margins.top: 8     // Below the bar
+    margins.top: 0     // Below the bar
     exclusiveZone: 0
     color: "transparent"
 
@@ -25,12 +25,43 @@ PanelWindow {
     WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     // Hide window when not expanded (after animation completes)
-    visible: expanded || slideAnimation.running
+    visible: expanded || slideAnimation.running || bgFadeAnim.running
 
-    // Dark background to match overlay (fills entire window including padding)
-    Rectangle {
+    // Dark background to match overlay (curved top-left to avoid bar corner)
+    Canvas {
+        id: bgCanvas
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.3)
+        opacity: leftSidebar.expanded ? 1 : 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                id: bgFadeAnim
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.reset()
+
+            var w = width
+            var h = height
+            var r = 24  // Match bar corner radius
+
+            ctx.fillStyle = Qt.rgba(0, 0, 0, 0.3)
+            ctx.beginPath()
+            ctx.moveTo(0, r)
+            ctx.arc(r, r, r, Math.PI, -Math.PI / 2, false)
+            ctx.lineTo(w, 0)
+            ctx.lineTo(w, h)
+            ctx.lineTo(0, h)
+            ctx.lineTo(0, r)
+            ctx.closePath()
+            ctx.fill()
+        }
+
+        Component.onCompleted: requestPaint()
     }
 
     // Clip container for smooth slide animation

@@ -125,7 +125,7 @@ Item {
 
         // Spacer
         Item {
-            width: parent.width - 220
+            width: parent.width - 240
             height: 1
         }
 

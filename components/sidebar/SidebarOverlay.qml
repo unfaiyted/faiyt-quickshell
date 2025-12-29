@@ -14,21 +14,30 @@ PanelWindow {
     }
 
     // Start below the bar
-    margins.top:8 
+    margins.top: 0
 
     // Exclude sidebar areas so they remain clickable
     margins.left: SidebarState.leftOpen ? 396 : 0   // sidebar width
     margins.right: SidebarState.rightOpen ? 396 : 0  // sidebar width
 
-    // Only visible when a sidebar is open
-    visible: isOpen
+    // Stay visible while fading out
+    visible: isOpen || fadeAnim.running
     exclusiveZone: 0
+    color: "transparent"
 
-    // Semi-transparent dark background
-    color: Qt.rgba(0, 0, 0, isOpen ? 0.3 : 0)
+    // Dark background with fade animation
+    Rectangle {
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.3)
+        opacity: overlay.isOpen ? 1 : 0
 
-    Behavior on color {
-        ColorAnimation { duration: 200 }
+        Behavior on opacity {
+            NumberAnimation {
+                id: fadeAnim
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     // Click anywhere to close sidebars

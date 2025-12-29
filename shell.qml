@@ -9,6 +9,7 @@ import "components/notifications"
 import "components/wallpaper"
 import "components/launcher"
 import "components/overview"
+import "services"
 
 ShellRoot {
     id: root
