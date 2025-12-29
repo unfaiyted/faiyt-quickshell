@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import "../../../theme"
 import ".."
 import "../../wallpaper"
@@ -14,18 +15,22 @@ BarGroup {
         anchors.centerIn: parent
         spacing: 8
 
-        // Screenshot button
+        // Screenshot button - use hyprctl dispatch exec for proper Wayland access
         UtilityButton {
+            property string scriptPath: Quickshell.env("HOME") + "/codebase/faiyt-qs/scripts/screen-capture.sh"
             icon: "󰄀"
             tooltip: "Screenshot"
-            command: ["grimblast", "copy", "area"]
+            command: ["hyprctl", "dispatch", "exec", scriptPath + " screenshot selection"]
         }
 
-        // Color picker button
+        // Recording button
+        RecordingButton {}
+
+        // Color picker button - use hyprctl dispatch exec for proper Wayland access
         UtilityButton {
             icon: "󰴱"
             tooltip: "Color Picker"
-            command: ["hyprpicker", "-a"]
+            command: ["hyprctl", "dispatch", "exec", "hyprpicker -a"]
         }
 
         // Wallpaper button

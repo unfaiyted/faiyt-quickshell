@@ -14,7 +14,11 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
 - **System Tray** - Application tray icons with tooltips and menus
 - **Network** - Connection status indicator
 - **Weather** - Current weather display
-- **Utilities** - Quick action buttons
+- **Utilities** - Quick action buttons:
+  - Screenshot (area selection)
+  - Screen Recording with status indicator
+  - Color Picker
+  - Wallpaper Picker
 - **Bar Corners** - Rounded corner decorations
 
 ### Right Sidebar
@@ -98,6 +102,29 @@ Real-time calculations displayed on the right side of the input as you type:
 - `Enter` - Activate selected / Copy eval result
 - `Escape` - Close launcher
 
+### Screen Capture
+Screenshot and screen recording functionality with area selection:
+
+**Screenshots:**
+- Click the screenshot button or use IPC
+- Select area with slurp
+- Saved to `~/Pictures/Screenshots/` with timestamp
+- Copied to clipboard automatically
+
+**Screen Recording:**
+- Click the recording button to start (red pulsing indicator when active)
+- Select area with slurp
+- Click again to stop recording
+- Saved to `~/Videos/Recordings/` as VP9/MKV
+- File path copied to clipboard on completion
+- Desktop notification on save
+
+**Recording Targets:**
+- `selection` - Record selected area (default)
+- `eDP-1` - Record primary display
+- `HDMI-A-1` - Record external display
+- `stop` - Stop current recording
+
 ### Notification Popups
 Toast notifications that appear when notifications arrive:
 - Stack from top-right corner (up to 5)
@@ -114,7 +141,14 @@ Toast notifications that appear when notifications arrive:
 - Pipewire (for audio controls)
 - NetworkManager (for WiFi controls)
 - BlueZ (for Bluetooth controls)
-- wl-clipboard (`wl-copy`) for launcher evaluator clipboard
+- wl-clipboard (`wl-copy`) for clipboard operations
+
+**Screen Capture Dependencies:**
+- `grim` - Screenshot utility for Wayland
+- `slurp` - Area selection tool
+- `wf-recorder` - Screen recording for Wayland
+- `hyprpicker` - Color picker for Hyprland
+- `notify-send` - Desktop notifications (libnotify)
 
 ## Installation
 
@@ -122,6 +156,10 @@ Toast notifications that appear when notifications arrive:
 git clone https://github.com/yourusername/faiyt-qs.git
 cd faiyt-qs
 ```
+
+The shell will automatically create the following directories on startup if they don't exist:
+- `~/Pictures/Screenshots/` - Screenshot storage
+- `~/Videos/Recordings/` - Screen recording storage
 
 ## Running
 
@@ -159,7 +197,10 @@ faiyt-qs/
 │   │       ├── SystemTray.qml
 │   │       ├── Network.qml
 │   │       ├── Weather.qml
-│   │       └── Utilities.qml
+│   │       ├── Utilities.qml
+│   │       ├── UtilityButton.qml
+│   │       ├── RecordingButton.qml
+│   │       └── RecordingState.qml  # Singleton recording state + IPC
 │   ├── sidebar/
 │   │   ├── SidebarState.qml     # Shared sidebar state
 │   │   ├── SidebarOverlay.qml   # Click-away overlay
@@ -197,7 +238,8 @@ faiyt-qs/
 │       ├── NotificationServer.qml  # Singleton notification daemon
 │       └── NotificationPopups.qml  # Popup windows
 ├── scripts/
-│   └── toggle-launcher.sh       # IPC toggle script
+│   ├── screen-capture.sh        # Screenshot and recording script
+│   └── slurp-to-file.sh         # Helper for area selection
 └── README.md
 ```
 
@@ -216,9 +258,13 @@ bind = SUPER, N, exec, qs ipc call sidebar toggleRight
 
 # Toggle left sidebar
 bind = SUPER, T, exec, qs ipc call sidebar toggleLeft
+
+# Screen capture
+bind = , Print, exec, qs ipc call recording toggle
+bind = SUPER, Print, exec, /path/to/faiyt-qs/scripts/screen-capture.sh screenshot selection
 ```
 
-Or use the bar's utility buttons to toggle sidebars.
+Or use the bar's utility buttons for quick access.
 
 ### IPC Commands
 
@@ -235,6 +281,13 @@ qs ipc call launcher search "firefox"  # Open with search query
 qs ipc call sidebar toggleLeft   # Toggle left sidebar
 qs ipc call sidebar toggleRight  # Toggle right sidebar
 qs ipc call sidebar closeAll     # Close all sidebars
+
+# Screen Recording
+qs ipc call recording toggle     # Toggle recording (start selection/stop)
+qs ipc call recording start selection  # Start recording selected area
+qs ipc call recording start eDP-1      # Start recording primary display
+qs ipc call recording stop       # Stop current recording
+qs ipc call recording status     # Check if recording (returns "recording" or "idle")
 ```
 
 ## Theme (Rosé Pine)
