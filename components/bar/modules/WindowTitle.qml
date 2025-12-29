@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import Quickshell.Wayland
 import Quickshell.Hyprland
 import "../../../theme"
 import ".."
@@ -7,16 +9,35 @@ BarGroup {
     id: windowTitle
 
     implicitWidth: content.width + 20
-    implicitHeight: 30 
+    implicitHeight: 30
 
-    property string title: Hyprland.activeToplevel
-        ? Hyprland.activeToplevel.title
-        : "Desktop"
+    // Use ToplevelManager to get the focused window
+    property var focusedToplevel: {
+        for (var toplevel of ToplevelManager.toplevels.values) {
+            if (toplevel.activated) {
+                return toplevel
+            }
+        }
+        return null
+    }
+
+    property string title: focusedToplevel?.title ?? "Desktop"
+    property string appClass: focusedToplevel?.appId ?? ""
 
     Row {
         id: content
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 6
+
+        Image {
+            id: appIcon
+            anchors.verticalCenter: parent.verticalCenter
+            width: 14
+            height: 14
+            source: windowTitle.appClass !== "" ? Quickshell.iconPath(windowTitle.appClass, "image-missing") : ""
+            sourceSize: Qt.size(14, 14)
+            visible: status === Image.Ready
+        }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter

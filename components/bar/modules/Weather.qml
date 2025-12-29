@@ -8,7 +8,7 @@ BarGroup {
     id: weather
 
     implicitWidth: weatherText.width + 16
-    implicitHeight: 24
+    implicitHeight: 30 
 
     property string weatherData: "..."
     property string condition: ""
