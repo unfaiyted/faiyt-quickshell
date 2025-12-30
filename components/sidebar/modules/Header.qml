@@ -1,4 +1,5 @@
 import QtQuick
+import Qt5Compat.GraphicalEffects
 import Quickshell.Io
 import "../../../theme"
 
@@ -11,6 +12,8 @@ Item {
     property string username: "User"
     property string hostname: "localhost"
     property string uptime: ""
+    property int userId: 1000
+    property string profilePicture: ""
 
     // Get username
     Process {
@@ -21,6 +24,40 @@ Item {
         stdout: SplitParser {
             onRead: data => {
                 header.username = data.trim()
+            }
+        }
+    }
+
+    // Get user ID for AccountsService query
+    Process {
+        id: uidProcess
+        command: ["id", "-u"]
+        running: true
+
+        stdout: SplitParser {
+            onRead: data => {
+                header.userId = parseInt(data.trim())
+                iconProcess.running = true
+            }
+        }
+    }
+
+    // Get profile picture from AccountsService via D-Bus
+    Process {
+        id: iconProcess
+        command: ["bash", "-c",
+            "busctl --system get-property org.freedesktop.Accounts " +
+            "/org/freedesktop/Accounts/User" + header.userId + " " +
+            "org.freedesktop.Accounts.User IconFile 2>/dev/null | " +
+            "sed 's/s //' | tr -d '\"'"
+        ]
+
+        stdout: SplitParser {
+            onRead: data => {
+                let path = data.trim()
+                if (path && path.length > 0) {
+                    header.profilePicture = "file://" + path
+                }
             }
         }
     }
@@ -80,12 +117,51 @@ Item {
             border.width: 2
             border.color: Colors.primary
 
+            // Profile picture with circular mask
+            Item {
+                id: avatarContainer
+                anchors.centerIn: parent
+                width: 42
+                height: 42
+                visible: header.profilePicture !== "" && profileImage.status === Image.Ready
+
+                Image {
+                    id: profileImage
+                    anchors.fill: parent
+                    source: header.profilePicture
+                    fillMode: Image.PreserveAspectCrop
+                    smooth: true
+                    asynchronous: true
+                    sourceSize.width: 84
+                    sourceSize.height: 84
+                    visible: false  // Hidden, rendered through mask
+                    layer.enabled: true
+                }
+
+                // Circular mask
+                Rectangle {
+                    id: avatarMask
+                    anchors.fill: parent
+                    radius: width / 2
+                    visible: false
+                    layer.enabled: true
+                }
+
+                OpacityMask {
+                    anchors.fill: parent
+                    source: profileImage
+                    maskSource: avatarMask
+                }
+            }
+
+            // Letter fallback (when no profile picture)
             Rectangle {
                 anchors.centerIn: parent
                 width: 42
                 height: 42
                 radius: 21
                 color: Colors.primary
+                visible: header.profilePicture === "" || profileImage.status !== Image.Ready
 
                 Text {
                     anchors.centerIn: parent

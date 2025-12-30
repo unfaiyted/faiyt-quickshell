@@ -5,7 +5,7 @@ import "../../../theme"
 Item {
     id: quickToggles
 
-    implicitHeight: 56
+    implicitHeight: 88
     implicitWidth: parent.width
 
     property bool wifiEnabled: true
@@ -80,93 +80,88 @@ Item {
         }
     }
 
-    Row {
+    // Container with elevated background
+    Rectangle {
+        id: container
         anchors.fill: parent
-        anchors.margins: 8
-        spacing: 8
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
+        radius: 12
+        color: Colors.backgroundElevated
+        border.width: 1
+        border.color: Colors.border
 
-        // WiFi Toggle
-        Rectangle {
-            width: (parent.width - 16) / 3
-            height: 40
-            radius: 10
-            color: quickToggles.wifiEnabled ? Colors.primary : Colors.surface
+        Row {
+            anchors.fill: parent
+            anchors.margins: 12
+            spacing: 8
 
-            Behavior on color {
-                ColorAnimation { duration: 150 }
-            }
-
-            Row {
-                anchors.centerIn: parent
-                spacing: 8
-
-                Text {
-                    text: quickToggles.wifiEnabled ? "󰤨" : "󰤭"
-                    font.family: "Symbols Nerd Font"
-                    font.pixelSize: 18
-                    color: quickToggles.wifiEnabled ? Colors.background : Colors.foreground
-                }
-
-                Text {
-                    text: "WiFi"
-                    font.pixelSize: 11
-                    font.bold: true
-                    color: quickToggles.wifiEnabled ? Colors.background : Colors.foreground
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
+            // WiFi Toggle
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: parent.height
+                active: quickToggles.wifiEnabled
+                icon: quickToggles.wifiEnabled ? "󰤨" : "󰤭"
+                label: "WiFi"
                 onClicked: wifiToggleProcess.running = true
             }
-        }
 
-        // Bluetooth Toggle
-        Rectangle {
-            width: (parent.width - 16) / 3
-            height: 40
-            radius: 10
-            color: quickToggles.bluetoothEnabled ? Colors.primary : Colors.surface
-
-            Behavior on color {
-                ColorAnimation { duration: 150 }
-            }
-
-            Row {
-                anchors.centerIn: parent
-                spacing: 8
-
-                Text {
-                    text: quickToggles.bluetoothEnabled ? "󰂯" : "󰂲"
-                    font.family: "Symbols Nerd Font"
-                    font.pixelSize: 18
-                    color: quickToggles.bluetoothEnabled ? Colors.background : Colors.foreground
-                }
-
-                Text {
-                    text: "BT"
-                    font.pixelSize: 11
-                    font.bold: true
-                    color: quickToggles.bluetoothEnabled ? Colors.background : Colors.foreground
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
+            // Bluetooth Toggle
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: parent.height
+                active: quickToggles.bluetoothEnabled
+                icon: quickToggles.bluetoothEnabled ? "󰂯" : "󰂲"
+                label: "BT"
                 onClicked: btToggleProcess.running = true
             }
-        }
 
-        // Idle Inhibitor Toggle
+            // Idle Inhibitor Toggle
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: parent.height
+                active: quickToggles.idleInhibited
+                icon: quickToggles.idleInhibited ? "󰅶" : "󰛊"
+                label: "Caffeine"
+                activeColor: Colors.gold
+                onClicked: quickToggles.idleInhibited = !quickToggles.idleInhibited
+            }
+        }
+    }
+
+    // Reusable Toggle Button Component
+    component ToggleButton: Column {
+        id: toggleBtn
+
+        property bool active: false
+        property string icon: ""
+        property string label: ""
+        property color activeColor: Colors.primary
+        signal clicked()
+
+        spacing: 4
+
+        // Main toggle button
         Rectangle {
-            width: (parent.width - 16) / 3
-            height: 40
-            radius: 10
-            color: quickToggles.idleInhibited ? Colors.gold : Colors.surface
+            width: parent.width
+            height: parent.height - oblongIndicator.height - parent.spacing
+            radius: 12
+
+            // Semi-transparent background
+            color: toggleBtn.active
+                ? Qt.rgba(toggleBtn.activeColor.r, toggleBtn.activeColor.g, toggleBtn.activeColor.b, 0.15)
+                : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.5)
+
+            border.width: 1
+            border.color: toggleBtn.active
+                ? Qt.rgba(toggleBtn.activeColor.r, toggleBtn.activeColor.g, toggleBtn.activeColor.b, 0.3)
+                : Colors.border
 
             Behavior on color {
+                ColorAnimation { duration: 150 }
+            }
+
+            Behavior on border.color {
                 ColorAnimation { duration: 150 }
             }
 
@@ -175,24 +170,60 @@ Item {
                 spacing: 8
 
                 Text {
-                    text: quickToggles.idleInhibited ? "󰅶" : "󰛊"
+                    text: toggleBtn.icon
                     font.family: "Symbols Nerd Font"
                     font.pixelSize: 18
-                    color: quickToggles.idleInhibited ? Colors.background : Colors.foreground
+                    color: toggleBtn.active ? toggleBtn.activeColor : Colors.foregroundAlt
+
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
                 }
 
                 Text {
-                    text: "Caffeine"
+                    text: toggleBtn.label
                     font.pixelSize: 11
                     font.bold: true
-                    color: quickToggles.idleInhibited ? Colors.background : Colors.foreground
+                    color: toggleBtn.active ? Colors.foreground : Colors.foregroundAlt
+
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
                 }
             }
 
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: quickToggles.idleInhibited = !quickToggles.idleInhibited
+                hoverEnabled: true
+
+                onClicked: toggleBtn.clicked()
+
+                onEntered: {
+                    if (!toggleBtn.active) {
+                        parent.color = Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.7)
+                    }
+                }
+
+                onExited: {
+                    if (!toggleBtn.active) {
+                        parent.color = Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.5)
+                    }
+                }
+            }
+        }
+
+        // Oblong indicator showing on/off status
+        Rectangle {
+            id: oblongIndicator
+            width: 20
+            height: 6
+            radius: 3
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: toggleBtn.active ? Colors.secondary : Colors.muted
+
+            Behavior on color {
+                ColorAnimation { duration: 150 }
             }
         }
     }

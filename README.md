@@ -59,8 +59,8 @@ Slide-out panel with multiple tabs:
   - Live clock display
 
 **Header Section:**
-- User avatar and username
-- Hostname and system uptime
+- User avatar (profile picture from AccountsService, or letter fallback)
+- Username, hostname, and system uptime
 - Settings and power buttons
 
 **Quick Toggles:**
@@ -378,10 +378,11 @@ The shell uses various system commands for functionality:
 
 - `nmcli` - WiFi management
 - `bluetoothctl` - Bluetooth management
+- `busctl` - D-Bus queries (AccountsService for profile picture)
 - `wpctl` / Pipewire - Audio control
 - `systemctl` - Power management, idle inhibit
 - `hyprctl` - Workspace management
-- Standard Unix utilities (`uptime`, `whoami`, `hostname`, etc.)
+- Standard Unix utilities (`uptime`, `whoami`, `hostname`, `id`, etc.)
 
 ## Credits
 

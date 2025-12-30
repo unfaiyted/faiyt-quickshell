@@ -35,8 +35,8 @@ Rectangle {
 
             Rectangle {
                 id: wsIndicator
-                width: 22
-                height: 22
+                width: 24
+                height: 24
                 radius: 12
 
                 required property int index
@@ -54,7 +54,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: wsIndicator.wsId
-                    font.pixelSize: 10
+                    font.pixelSize: 12
                     color: wsIndicator.isActive ? Colors.base
                          : wsIndicator.isOccupied ? Colors.foreground
                          : Colors.subtle

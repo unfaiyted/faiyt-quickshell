@@ -49,7 +49,7 @@ BarGroup {
                 return t
             }
             color: Colors.foregroundAlt
-            font.pixelSize: 11
+            font.pixelSize: 12
         }
     }
 }

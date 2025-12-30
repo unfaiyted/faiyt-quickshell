@@ -128,7 +128,7 @@ BarGroup {
                 }
                 return t
             }
-            font.pixelSize: 11
+            font.pixelSize: 12
             color: Colors.foreground
         }
     }

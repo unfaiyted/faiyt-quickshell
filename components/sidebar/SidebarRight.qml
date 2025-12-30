@@ -103,27 +103,34 @@ PanelWindow {
                     width: parent.width
                 }
 
+                // Spacer between header and toggles
+                Item {
+                    width: parent.width
+                    height: 8
+                }
+
                 // Quick toggles (WiFi, Bluetooth, Caffeine)
                 QuickToggles {
                     width: parent.width
                 }
 
-                // Tab bar
+                // Spacer between toggles and tabs
                 Item {
                     width: parent.width
-                    height: 48
+                    height: 8
+                }
 
-                    TabBar {
-                        id: tabs
-                        anchors.centerIn: parent
-                        tabs: ["󰂚", "󰕾", "󰂯", "󰤨", "󰃭"]  // Icons: Bell, Volume, Bluetooth, WiFi, Calendar
-                    }
+                // Tab bar
+                TabBar {
+                    id: tabs
+                    width: parent.width
+                    tabs: ["󰂚", "󰕾", "󰂯", "󰤨", "󰃭"]  // Icons: Bell, Volume, Bluetooth, WiFi, Calendar
                 }
 
                 // Tab content
                 Item {
                     width: parent.width
-                    height: parent.height - 176  // Header(72) + QuickToggles(56) + TabBar(48)
+                    height: parent.height - 228  // Header(72) + Spacer(8) + QuickToggles(88) + Spacer(8) + TabBar(52)
 
                     // Use Loader for efficient tab switching
                     Loader {
