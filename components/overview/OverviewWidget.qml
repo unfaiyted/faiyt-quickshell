@@ -79,8 +79,8 @@ Item {
                             property bool isActive: monitor.activeWorkspace?.id === workspaceValue
                             property bool hoveredWhileDragging: false
 
-                            implicitWidth: Math.floor(root.workspaceImplicitWidth)
-                            implicitHeight: Math.floor(root.workspaceImplicitHeight)
+                            implicitWidth: root.workspaceImplicitWidth | 0
+                            implicitHeight: root.workspaceImplicitHeight | 0
 
                             color: hoveredWhileDragging ? Colors.overlay : Colors.surface
                             radius: 8
@@ -91,7 +91,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: workspace.workspaceValue
-                                font.pixelSize: Math.floor(root.workspaceImplicitHeight * 0.4)
+                                font.pixelSize: (root.workspaceImplicitHeight * 0.4) | 0
                                 font.bold: true
                                 color: Qt.rgba(Colors.foreground.r, Colors.foreground.g, Colors.foreground.b, 0.15)
                             }
@@ -244,8 +244,8 @@ Item {
 
                 x: (root.workspaceImplicitWidth + root.workspaceSpacing) * activeColIndex
                 y: (root.workspaceImplicitHeight + root.workspaceSpacing) * activeRowIndex
-                width: Math.floor(root.workspaceImplicitWidth)
-                height: Math.floor(root.workspaceImplicitHeight)
+                width: root.workspaceImplicitWidth | 0
+                height: root.workspaceImplicitHeight | 0
                 color: "transparent"
                 radius: 8
                 border.width: 3

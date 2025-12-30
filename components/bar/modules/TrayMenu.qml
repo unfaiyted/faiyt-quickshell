@@ -9,6 +9,8 @@ PopupWindow {
 
     property var menu: null
     property var trayItem: null
+    property var focusAppFunction: null
+    property string appId: ""
 
     signal menuClosed()
 
@@ -169,6 +171,10 @@ PopupWindow {
 
                 onClicked: {
                     if (entry.enabled && !entry.hasChildren) {
+                        // Focus app window before executing menu action
+                        if (menuPopup.focusAppFunction && menuPopup.appId) {
+                            menuPopup.focusAppFunction(menuPopup.appId)
+                        }
                         entry.triggered()
                         menuPopup.visible = false
                     }

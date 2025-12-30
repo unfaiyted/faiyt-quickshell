@@ -270,6 +270,8 @@ BarGroup {
                     id: trayMenu
                     menu: trayData.menu
                     trayItem: trayData
+                    focusAppFunction: tray.focusAppWindow
+                    appId: trayItemContainer.trayId
 
                     anchor.window: QsWindow.window
                     anchor.onAnchoring: {
