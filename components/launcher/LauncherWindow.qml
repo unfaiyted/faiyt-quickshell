@@ -91,14 +91,38 @@ PanelWindow {
                 spacing: 4
                 model: LauncherState.results
 
-                delegate: ResultItem {
+                delegate: Loader {
                     width: resultsList.width
-                    result: modelData
-                    isSelected: index === LauncherState.selectedIndex
+                    height: modelData?.type === "window" ? 70 : 52
 
-                    onClicked: {
-                        LauncherState.selectedIndex = index
-                        LauncherState.activateSelected()
+                    sourceComponent: modelData?.type === "window" ? windowResultComponent : resultComponent
+
+                    Component {
+                        id: resultComponent
+                        ResultItem {
+                            width: resultsList.width
+                            result: modelData
+                            isSelected: index === LauncherState.selectedIndex
+
+                            onClicked: {
+                                LauncherState.selectedIndex = index
+                                LauncherState.activateSelected()
+                            }
+                        }
+                    }
+
+                    Component {
+                        id: windowResultComponent
+                        WindowResultItem {
+                            width: resultsList.width
+                            result: modelData
+                            isSelected: index === LauncherState.selectedIndex
+
+                            onClicked: {
+                                LauncherState.selectedIndex = index
+                                LauncherState.activateSelected()
+                            }
+                        }
                     }
                 }
 

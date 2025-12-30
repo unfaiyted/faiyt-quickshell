@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import "../../../theme"
+import "../../../services"
 import "../../overview"
 
 Rectangle {
@@ -215,6 +216,12 @@ Rectangle {
                     border.color: windowItem.hovered ? Colors.primary : Colors.rose
                     clip: true
 
+                    // Check if we have a NerdFont icon for this app
+                    property string appClass: windowItem.winData?.class ?? ""
+                    property bool hasNerdIcon: IconService.hasIcon(appClass)
+                    // Only try system icon if we don't have a NerdFont mapping
+                    property string iconPath: (!hasNerdIcon && appClass !== "") ? Quickshell.iconPath(appClass, "") : ""
+
                     Behavior on border.width {
                         NumberAnimation { duration: 100 }
                     }
@@ -228,17 +235,49 @@ Rectangle {
                         live: true
                     }
 
-                    // App icon overlay
+                    // NerdFont icon (preferred - use if we have a mapping)
+                    Text {
+                        anchors.centerIn: parent
+                        property real iconSize: Math.min(parent.width, parent.height) * 0.4
+                        visible: iconSize >= 12 && windowFrame.hasNerdIcon
+                        text: IconService.getIcon(windowFrame.appClass)
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: iconSize
+                        color: Colors.foreground
+                        opacity: windowItem.hovered ? 0.5 : 0.85
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 100 }
+                        }
+                    }
+
+                    // System icon (fallback for apps without NerdFont mapping)
                     Image {
                         id: appIcon
                         anchors.centerIn: parent
                         property real iconSize: Math.min(parent.width, parent.height) * 0.4
                         width: iconSize
                         height: iconSize
-                        source: Quickshell.iconPath(windowItem.winData?.class ?? "application-x-executable", "image-missing")
+                        source: windowFrame.iconPath
                         sourceSize: Qt.size(iconSize, iconSize)
                         opacity: windowItem.hovered ? 0.5 : 0.85
-                        visible: iconSize >= 12
+                        visible: iconSize >= 12 && !windowFrame.hasNerdIcon && status === Image.Ready
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 100 }
+                        }
+                    }
+
+                    // Default NerdFont icon (when system icon also fails)
+                    Text {
+                        anchors.centerIn: parent
+                        property real iconSize: Math.min(parent.width, parent.height) * 0.4
+                        visible: iconSize >= 12 && !windowFrame.hasNerdIcon && appIcon.status !== Image.Ready
+                        text: IconService.getIcon("")
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: iconSize
+                        color: Colors.foreground
+                        opacity: windowItem.hovered ? 0.5 : 0.85
 
                         Behavior on opacity {
                             NumberAnimation { duration: 100 }

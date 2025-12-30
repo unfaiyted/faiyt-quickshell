@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "."
 
 Item {
@@ -67,15 +68,46 @@ Item {
             live: true
         }
 
-        // App icon overlay
+        // Check if we have a NerdFont icon for this app
+        property string appClass: windowData?.class ?? ""
+        property bool hasNerdIcon: IconService.hasIcon(appClass)
+        // Only try system icon if we don't have a NerdFont mapping
+        property string iconPath: (!hasNerdIcon && appClass !== "") ? Quickshell.iconPath(appClass, "") : ""
+
+        // NerdFont icon (preferred - use if we have a mapping)
+        Text {
+            anchors.centerIn: parent
+            property real iconSize: Math.min(root.targetWindowWidth, root.targetWindowHeight) * 0.3
+            visible: windowFrame.hasNerdIcon
+            text: IconService.getIcon(windowFrame.appClass)
+            font.family: "Symbols Nerd Font"
+            font.pixelSize: iconSize
+            color: Colors.foreground
+            opacity: 0.8
+        }
+
+        // System icon (fallback for apps without NerdFont mapping)
         Image {
             id: appIcon
             anchors.centerIn: parent
             property real iconSize: Math.min(root.targetWindowWidth, root.targetWindowHeight) * 0.3
             width: iconSize
             height: iconSize
-            source: Quickshell.iconPath(windowData?.class ?? "application-x-executable", "image-missing")
+            source: windowFrame.iconPath
             sourceSize: Qt.size(iconSize, iconSize)
+            opacity: 0.8
+            visible: !windowFrame.hasNerdIcon && status === Image.Ready
+        }
+
+        // Default NerdFont icon (when system icon also fails)
+        Text {
+            anchors.centerIn: parent
+            property real iconSize: Math.min(root.targetWindowWidth, root.targetWindowHeight) * 0.3
+            visible: !windowFrame.hasNerdIcon && appIcon.status !== Image.Ready
+            text: IconService.getIcon("")
+            font.family: "Symbols Nerd Font"
+            font.pixelSize: iconSize
+            color: Colors.foreground
             opacity: 0.8
         }
 

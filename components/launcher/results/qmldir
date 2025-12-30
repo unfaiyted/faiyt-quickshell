@@ -2,3 +2,4 @@ module results
 AppResults 1.0 AppResults.qml
 CommandResults 1.0 CommandResults.qml
 SystemResults 1.0 SystemResults.qml
+WindowResults 1.0 WindowResults.qml

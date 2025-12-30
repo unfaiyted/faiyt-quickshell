@@ -6,6 +6,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Notifications
 import "../../theme"
+import "../../services"
 import "."
 
 Item {
@@ -63,7 +64,7 @@ Item {
 
                     Text {
                         anchors.centerIn: parent
-                        text: getAppIcon(root.notif?.appName ?? "")
+                        text: IconService.getIcon(root.notif?.appName ?? "")
                         font.family: "Symbols Nerd Font"
                         font.pixelSize: 12
                         color: Colors.background
@@ -251,26 +252,4 @@ Item {
         }
     }
 
-    // Helper function for app icons
-    function getAppIcon(appName) {
-        let n = (appName || "").toLowerCase()
-        if (n.includes("firefox")) return "󰈹"
-        if (n.includes("chrome") || n.includes("chromium")) return ""
-        if (n.includes("discord")) return "󰙯"
-        if (n.includes("spotify")) return "󰓇"
-        if (n.includes("telegram")) return ""
-        if (n.includes("slack")) return "󰒱"
-        if (n.includes("mail") || n.includes("thunderbird")) return "󰇮"
-        if (n.includes("terminal") || n.includes("kitty") || n.includes("alacritty")) return ""
-        if (n.includes("code") || n.includes("vscode")) return "󰨞"
-        if (n.includes("file") || n.includes("nautilus") || n.includes("thunar")) return "󰉋"
-        if (n.includes("screen capture") || n.includes("screenshot")) return "󰹑"
-        if (n.includes("volume") || n.includes("audio") || n.includes("sound")) return "󰕾"
-        if (n.includes("brightness")) return "󰃟"
-        if (n.includes("battery")) return "󰁹"
-        if (n.includes("network") || n.includes("wifi")) return "󰤨"
-        if (n.includes("bluetooth")) return "󰂯"
-        if (n.includes("update")) return "󰚰"
-        return "󰂚"
-    }
 }

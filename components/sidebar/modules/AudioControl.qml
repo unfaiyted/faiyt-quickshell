@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import "../../../theme"
+import "../../../services"
 
 Item {
     id: audioControl
@@ -73,20 +74,6 @@ Item {
     function getNodeName(node) {
         if (!node) return "Unknown"
         return node.nickname || node.description || node.name || "Unknown"
-    }
-
-    // Get icon for app name
-    function getAppIcon(name) {
-        let n = (name || "").toLowerCase()
-        if (n.includes("firefox")) return "󰈹"
-        if (n.includes("chrome") || n.includes("chromium")) return ""
-        if (n.includes("spotify")) return "󰓇"
-        if (n.includes("discord")) return "󰙯"
-        if (n.includes("obs")) return "󰑋"
-        if (n.includes("mpv") || n.includes("vlc") || n.includes("video")) return "󰕧"
-        if (n.includes("music") || n.includes("rhythmbox") || n.includes("clementine")) return "󰎆"
-        if (n.includes("game") || n.includes("steam")) return "󰊖"
-        return "󰓃"
     }
 
     // Get speaker icon based on volume
@@ -706,7 +693,7 @@ Item {
 
                                         Text {
                                             anchors.centerIn: parent
-                                            text: getAppIcon(stream ? stream.name : "")
+                                            text: IconService.getIcon(stream ? stream.name : "")
                                             font.family: "Symbols Nerd Font"
                                             font.pixelSize: 14
                                             color: isMuted ? Colors.foregroundMuted : Colors.background

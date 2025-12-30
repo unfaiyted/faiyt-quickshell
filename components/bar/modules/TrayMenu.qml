@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../../theme"
+import "../../../services"
 import ".."
 
 PopupWindow {
@@ -112,12 +113,33 @@ PopupWindow {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                // Icon
+                // Icon - NerdFont preferred, system icon fallback
+                Text {
+                    id: nerdIcon
+                    visible: entry.icon && entry.icon.length > 0 && IconService.hasIcon(entry.icon)
+                    text: IconService.getIcon(entry.icon)
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 14
+                    color: entry.enabled ? Colors.foreground : Colors.muted
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
                 Image {
-                    visible: entry.icon && entry.icon.length > 0
-                    source: entry.icon || ""
+                    id: menuIcon
+                    visible: entry.icon && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && status === Image.Ready
+                    source: (entry.icon && !IconService.hasIcon(entry.icon)) ? entry.icon : ""
                     width: 14
                     height: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                // Default icon when system icon fails
+                Text {
+                    visible: entry.icon && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && menuIcon.status !== Image.Ready
+                    text: IconService.getIcon("")
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 14
+                    color: entry.enabled ? Colors.foreground : Colors.muted
                     anchors.verticalCenter: parent.verticalCenter
                 }
 

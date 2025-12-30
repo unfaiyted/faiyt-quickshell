@@ -145,13 +145,19 @@ wf-recorder_check() {
   fi
 }
 
-# Function to record with standard settings (hardware-accelerated H.264 for Discord/Slack compatibility)
+# Function to record with standard settings (hardware-accelerated H.265 for large resolutions)
 record_video() {
   local output_file="$1"
   shift
 
-  # Use NVENC for NVIDIA GPUs
-  wf-recorder "$@" -f "$output_file" -c h264_nvenc --pixel-format yuv420p
+  # Use HEVC NVENC for NVIDIA GPUs - supports resolutions up to 8K (h264_nvenc limited to 4096px width)
+  # preset=p4 is balanced speed/quality, cq=23 is good quality without huge files
+  wf-recorder "$@" -f "$output_file" \
+    -c hevc_nvenc \
+    -p preset=p4 \
+    -p rc=vbr \
+    -p cq=23 \
+    --pixel-format yuv420p
 }
 
 # High quality recording for YouTube (hardware-accelerated)
@@ -159,12 +165,14 @@ record_high_quality() {
   local output_file="$1"
   shift
 
-  # Use NVENC for NVIDIA GPUs with high quality settings
+  # Use HEVC NVENC for NVIDIA GPUs with high quality settings (supports 8K)
+  # Use codec params for bitrate control instead of -b flag
   wf-recorder "$@" -f "$output_file" \
-    -c h264_nvenc \
+    -c hevc_nvenc \
     -r 60 \
-    -b 12000000 \
-    -B 192000 \
+    -p preset=p7 \
+    -p rc=vbr \
+    -p cq=19 \
     --pixel-format yuv420p
 }
 
@@ -176,9 +184,9 @@ record_gif() {
   local temp_video="/tmp/gif_recording_$(date +%s).mp4"
   echo "$temp_video" >/tmp/gif_temp_video.txt
 
-  # GIF-optimized recording (15 fps, no audio) - Use NVENC for NVIDIA GPUs
+  # GIF-optimized recording (15 fps, no audio) - Use HEVC NVENC for NVIDIA GPUs (supports 8K)
   wf-recorder "$@" -f "$temp_video" \
-    -c h264_nvenc \
+    -c hevc_nvenc \
     -r 15 \
     --pixel-format yuv420p \
     --no-audio

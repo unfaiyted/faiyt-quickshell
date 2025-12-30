@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
 import "../../../theme"
+import "../../../services"
 import ".."
 
 BarGroup {
@@ -45,11 +46,36 @@ BarGroup {
                 height: 16
 
                 property var trayData: modelData
+                property string trayId: trayData.id || trayData.title || ""
+                // Check if we have a NerdFont icon for this tray item
+                property bool hasNerdIcon: IconService.hasIcon(trayId)
 
+                // NerdFont icon (preferred - use if we have a mapping)
+                Text {
+                    anchors.centerIn: parent
+                    visible: trayItemContainer.hasNerdIcon
+                    text: IconService.getIcon(trayItemContainer.trayId)
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 14
+                    color: Colors.foreground
+                }
+
+                // System tray icon (fallback for items without NerdFont mapping)
                 Image {
                     id: trayIcon
                     anchors.fill: parent
-                    source: modelData.icon
+                    source: trayItemContainer.hasNerdIcon ? "" : modelData.icon
+                    visible: !trayItemContainer.hasNerdIcon && status === Image.Ready
+                }
+
+                // Default NerdFont icon (when system icon also fails)
+                Text {
+                    anchors.centerIn: parent
+                    visible: !trayItemContainer.hasNerdIcon && trayIcon.status !== Image.Ready
+                    text: IconService.getIcon("")
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 14
+                    color: Colors.foreground
                 }
 
                 MouseArea {

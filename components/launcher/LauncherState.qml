@@ -40,6 +40,7 @@ Singleton {
     AppResults { id: appResults }
     CommandResults { id: commandResults }
     SystemResults { id: systemResults }
+    WindowResults { id: windowResults }
 
     // Visibility state
     property bool visible: false
@@ -65,12 +66,23 @@ Singleton {
         onTriggered: launcherState.performSearch()
     }
 
+    // Delayed action timer - allows keyboard focus to release before action
+    Timer {
+        id: actionTimer
+        interval: 50
+        property var pendingAction: null
+        onTriggered: {
+            if (pendingAction) pendingAction()
+            pendingAction = null
+        }
+    }
+
     // Search type prefixes
     property var prefixes: {
         "app": ["app:", "apps:", "a:"],
         "command": ["cmd:", "command:", "$:", ">:"],
         "system": ["sys:", "system:"],
-        "hyprland": ["h:", "hypr:", "win:", "window:"],
+        "window": ["win:", "window:", "w:"],
         "directory": ["d:", "dir:", "directory:"],
         "clipboard": ["clip:", "clipboard:", "cb:"],
         "search": ["search:", "!g", "!d", "!c"],
@@ -126,6 +138,10 @@ Singleton {
                 let appRes = appResults.search(query, false)
                 allResults = allResults.concat(appRes)
 
+                // Windows
+                let winRes = windowResults.search(query, false)
+                allResults = allResults.concat(winRes)
+
                 // System actions
                 let sysRes = systemResults.search(query, false)
                 allResults = allResults.concat(sysRes)
@@ -146,6 +162,8 @@ Singleton {
             allResults = commandResults.search(query, isPrefixSearch)
         } else if (searchType === "SYSTEM") {
             allResults = systemResults.search(query, isPrefixSearch)
+        } else if (searchType === "WINDOW") {
+            allResults = windowResults.search(query, isPrefixSearch)
         }
 
         // Limit results
@@ -170,8 +188,9 @@ Singleton {
         if (selectedIndex >= 0 && selectedIndex < results.length) {
             let result = results[selectedIndex]
             if (result && result.action) {
-                result.action()
-                hide()
+                actionTimer.pendingAction = result.action
+                hide()  // Hide first to release keyboard focus
+                actionTimer.start()  // Execute action after delay
             }
         }
     }

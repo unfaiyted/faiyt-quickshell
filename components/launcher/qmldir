@@ -3,4 +3,5 @@ singleton LauncherState 1.0 LauncherState.qml
 LauncherWindow 1.0 LauncherWindow.qml
 LauncherEntry 1.0 LauncherEntry.qml
 ResultItem 1.0 ResultItem.qml
+WindowResultItem 1.0 WindowResultItem.qml
 Evaluator 1.0 Evaluator.qml

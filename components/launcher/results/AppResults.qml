@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../../../services"
 
 Item {
     id: appResults
@@ -177,47 +178,6 @@ Item {
         return entry
     }
 
-    // Icon mapping for common apps
-    property var iconMap: {
-        "firefox": "󰈹",
-        "chromium": "󰊯",
-        "google-chrome": "󰊯",
-        "code": "󰨞",
-        "visual-studio-code": "󰨞",
-        "kitty": "",
-        "alacritty": "",
-        "foot": "",
-        "thunar": "󰉋",
-        "nautilus": "󰉋",
-        "dolphin": "󰉋",
-        "spotify": "󰓇",
-        "discord": "󰙯",
-        "telegram": "",
-        "steam": "󰓓",
-        "vlc": "󰕼",
-        "mpv": "󰐌",
-        "gimp": "",
-        "inkscape": "",
-        "blender": "󰂫",
-        "obs": "󰑋",
-        "slack": "󰒱",
-        "thunderbird": "󰇰",
-        "libreoffice": "󰏆",
-        "default": "󰀻"
-    }
-
-    function getIconForApp(iconName) {
-        if (!iconName) return iconMap["default"]
-
-        let lower = iconName.toLowerCase()
-        for (let key in iconMap) {
-            if (lower.includes(key)) {
-                return iconMap[key]
-            }
-        }
-        return iconMap["default"]
-    }
-
     // Search applications
     function search(query, isPrefixSearch) {
         if (!isLoaded) {
@@ -252,7 +212,7 @@ Item {
             type: "app",
             title: app.name,
             description: app.genericName || app.comment || "",
-            icon: getIconForApp(app.icon),
+            icon: IconService.getIcon(app.icon),
             data: app,
             action: function() {
                 launchApp(app)

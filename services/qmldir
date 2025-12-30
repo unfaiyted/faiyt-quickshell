@@ -1,2 +1,3 @@
 module services
 singleton BluetoothService 1.0 BluetoothService.qml
+singleton IconService 1.0 IconService.qml
