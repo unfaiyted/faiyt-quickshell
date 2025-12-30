@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
 import "../../../theme"
+import "../../../services"
 import ".."
 
 BarGroup {
@@ -65,6 +66,15 @@ BarGroup {
     property string playerName: player ? (player.identity || "") : ""
     property bool isPlaying: player ? player.isPlaying : false
 
+    // Control cava based on playing state
+    onIsPlayingChanged: {
+        if (isPlaying) {
+            CavaService.open()
+        } else {
+            CavaService.close()
+        }
+    }
+
     // Album art
     property string artUrl: player ? (player.trackArtUrl || "") : ""
 
@@ -108,13 +118,43 @@ BarGroup {
         anchors.centerIn: parent
         spacing: 8
 
-        // Play/Pause indicator
-        Text {
+        // Cava bars when playing, icon when paused
+        Item {
+            width: musicModule.isPlaying ? cavaRow.width : playIcon.width
+            height: 14
             anchors.verticalCenter: parent.verticalCenter
-            text: musicModule.isPlaying ? "󰐊" : "󰏤"
-            font.pixelSize: 12
-            font.family: "Symbols Nerd Font"
-            color: Colors.foreground
+
+            Row {
+                id: cavaRow
+                visible: musicModule.isPlaying
+                spacing: 2
+                anchors.bottom: parent.bottom
+
+                Repeater {
+                    model: CavaService.values
+                    Rectangle {
+                        width: 3
+                        height: Math.max(3, modelData * 0.14)
+                        radius: 1
+                        color: Colors.primary
+                        anchors.bottom: parent.bottom
+
+                        Behavior on height {
+                            NumberAnimation { duration: 50 }
+                        }
+                    }
+                }
+            }
+
+            Text {
+                id: playIcon
+                visible: !musicModule.isPlaying
+                anchors.verticalCenter: parent.verticalCenter
+                text: "󰏤"
+                font.pixelSize: 12
+                font.family: "Symbols Nerd Font"
+                color: Colors.foreground
+            }
         }
 
         // Track title
@@ -358,6 +398,33 @@ BarGroup {
                             font.pixelSize: 10
                             elide: Text.ElideRight
                             width: parent.width
+                        }
+                    }
+                }
+
+                // Cava visualization bars
+                Item {
+                    width: parent.width
+                    height: 32
+                    visible: musicModule.isPlaying
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 3
+
+                        Repeater {
+                            model: CavaService.values
+                            Rectangle {
+                                width: 4
+                                height: Math.max(4, modelData * 0.3)
+                                radius: 2
+                                color: Colors.primary
+                                anchors.bottom: parent.bottom
+
+                                Behavior on height {
+                                    NumberAnimation { duration: 50 }
+                                }
+                            }
                         }
                     }
                 }

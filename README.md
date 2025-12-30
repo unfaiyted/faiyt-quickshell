@@ -20,10 +20,12 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
   - Network upload speed (% of max bandwidth)
 - **Battery** - Battery level with charging indicator
 - **Music** - MPRIS media player with interactive tooltip:
+  - Animated audio visualization bars (cava) when playing
   - Album art display with fallback placeholder
   - Track info (title, artist, album)
   - Seekable progress bar with time display
   - Playback controls (previous, play/pause, next)
+  - Simulated animation when no local audio (e.g., Spotify Connect)
   - Click outside to dismiss
 - **System Tray** - Application tray icons with tooltips and menus
 - **Network** - Connection status indicator
@@ -189,6 +191,9 @@ Toast notifications that appear when notifications arrive:
 - `hyprpicker` - Color picker for Hyprland
 - `notify-send` - Desktop notifications (libnotify)
 
+**Music Visualization:**
+- `cava` - Audio visualizer for animated bars in the music module
+
 ## Installation
 
 ```bash
@@ -286,6 +291,7 @@ faiyt-qs/
 │       └── HyprlandData.qml      # Hyprctl data singleton
 ├── services/
 │   ├── BluetoothService.qml     # Bluetooth device management singleton
+│   ├── CavaService.qml          # Audio visualization (cava) singleton
 │   └── IconService.qml          # Centralized NerdFont icon mappings
 ├── scripts/
 │   └── screen-capture.sh        # Screenshot and recording script
