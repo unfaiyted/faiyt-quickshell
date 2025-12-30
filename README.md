@@ -90,6 +90,7 @@ Application launcher with instant evaluators and multiple search modes:
 
 **Search Types:**
 - **Apps** (`app:`, `a:`) - Search and launch desktop applications
+- **Windows** (`win:`, `window:`, `w:`) - Search open windows with live previews
 - **Commands** (`cmd:`, `$:`, `>:`) - Run shell commands with history
 - **System** (`sys:`) - Power actions (shutdown, reboot, suspend, lock, logout)
 
@@ -130,13 +131,13 @@ Screenshot and screen recording functionality with area selection:
 - Right-click to select recording mode before starting
 - Select area with slurp
 - Click again to stop recording
-- Saved to `~/Videos/Recordings/` as MP4 (NVENC hardware encoding)
+- Saved to `~/Videos/Recordings/` as MP4 (HEVC NVENC hardware encoding)
 - File path copied to clipboard on completion
 - Desktop notification on save
 
 **Recording Modes** (right-click menu):
-- **Standard** - Regular MP4 recording with hardware H.264
-- **High Quality** - 60fps, high bitrate for YouTube uploads
+- **Standard** - Regular MP4 recording with hardware HEVC (supports 8K resolution)
+- **High Quality** - 60fps, high quality HEVC for YouTube uploads
 - **GIF** - Records at 15fps, auto-converts to optimized GIF
 
 **Recording Targets:**
@@ -260,11 +261,13 @@ faiyt-qs/
 │   │   ├── LauncherWindow.qml   # Launcher overlay window
 │   │   ├── LauncherEntry.qml    # Search input with evaluators
 │   │   ├── ResultItem.qml       # Search result item
+│   │   ├── WindowResultItem.qml # Window result with live preview
 │   │   ├── Evaluator.qml        # Evaluator manager
 │   │   ├── results/             # Search providers
 │   │   │   ├── AppResults.qml
 │   │   │   ├── CommandResults.qml
-│   │   │   └── SystemResults.qml
+│   │   │   ├── SystemResults.qml
+│   │   │   └── WindowResults.qml
 │   │   └── evaluators/          # Instant evaluators
 │   │       ├── MathEvaluator.qml
 │   │       ├── PercentageEvaluator.qml
@@ -281,6 +284,9 @@ faiyt-qs/
 │       ├── OverviewWidget.qml    # Workspace grid layout
 │       ├── OverviewWindow.qml    # Individual window preview
 │       └── HyprlandData.qml      # Hyprctl data singleton
+├── services/
+│   ├── BluetoothService.qml     # Bluetooth device management singleton
+│   └── IconService.qml          # Centralized NerdFont icon mappings
 ├── scripts/
 │   └── screen-capture.sh        # Screenshot and recording script
 └── README.md
