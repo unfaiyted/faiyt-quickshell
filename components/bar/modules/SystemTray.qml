@@ -1,18 +1,55 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
+import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../../../theme"
 import "../../../services"
+import "../../overview"
 import ".."
 
 BarGroup {
     id: tray
 
     implicitWidth: trayRow.width + 16
-    implicitHeight: 30 
+    implicitHeight: 30
 
     // Track currently open menu
     property var activeMenu: null
+
+    // Focus window by app name/class
+    function focusAppWindow(appName) {
+        if (!appName) return false
+
+        HyprlandData.updateWindowList()
+        let appLower = appName.toLowerCase().trim()
+
+        // Extract first word and last word for better matching
+        let words = appLower.split(/[\s\-_]+/)
+        let firstWord = words[0] || appLower
+        let lastWord = words[words.length - 1] || appLower
+
+        for (let toplevel of ToplevelManager.toplevels.values) {
+            if (!toplevel.HyprlandToplevel) continue
+            const address = "0x" + toplevel.HyprlandToplevel.address
+            const winData = HyprlandData.windowByAddress[address]
+            if (!winData) continue
+
+            let winClass = (winData.class || "").toLowerCase()
+            let winTitle = (winData.title || "").toLowerCase()
+
+
+            // Match by class or title containing the app name (or vice versa)
+            if (winClass.includes(appLower) || appLower.includes(winClass) ||
+                winClass.includes(firstWord) || winClass.includes(lastWord) ||
+                winTitle.includes(appLower) || winTitle.includes(firstWord) ||
+                firstWord.includes(winClass) || lastWord.includes(winClass)) {
+                Hyprland.dispatch("focuswindow address:" + winData.address)
+                return true
+            }
+        }
+        return false
+    }
 
     function closeAllMenus() {
         if (activeMenu) {
@@ -46,7 +83,71 @@ BarGroup {
                 height: 16
 
                 property var trayData: modelData
-                property string trayId: trayData.id || trayData.title || ""
+
+                // Known Electron apps mapping (id pattern -> app name)
+                readonly property var electronApps: ({
+                    "slack": "slack",
+                    "discord": "discord",
+                    "teams": "teams",
+                    "element": "element",
+                    "signal": "signal",
+                    "goofcord": "goofcord",
+                    "legcord": "legcord",
+                    "webcord": "webcord"
+                })
+
+                // For Electron apps, identify which app this tray icon belongs to
+                function findElectronApp() {
+                    // First, check the icon path - it usually contains the app name
+                    let iconStr = String(trayData.icon || "")
+                    let iconLower = iconStr.toLowerCase()
+                    for (let appName in electronApps) {
+                        if (iconLower.includes(appName)) {
+                            return electronApps[appName]
+                        }
+                    }
+
+                    // Fallback: check if any known electron app is running
+                    for (let appName in electronApps) {
+                        for (let toplevel of ToplevelManager.toplevels.values) {
+                            if (!toplevel.HyprlandToplevel) continue
+                            const address = "0x" + toplevel.HyprlandToplevel.address
+                            const winData = HyprlandData.windowByAddress[address]
+                            if (!winData) continue
+                            let winClass = (winData.class || "").toLowerCase()
+                            if (winClass === appName || winClass.includes(appName)) {
+                                return electronApps[appName]
+                            }
+                        }
+                    }
+                    return ""
+                }
+
+                // Use title/tooltipTitle for icon lookup when id is a chrome status icon (Electron apps)
+                property string trayId: {
+                    let id = trayData.id || ""
+                    if (id.startsWith("chrome_status_icon")) {
+                        // For Electron apps, try to match against known apps with open windows
+                        let found = findElectronApp()
+                        if (found) return found
+
+                        // Check title/tooltipTitle only if they look like app names (not status messages)
+                        let title = trayData.title || ""
+                        let tooltip = trayData.tooltipTitle || ""
+                        let statusWords = ["unread", "message", "notification", "online", "offline", "away", "busy", "idle", "connecting"]
+                        let titleLower = title.toLowerCase()
+                        let isStatus = statusWords.some(w => titleLower.includes(w))
+
+                        if (title.length > 0 && title.length < 30 && !isStatus) {
+                            return title
+                        }
+                        if (tooltip.length > 0 && tooltip.length < 30 && !statusWords.some(w => tooltip.toLowerCase().includes(w))) {
+                            return tooltip
+                        }
+                        return id
+                    }
+                    return id || trayData.title || ""
+                }
                 // Check if we have a NerdFont icon for this tray item
                 property bool hasNerdIcon: IconService.hasIcon(trayId)
 
@@ -94,7 +195,10 @@ BarGroup {
                                 }
                             } else {
                                 tray.closeAllMenus()
-                                trayData.activate()
+                                // Try to focus the app window, fall back to activate
+                                if (!tray.focusAppWindow(trayItemContainer.trayId)) {
+                                    trayData.activate()
+                                }
                             }
                         } else if (mouse.button === Qt.MiddleButton) {
                             tray.closeAllMenus()
@@ -143,7 +247,7 @@ BarGroup {
                             spacing: 2
 
                             Text {
-                                text: trayData.title || trayData.id || "Unknown"
+                                text: trayItemContainer.trayId || "Unknown"
                                 color: Colors.foreground
                                 font.pixelSize: 11
                                 font.bold: true

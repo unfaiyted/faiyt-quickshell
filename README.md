@@ -28,6 +28,8 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
   - Simulated animation when no local audio (e.g., Spotify Connect)
   - Click outside to dismiss
 - **System Tray** - Application tray icons with tooltips and menus
+  - Left-click to focus app window (including Electron apps like Slack, Discord)
+  - Right-click for context menu
 - **Network** - Connection status indicator
 - **Weather** - Current weather display
 - **Utilities** - Quick action buttons:

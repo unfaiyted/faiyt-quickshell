@@ -201,8 +201,8 @@ BarGroup {
 
         visible: tooltip.visible
 
-        width: Screen.width
-        height: Screen.height
+        implicitWidth: Screen.width
+        implicitHeight: Screen.height
         color: "transparent"
 
         // Take focus when visible to receive key events
