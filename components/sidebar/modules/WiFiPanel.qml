@@ -282,7 +282,7 @@ Item {
                 }
 
                 // Spacer
-                Item { width: parent.width - 200; height: 1 }
+                Item { width: parent.width - 280; height: 1 }
 
                 // Signal strength
                 Text {

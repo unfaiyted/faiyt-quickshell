@@ -19,6 +19,14 @@ Item {
         NotificationState.clearAll()
     }
 
+    // Helper to dismiss a single notification
+    function dismissNotification(notification) {
+        if (notification) {
+            notification.tracked = false
+            notification.dismiss()
+        }
+    }
+
     // Helper to format timestamp
     function formatTime(timestamp) {
         if (!timestamp) return ""
@@ -166,7 +174,7 @@ Item {
         // Notification list
         Flickable {
             width: parent.width
-            height: parent.height - 60
+            height: parent.height - 50
             clip: true
             contentHeight: notifColumn.height
             boundsBehavior: Flickable.StopAtBounds
@@ -195,11 +203,25 @@ Item {
 
                         property var notification: modelData
                         property bool expanded: false
-                        property int collapsedHeight: 72
-                        property int expandedHeight: bodyText.implicitHeight + actionsRow.height + 100
+                        property int collapsedHeight: 90
+                        property int expandedHeight: bodyText.implicitHeight + actionsRow.height + 120
 
                         Behavior on height {
                             NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+                        }
+
+                        // Background click area with z: -1 to stay behind content
+                        MouseArea {
+                            id: notifArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            z: -1
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (notification && (notification.body || (notification.actions && notification.actions.length > 0))) {
+                                    notifItem.expanded = !notifItem.expanded
+                                }
+                            }
                         }
 
                         Column {
@@ -285,7 +307,7 @@ Item {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
-                                            if (notification) notification.dismiss()
+                                            dismissNotification(notification)
                                         }
                                     }
                                 }
@@ -298,7 +320,7 @@ Item {
                                 font.pixelSize: 11
                                 color: Colors.foregroundAlt
                                 elide: Text.ElideRight
-                                maximumLineCount: expanded ? 1 : 2
+                                maximumLineCount: 2
                                 wrapMode: Text.WordWrap
                                 visible: !expanded && (notification ? notification.body : false)
                             }
@@ -371,17 +393,6 @@ Item {
                             }
                         }
 
-                        MouseArea {
-                            id: notifArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                if (notification && (notification.body || (notification.actions && notification.actions.length > 0))) {
-                                    notifItem.expanded = !notifItem.expanded
-                                }
-                            }
-                        }
                     }
                 }
             }
