@@ -143,7 +143,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.leftMargin: 12
                 Layout.rightMargin: 12
-                Layout.bottomMargin: 12
+                Layout.bottomMargin: notifImage.visible ? 8 : 12
                 visible: root.notif?.body?.length > 0
 
                 text: root.notif?.body ?? ""
@@ -152,6 +152,26 @@ Item {
                 elide: Text.ElideRight
                 wrapMode: Text.WordWrap
                 maximumLineCount: 4
+            }
+
+            // Notification image (for screenshots, etc.)
+            Image {
+                id: notifImage
+                Layout.fillWidth: true
+                Layout.preferredHeight: status === Image.Ready ? Math.min(sourceSize.height, 140) : 0
+                Layout.leftMargin: 12
+                Layout.rightMargin: 12
+                Layout.bottomMargin: status === Image.Ready ? 12 : 0
+
+                source: {
+                    let img = root.notif?.image ?? ""
+                    if (!img) return ""
+                    // Ensure file:// prefix for local paths
+                    if (img.startsWith("/")) return "file://" + img
+                    return img
+                }
+                fillMode: Image.PreserveAspectFit
+                visible: status === Image.Ready
             }
 
             // Action buttons
@@ -244,7 +264,7 @@ Item {
         if (n.includes("terminal") || n.includes("kitty") || n.includes("alacritty")) return ""
         if (n.includes("code") || n.includes("vscode")) return "󰨞"
         if (n.includes("file") || n.includes("nautilus") || n.includes("thunar")) return "󰉋"
-        if (n.includes("screenshot")) return "󰹑"
+        if (n.includes("screen capture") || n.includes("screenshot")) return "󰹑"
         if (n.includes("volume") || n.includes("audio") || n.includes("sound")) return "󰕾"
         if (n.includes("brightness")) return "󰃟"
         if (n.includes("battery")) return "󰁹"

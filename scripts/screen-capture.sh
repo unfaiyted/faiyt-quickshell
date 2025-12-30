@@ -63,11 +63,84 @@ if [ $# -eq 0 ]; then
   usage
 fi
 
+# Notification with actions for screenshots
+# Usage: notify_screenshot "/path/to/image.png"
+notify_screenshot() {
+  local img_path="$1"
+  (
+    ACTION=$(notify-send -a "Screen Capture" "Screenshot Taken" "Copied to clipboard" \
+      -h "string:image-path:$img_path" \
+      -A "open=Open" \
+      -A "delete=Delete")
+
+    case "$ACTION" in
+      open)
+        xdg-open "$img_path"
+        ;;
+      delete)
+        rm -f "$img_path"
+        notify-send -a "Screen Capture" "Screenshot Deleted" "File removed"
+        ;;
+    esac
+  ) &
+}
+
+# Notification with actions for recordings
+# Usage: notify_recording "/path/to/video.mp4" [is_gif]
+notify_recording() {
+  local vid_path="$1"
+  local is_gif="${2:-false}"
+  local file_size
+  file_size=$(du -h "$vid_path" | cut -f1)
+
+  (
+    local thumb_path="/tmp/recording_thumb_$(date +%s).png"
+    local hint_arg=""
+
+    # Generate thumbnail for video (not for GIF)
+    if [ "$is_gif" = "false" ] && command -v ffmpeg >/dev/null 2>&1; then
+      ffmpeg -i "$vid_path" -ss 00:00:01 -vframes 1 "$thumb_path" 2>/dev/null
+      if [ -f "$thumb_path" ]; then
+        hint_arg="-h string:image-path:$thumb_path"
+      fi
+    elif [ "$is_gif" = "true" ]; then
+      # For GIF, use the GIF itself as the image
+      hint_arg="-h string:image-path:$vid_path"
+    fi
+
+    ACTION=$(notify-send -a "Screen Capture" "Recording Saved" "Size: $file_size" \
+      $hint_arg \
+      -A "open=Open" \
+      -A "delete=Delete")
+
+    # Clean up thumbnail
+    [ -f "$thumb_path" ] && rm -f "$thumb_path"
+
+    case "$ACTION" in
+      open)
+        xdg-open "$vid_path"
+        ;;
+      delete)
+        rm -f "$vid_path"
+        notify-send -a "Screen Capture" "Recording Deleted" "File removed"
+        ;;
+    esac
+  ) &
+}
+
 wf-recorder_check() {
   if pgrep -x "wf-recorder" >/dev/null; then
     pkill -INT -x wf-recorder
-    notify-send "Stopping all instances of wf-recorder" "$(cat /tmp/recording.txt)"
-    wl-copy <"$(cat /tmp/recording.txt)"
+    local vid_path
+    vid_path=$(cat /tmp/recording.txt 2>/dev/null)
+    wl-copy < "$vid_path"
+    # Wait a moment for file to be finalized, then notify
+    sleep 0.5
+    if [ -f "$vid_path" ]; then
+      notify_recording "$vid_path" "false"
+    else
+      notify-send -a "Screen Capture" "Recording Stopped" "$vid_path"
+    fi
     exit 0
   fi
 }
@@ -112,27 +185,26 @@ record_gif() {
   
   # After recording stops, convert to GIF
   if [ -f "$temp_video" ]; then
-    notify-send "Converting to GIF" "Processing recording..."
-    
+    notify-send -a "Screen Capture" "Converting to GIF" "Processing recording..."
+
     # Create high-quality GIF with optimized palette
     # Using ffmpeg with palette generation for better colors
     ffmpeg -i "$temp_video" \
       -vf "fps=15,scale=iw:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
       -loop 0 \
       "$output_file" 2>/tmp/gif_conversion.log
-    
+
     if [ $? -eq 0 ]; then
       # Clean up temp file
       rm -f "$temp_video"
       rm -f /tmp/gif_temp_video.txt
-      
-      # Copy to clipboard and notify
+
+      # Copy to clipboard and notify with actions
       wl-copy <"$output_file"
-      file_size=$(du -h "$output_file" | cut -f1)
-      notify-send "GIF Created" "Size: $file_size - Copied to clipboard"
+      notify_recording "$output_file" "true"
     else
       error=$(cat /tmp/gif_conversion.log | tail -n 5)
-      notify-send "GIF Conversion Failed" "Error: $error"
+      notify-send -a "Screen Capture" "GIF Conversion Failed" "Error: $error"
       rm -f "$temp_video"
       rm -f /tmp/gif_temp_video.txt
     fi
@@ -153,17 +225,17 @@ case "$COMMAND" in
       "selection")
         grim -g "$(slurp)" "$IMG"
         wl-copy <"$IMG"
-        notify-send "Screenshot Taken" -i "${IMG}"
+        notify_screenshot "$IMG"
         ;;
       "eDP-1")
         grim -c -o eDP-1 "$IMG"
         wl-copy <"$IMG"
-        notify-send "Screenshot Taken" -i "${IMG}"
+        notify_screenshot "$IMG"
         ;;
       "HDMI-A-1")
         grim -c -o HDMI-A-1 "$IMG"
         wl-copy <"$IMG"
-        notify-send "Screenshot Taken" -i "${IMG}"
+        notify_screenshot "$IMG"
         ;;
       "both")
         grim -c -o eDP-1 "${IMG//.png/-eDP-1.png}"
@@ -171,7 +243,7 @@ case "$COMMAND" in
         montage "${IMG//.png/-eDP-1.png}" "${IMG//.png/-HDMI-A-1.png}" -tile 2x1 -geometry +0+0 "$IMG"
         wl-copy <"$IMG"
         rm "${IMG//.png/-eDP-1.png}" "${IMG//.png/-HDMI-A-1.png}"
-        notify-send "Screenshot Taken" -i "${IMG}"
+        notify_screenshot "$IMG"
         ;;
       *)
         echo "Error: Invalid screenshot target '$TARGET'"
@@ -218,19 +290,19 @@ case "$COMMAND" in
       "selection")
         wf-recorder_check
         echo "$VID_HQ" >/tmp/recording.txt
-        notify-send "High Quality Recording" "Starting YouTube-quality recording..."
+        notify-send -a "Screen Capture" "High Quality Recording" "Starting YouTube-quality recording..."
         record_high_quality "$VID_HQ" -g "$(slurp)"
         ;;
       "eDP-1")
         wf-recorder_check
         echo "$VID_HQ" >/tmp/recording.txt
-        notify-send "High Quality Recording" "Starting YouTube-quality recording on eDP-1..."
+        notify-send -a "Screen Capture" "High Quality Recording" "Starting on eDP-1..."
         record_high_quality "$VID_HQ" -a -o eDP-1
         ;;
       "HDMI-A-1")
         wf-recorder_check
         echo "$VID_HQ" >/tmp/recording.txt
-        notify-send "High Quality Recording" "Starting YouTube-quality recording on HDMI-A-1..."
+        notify-send -a "Screen Capture" "High Quality Recording" "Starting on HDMI-A-1..."
         record_high_quality "$VID_HQ" -a -o HDMI-A-1
         ;;
       *)
@@ -251,19 +323,19 @@ case "$COMMAND" in
       "selection")
         wf-recorder_check
         echo "$GIF" >/tmp/recording.txt
-        notify-send "GIF Recording" "Starting GIF recording (15 FPS)..."
+        notify-send -a "Screen Capture" "GIF Recording" "Starting (15 FPS)..."
         record_gif "$GIF" -g "$(slurp)"
         ;;
       "eDP-1")
         wf-recorder_check
         echo "$GIF" >/tmp/recording.txt
-        notify-send "GIF Recording" "Starting GIF recording on eDP-1..."
+        notify-send -a "Screen Capture" "GIF Recording" "Starting on eDP-1..."
         record_gif "$GIF" -o eDP-1
         ;;
       "HDMI-A-1")
         wf-recorder_check
         echo "$GIF" >/tmp/recording.txt
-        notify-send "GIF Recording" "Starting GIF recording on HDMI-A-1..."
+        notify-send -a "Screen Capture" "GIF Recording" "Starting on HDMI-A-1..."
         record_gif "$GIF" -o HDMI-A-1
         ;;
       *)
@@ -289,7 +361,7 @@ case "$COMMAND" in
       "webm")
         # Check if ffmpeg is installed
         if ! command -v ffmpeg >/dev/null 2>&1; then
-          notify-send "Error" "ffmpeg is not installed. Please install it to use this feature."
+          notify-send -a "Screen Capture" "Error" "ffmpeg is not installed"
           exit 1
         fi
 
@@ -308,26 +380,26 @@ case "$COMMAND" in
 
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
-                notify-send "Converted to WebM" "$(basename "$mp4_file")"
+                notify-send -a "Screen Capture" "Converted to WebM" "$(basename "$mp4_file")"
               else
                 error=$(cat /tmp/ffmpeg_error.log | tail -n 5)
-                notify-send "Conversion Failed" "Error: $error"
+                notify-send -a "Screen Capture" "Conversion Failed" "Error: $error"
               fi
             fi
           fi
         done
 
         if [ $TOTAL -eq 0 ]; then
-          notify-send "WebM Conversion" "No MP4 files found in Recordings folder"
+          notify-send -a "Screen Capture" "WebM Conversion" "No MP4 files found"
         else
-          notify-send "WebM Conversion Complete" "Converted $CONVERTED out of $TOTAL MP4 files"
+          notify-send -a "Screen Capture" "WebM Conversion Complete" "Converted $CONVERTED of $TOTAL files"
         fi
         ;;
 
       "iphone")
         # Check if ffmpeg is installed
         if ! command -v ffmpeg >/dev/null 2>&1; then
-          notify-send "Error" "ffmpeg is not installed. Please install it to use this feature."
+          notify-send -a "Screen Capture" "Error" "ffmpeg is not installed"
           exit 1
         fi
 
@@ -356,10 +428,10 @@ case "$COMMAND" in
 
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
-                notify-send "Converted for iPhone" "$(basename "$mp4_file")"
+                notify-send -a "Screen Capture" "Converted for iPhone" "$(basename "$mp4_file")"
               else
                 error=$(cat /tmp/ffmpeg_error.log | tail -n 5)
-                notify-send "Conversion Failed" "Error: $error"
+                notify-send -a "Screen Capture" "Conversion Failed" "Error: $error"
               fi
             else
               SKIPPED_EXISTING=$((SKIPPED_EXISTING+1))
@@ -368,19 +440,16 @@ case "$COMMAND" in
         done
 
         if [ $TOTAL_FILES -eq 0 ]; then
-          notify-send "iPhone Conversion" "No MP4 files found in Recordings folder"
+          notify-send -a "Screen Capture" "iPhone Conversion" "No MP4 files found"
         else
-          notify-send "iPhone Conversion Complete" "Converted: $CONVERTED files
-Skipped (already iPhone): $SKIPPED_IPHONE files
-Skipped (has iPhone version): $SKIPPED_EXISTING files
-Total files checked: $TOTAL_FILES"
+          notify-send -a "Screen Capture" "iPhone Conversion Complete" "Converted: $CONVERTED files"
         fi
         ;;
 
       "youtube")
         # Check if ffmpeg is installed
         if ! command -v ffmpeg >/dev/null 2>&1; then
-          notify-send "Error" "ffmpeg is not installed. Please install it to use this feature."
+          notify-send -a "Screen Capture" "Error" "ffmpeg is not installed"
           exit 1
         fi
 
@@ -405,7 +474,7 @@ Total files checked: $TOTAL_FILES"
 
             # Check if YouTube version doesn't already exist
             if [ ! -f "$youtube_file" ]; then
-              notify-send "Converting for YouTube" "Processing: $(basename "$video_file")"
+              notify-send -a "Screen Capture" "Converting for YouTube" "Processing: $(basename "$video_file")"
 
               ffmpeg -y -i "$video_file" \
                 -c:v libx264 \
@@ -421,10 +490,10 @@ Total files checked: $TOTAL_FILES"
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
                 file_size=$(du -h "$youtube_file" | cut -f1)
-                notify-send "YouTube Conversion Success" "$(basename "$video_file") → $(basename "$youtube_file") ($file_size)"
+                notify-send -a "Screen Capture" "YouTube Conversion Success" "$(basename "$youtube_file") ($file_size)"
               else
                 error=$(cat /tmp/ffmpeg_error.log | tail -n 5)
-                notify-send "YouTube Conversion Failed" "Error converting $(basename "$video_file"): $error"
+                notify-send -a "Screen Capture" "YouTube Conversion Failed" "Error: $error"
               fi
             else
               SKIPPED_EXISTING=$((SKIPPED_EXISTING+1))
@@ -433,19 +502,16 @@ Total files checked: $TOTAL_FILES"
         done
 
         if [ $TOTAL_FILES -eq 0 ]; then
-          notify-send "YouTube Conversion" "No MP4 files found in Recordings folder"
+          notify-send -a "Screen Capture" "YouTube Conversion" "No MP4 files found"
         else
-          notify-send "YouTube Conversion Complete" "Converted: $CONVERTED files
-Skipped (already YouTube): $SKIPPED_YOUTUBE files
-Skipped (has YouTube version): $SKIPPED_EXISTING files
-Total files checked: $TOTAL_FILES"
+          notify-send -a "Screen Capture" "YouTube Conversion Complete" "Converted: $CONVERTED files"
         fi
         ;;
 
       "gif")
         # Check if ffmpeg is installed
         if ! command -v ffmpeg >/dev/null 2>&1; then
-          notify-send "Error" "ffmpeg is not installed. Please install it to use this feature."
+          notify-send -a "Screen Capture" "Error" "ffmpeg is not installed"
           exit 1
         fi
 
@@ -464,7 +530,7 @@ Total files checked: $TOTAL_FILES"
 
             # Check if GIF version doesn't already exist
             if [ ! -f "$gif_file" ]; then
-              notify-send "Converting to GIF" "Processing: $(basename "$video_file")"
+              notify-send -a "Screen Capture" "Converting to GIF" "Processing: $(basename "$video_file")"
 
               # Get video dimensions for scaling
               width=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=s=x:p=0 "$video_file")
@@ -485,10 +551,10 @@ Total files checked: $TOTAL_FILES"
               if [ $? -eq 0 ]; then
                 CONVERTED=$((CONVERTED+1))
                 file_size=$(du -h "$gif_file" | cut -f1)
-                notify-send "GIF Conversion Success" "$(basename "$video_file") → $(basename "$gif_file") ($file_size)"
+                notify-send -a "Screen Capture" "GIF Created" "$(basename "$gif_file") ($file_size)" -h "string:image-path:$gif_file"
               else
                 error=$(cat /tmp/ffmpeg_error.log | tail -n 5)
-                notify-send "GIF Conversion Failed" "Error converting $(basename "$video_file"): $error"
+                notify-send -a "Screen Capture" "GIF Conversion Failed" "Error: $error"
               fi
             else
               SKIPPED_EXISTING=$((SKIPPED_EXISTING+1))
@@ -497,11 +563,9 @@ Total files checked: $TOTAL_FILES"
         done
 
         if [ $TOTAL_FILES -eq 0 ]; then
-          notify-send "GIF Conversion" "No MP4 files found in Recordings folder"
+          notify-send -a "Screen Capture" "GIF Conversion" "No MP4 files found"
         else
-          notify-send "GIF Conversion Complete" "Converted: $CONVERTED files
-Skipped (has GIF version): $SKIPPED_EXISTING files
-Total files checked: $TOTAL_FILES"
+          notify-send -a "Screen Capture" "GIF Conversion Complete" "Converted: $CONVERTED files"
         fi
         ;;
       

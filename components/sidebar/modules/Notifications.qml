@@ -52,7 +52,7 @@ Item {
         if (n.includes("terminal") || n.includes("kitty") || n.includes("alacritty")) return ""
         if (n.includes("code") || n.includes("vscode")) return "󰨞"
         if (n.includes("file") || n.includes("nautilus") || n.includes("thunar")) return "󰉋"
-        if (n.includes("screenshot")) return "󰹑"
+        if (n.includes("screen capture") || n.includes("screenshot")) return "󰹑"
         if (n.includes("volume") || n.includes("audio") || n.includes("sound")) return "󰕾"
         if (n.includes("brightness")) return "󰃟"
         if (n.includes("battery")) return "󰁹"
@@ -204,7 +204,7 @@ Item {
                         property var notification: modelData
                         property bool expanded: false
                         property int collapsedHeight: 90
-                        property int expandedHeight: bodyText.implicitHeight + actionsRow.height + 120
+                        property int expandedHeight: bodyText.implicitHeight + notifImage.height + actionsRow.height + 140
 
                         Behavior on height {
                             NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
@@ -338,11 +338,14 @@ Item {
 
                             // Notification image (if present)
                             Image {
-                                width: Math.min(parent.width, 200)
-                                height: width * 0.6
+                                id: notifImage
+                                width: parent.width
+                                height: status === Image.Ready ? Math.min(implicitHeight, 180) : 0
                                 fillMode: Image.PreserveAspectFit
-                                source: notification && notification.image ? notification.image : ""
-                                visible: expanded && notification && notification.image
+                                sourceSize.width: 1920
+                                sourceSize.height: 1080
+                                source: expanded && notification?.image ? (notification.image.startsWith("/") ? "file://" + notification.image : notification.image) : ""
+                                visible: status === Image.Ready
                             }
 
                             // Action buttons
