@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import "../../../theme"
 import "../../notifications"
+import ".."
 
 Item {
     id: notifications
@@ -353,10 +354,10 @@ Item {
                                 id: actionsRow
                                 width: parent.width
                                 spacing: 8
-                                visible: expanded && notification && notification.actions && notification.actions.length > 0
+                                visible: expanded && notifItem.notification && notifItem.notification.actions && notifItem.notification.actions.length > 0
 
                                 Repeater {
-                                    model: notification ? notification.actions : []
+                                    model: notifItem.notification ? notifItem.notification.actions : []
 
                                     Rectangle {
                                         width: actionText.width + 20
@@ -378,7 +379,14 @@ Item {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                if (modelData) modelData.invoke()
+                                                if (modelData) {
+                                                    // Get app name before invoking
+                                                    let appName = notifItem.notification?.appName ?? ""
+                                                    modelData.invoke()
+                                                    // Close sidebar and focus the app window
+                                                    SidebarState.rightOpen = false
+                                                    NotificationState.focusAppWindow(appName)
+                                                }
                                             }
                                         }
                                     }

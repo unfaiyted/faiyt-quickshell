@@ -4,6 +4,9 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import Quickshell.Hyprland
+import Quickshell.Wayland
+import "../overview"
 
 Singleton {
     id: root
@@ -116,5 +119,36 @@ Singleton {
         while (notifications.length > 0) {
             notifications[0].remove()
         }
+    }
+
+    // Focus window by app name/class (reused from SystemTray pattern)
+    function focusAppWindow(appName) {
+        if (!appName) return false
+
+        HyprlandData.updateWindowList()
+        let appLower = appName.toLowerCase().trim()
+
+        let words = appLower.split(/[\s\-_]+/)
+        let firstWord = words[0] || appLower
+        let lastWord = words[words.length - 1] || appLower
+
+        for (let toplevel of ToplevelManager.toplevels.values) {
+            if (!toplevel.HyprlandToplevel) continue
+            const address = "0x" + toplevel.HyprlandToplevel.address
+            const winData = HyprlandData.windowByAddress[address]
+            if (!winData) continue
+
+            let winClass = (winData.class || "").toLowerCase()
+            let winTitle = (winData.title || "").toLowerCase()
+
+            if (winClass.includes(appLower) || appLower.includes(winClass) ||
+                winClass.includes(firstWord) || winClass.includes(lastWord) ||
+                winTitle.includes(appLower) || winTitle.includes(firstWord) ||
+                firstWord.includes(winClass) || lastWord.includes(winClass)) {
+                Hyprland.dispatch("focuswindow address:" + winData.address)
+                return true
+            }
+        }
+        return false
     }
 }

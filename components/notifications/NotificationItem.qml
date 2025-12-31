@@ -212,6 +212,8 @@ Item {
                             onClicked: {
                                 if (actionBtn.modelData) {
                                     actionBtn.modelData.invoke()
+                                    // Focus the app window after invoking the action
+                                    NotificationState.focusAppWindow(root.notif?.appName ?? "")
                                 }
                             }
                         }
