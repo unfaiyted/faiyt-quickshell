@@ -89,7 +89,12 @@ BarGroup {
 
     // Hover state tracking for popup - at module level so accessible everywhere
     property bool hoverModule: false
-    property bool hoverPopup: false
+    // Check if mouse is over any part of the popup
+    property bool hoverPopup: tooltipMouseArea.containsMouse ||
+                              progressMouseArea.containsMouse ||
+                              prevArea.containsMouse ||
+                              playArea.containsMouse ||
+                              nextArea.containsMouse
 
     // Format time helper
     function formatTime(seconds) {
@@ -273,14 +278,8 @@ BarGroup {
                 id: tooltipMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
-                onEntered: {
-                    musicModule.hoverPopup = true
-                    closeTimer.stop()
-                }
-                onExited: {
-                    musicModule.hoverPopup = false
-                    tooltip.scheduleClose()
-                }
+                onEntered: closeTimer.stop()
+                onExited: tooltip.scheduleClose()
             }
 
             Column {
@@ -358,14 +357,15 @@ BarGroup {
                     }
                 }
 
-                // Cava visualization bars - full 30 bars in popup
+                // Cava visualization bars - full 40 bars in popup
                 Item {
                     width: parent.width
                     height: 36
                     visible: musicModule.isPlaying
 
                     Row {
-                        anchors.centerIn: parent
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
                         spacing: 1
 
                         Repeater {

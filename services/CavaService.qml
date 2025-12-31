@@ -54,9 +54,25 @@ Singleton {
 
     Process {
         id: cavaProc
-        command: ["cava", "-p", "/dev/stdin"]
+        command: ["sh", "-c",
+            "cat > /tmp/cava-qs.conf << 'EOF'\n" +
+            "[general]\n" +
+            "framerate = 60\n" +
+            "bars = " + cavaService.barCount + "\n" +
+            "[input]\n" +
+            "method = pulse\n" +
+            "source = auto\n" +
+            "[output]\n" +
+            "method = raw\n" +
+            "channels = mono\n" +
+            "data_format = ascii\n" +
+            "ascii_max_range = 100\n" +
+            "[smoothing]\n" +
+            "noise_reduction = 20\n" +
+            "EOF\n" +
+            "exec cava -p /tmp/cava-qs.conf"
+        ]
         running: false
-        stdinEnabled: true
 
         stdout: SplitParser {
             onRead: data => {
@@ -64,23 +80,6 @@ Singleton {
                 cavaService.rawValues = data.split(";")
                     .filter(v => v.length > 0)
                     .map(v => parseInt(v))
-            }
-        }
-
-        onRunningChanged: {
-            if (running) {
-                // Send config via stdin
-                let config = "[general]\n" +
-                    "framerate = 60\n" +
-                    "bars = " + cavaService.barCount + "\n" +
-                    "[output]\n" +
-                    "method = raw\n" +
-                    "channels = mono\n" +
-                    "data_format = ascii\n" +
-                    "ascii_max_range = 100\n" +
-                    "[smoothing]\n" +
-                    "noise_reduction = 20\n"
-                write(config)
             }
         }
     }
