@@ -65,7 +65,8 @@ Slide-out panel with multiple tabs:
 **Header Section:**
 - User avatar (profile picture from AccountsService, or letter fallback)
 - Username, hostname, and system uptime
-- Settings and power buttons
+- Settings button (opens Settings Panel)
+- Power button
 
 **Quick Toggles:**
 - WiFi on/off
@@ -88,6 +89,25 @@ Developer tools panel with search and category filtering:
 - Node Version - Check Node.js, npm, Bun versions
 - Disk Usage - Check disk space
 - Network Info - View network interfaces
+
+### Settings Panel
+Full-featured settings overlay for customizing the shell:
+
+**Sections:**
+- **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode
+- **Time & Weather** - Time format, weather city, temperature unit (C/F)
+- **Search/Launcher** - Max results, feature toggles (actions, commands, math results, directory search, AI search, web search)
+- **Search Evaluators** - Toggle individual evaluators (math, base converter, color, date/time, percentage, units)
+- **Battery** - Low and critical battery thresholds
+- **Animations** - Duration and choreography delay
+- **Windows & Components** - Enable/disable bar, corners, launcher, sidebars, overlays, notifications
+
+**Features:**
+- Searchable settings (type to filter)
+- Theme preview with color swatches
+- Persistent JSON configuration at `~/.config/faiyt-qs/config.json`
+- ESC or click outside to close
+- Smooth open/close animations
 
 ### Launcher
 Application launcher with instant evaluators and multiple search modes:
@@ -285,15 +305,28 @@ faiyt-qs/
 │   ├── notifications/
 │   │   ├── NotificationServer.qml  # Singleton notification daemon
 │   │   └── NotificationPopups.qml  # Popup windows
-│   └── overview/
-│       ├── Overview.qml          # Main overview entry with IPC
-│       ├── OverviewState.qml     # Singleton state
-│       ├── OverviewWidget.qml    # Workspace grid layout
-│       ├── OverviewWindow.qml    # Individual window preview
-│       └── HyprlandData.qml      # Hyprctl data singleton
+│   ├── overview/
+│   │   ├── Overview.qml          # Main overview entry with IPC
+│   │   ├── OverviewState.qml     # Singleton state
+│   │   ├── OverviewWidget.qml    # Workspace grid layout
+│   │   ├── OverviewWindow.qml    # Individual window preview
+│   │   └── HyprlandData.qml      # Hyprctl data singleton
+│   └── settings/
+│       ├── SettingsWindow.qml    # Full-screen overlay
+│       ├── SettingsPanel.qml     # Main panel with all sections
+│       ├── SettingsState.qml     # Singleton state + IPC
+│       ├── ThemeSelector.qml     # Theme picker with previews
+│       └── components/           # Reusable settings components
+│           ├── SettingsSection.qml
+│           ├── SettingRow.qml
+│           ├── ToggleSwitch.qml
+│           ├── NumberInput.qml
+│           ├── SettingsTextInput.qml
+│           └── DropdownSelect.qml
 ├── services/
 │   ├── BluetoothService.qml     # Bluetooth device management singleton
 │   ├── CavaService.qml          # Audio visualization (cava) singleton
+│   ├── ConfigService.qml        # Settings persistence (JSON config)
 │   └── IconService.qml          # Centralized NerdFont icon mappings
 ├── scripts/
 │   └── screen-capture.sh        # Screenshot and recording script
@@ -325,6 +358,9 @@ bind = SUPER, N, exec, qs ipc call sidebar toggleRight
 
 # Toggle left sidebar
 bind = SUPER, T, exec, qs ipc call sidebar toggleLeft
+
+# Toggle settings
+bind = SUPER, Comma, exec, qs ipc call settings toggle
 
 # Screen capture
 bind = , Print, exec, qs ipc call recording toggle
@@ -364,6 +400,11 @@ qs ipc call recording getMode    # Get current recording mode
 qs ipc call overview toggle      # Toggle overview mode
 qs ipc call overview open        # Open overview
 qs ipc call overview close       # Close overview
+
+# Settings
+qs ipc call settings toggle      # Toggle settings panel
+qs ipc call settings open        # Open settings panel
+qs ipc call settings close       # Close settings panel
 
 # System Resources
 qs ipc call sysresources setNetSpeed 930  # Set max network speed in Mbps

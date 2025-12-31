@@ -2,6 +2,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 import Quickshell.Io
 import "../../../theme"
+import "../../../components/settings"
 
 Item {
     id: header
@@ -230,12 +231,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: settingsProcess.running = true
-                }
-
-                Process {
-                    id: settingsProcess
-                    command: ["gnome-control-center"]
+                    onClicked: SettingsState.toggle()
                 }
             }
 

@@ -9,6 +9,7 @@ import "components/notifications"
 import "components/wallpaper"
 import "components/launcher"
 import "components/overview"
+import "components/settings"
 import "services"
 
 ShellRoot {
@@ -34,4 +35,5 @@ ShellRoot {
     WallpaperWindow {}
     LauncherWindow {}
     Overview {}
+    SettingsWindow {}
 }

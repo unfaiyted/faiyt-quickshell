@@ -87,6 +87,10 @@ BarGroup {
     property bool canPrevious: player ? player.canGoPrevious : false
     property bool canNext: player ? player.canGoNext : false
 
+    // Hover state tracking for popup - at module level so accessible everywhere
+    property bool hoverModule: false
+    property bool hoverPopup: false
+
     // Format time helper
     function formatTime(seconds) {
         var mins = Math.floor(seconds / 60)
@@ -131,7 +135,8 @@ BarGroup {
                 anchors.bottom: parent.bottom
 
                 Repeater {
-                    model: CavaService.values
+                    // Only show first 6 bars in the bar module
+                    model: CavaService.values.slice(0, 6)
                     Rectangle {
                         width: 3
                         height: Math.max(3, modelData * 0.14)
@@ -183,72 +188,15 @@ BarGroup {
                 musicModule.player.togglePlaying()
             }
         }
-        onContainsMouseChanged: {
-            if (containsMouse && musicModule.trackTitle.length > 0) {
+        onEntered: {
+            musicModule.hoverModule = true
+            if (musicModule.trackTitle.length > 0) {
                 tooltip.show()
-            } else if (!containsMouse && !tooltip.mouseInside) {
-                tooltip.startCloseTimer()
             }
         }
-    }
-
-    // Click-away overlay with ESC key and distance-based auto-close
-    PopupWindow {
-        id: clickAwayOverlay
-        anchor.window: QsWindow.window
-        anchor.rect: Qt.rect(0, 0, 0, 0)
-        anchor.edges: Edges.Top | Edges.Left
-
-        visible: tooltip.visible
-
-        implicitWidth: Screen.width
-        implicitHeight: Screen.height
-        color: "transparent"
-
-        // Take focus when visible to receive key events
-        onVisibleChanged: {
-            if (visible) {
-                overlayFocusScope.forceActiveFocus()
-            }
-        }
-
-        FocusScope {
-            id: overlayFocusScope
-            anchors.fill: parent
-            focus: true
-
-            Keys.onEscapePressed: tooltip.hide()
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-
-            // Close on click
-            onClicked: tooltip.hide()
-
-            // Track mouse position for distance-based auto-close
-            onPositionChanged: function(mouse) {
-                if (!tooltip.visible) return
-
-                // Get tooltip position
-                const tooltipPos = musicModule.mapToItem(null, 0, musicModule.height)
-                const tooltipX = tooltipPos.x
-                const tooltipY = tooltipPos.y + 7  // Account for anchor offset
-                const tooltipWidth = 280
-                const tooltipHeight = 200  // Approximate
-
-                // Calculate distance from mouse to tooltip bounds
-                const distX = mouse.x < tooltipX ? tooltipX - mouse.x :
-                              mouse.x > tooltipX + tooltipWidth ? mouse.x - (tooltipX + tooltipWidth) : 0
-                const distY = mouse.y < tooltipY ? tooltipY - mouse.y :
-                              mouse.y > tooltipY + tooltipHeight ? mouse.y - (tooltipY + tooltipHeight) : 0
-
-                // Close if mouse is more than 150px away from tooltip
-                if (distX > 150 || distY > 150) {
-                    tooltip.hide()
-                }
-            }
+        onExited: {
+            musicModule.hoverModule = false
+            tooltip.scheduleClose()
         }
     }
 
@@ -265,10 +213,11 @@ BarGroup {
 
         visible: false
 
-        property bool mouseInside: false
         property real slideOffset: -tooltipContent.height
 
         function show() {
+            closeTimer.stop()
+            hideTimer.stop()
             visible = true
             slideOffset = 0
         }
@@ -278,15 +227,19 @@ BarGroup {
             hideTimer.start()
         }
 
-        function startCloseTimer() {
-            closeTimer.start()
+        function scheduleClose() {
+            // Only schedule if not already scheduled
+            if (!closeTimer.running) {
+                closeTimer.start()
+            }
         }
 
         Timer {
             id: closeTimer
-            interval: 200
+            interval: 300  // Enough time to cross the gap
             onTriggered: {
-                if (!tooltip.mouseInside && !mouseArea.containsMouse) {
+                // Only close if not hovering either the module or popup
+                if (!musicModule.hoverModule && !musicModule.hoverPopup) {
                     tooltip.hide()
                 }
             }
@@ -320,10 +273,13 @@ BarGroup {
                 id: tooltipMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
-                onContainsMouseChanged: {
-                    if (containsMouse) {
-                        tooltip.mouseInside = true
-                    }
+                onEntered: {
+                    musicModule.hoverPopup = true
+                    closeTimer.stop()
+                }
+                onExited: {
+                    musicModule.hoverPopup = false
+                    tooltip.scheduleClose()
                 }
             }
 
@@ -402,21 +358,21 @@ BarGroup {
                     }
                 }
 
-                // Cava visualization bars
+                // Cava visualization bars - full 30 bars in popup
                 Item {
                     width: parent.width
-                    height: 32
+                    height: 36
                     visible: musicModule.isPlaying
 
                     Row {
                         anchors.centerIn: parent
-                        spacing: 3
+                        spacing: 1
 
                         Repeater {
                             model: CavaService.values
                             Rectangle {
-                                width: 4
-                                height: Math.max(4, modelData * 0.3)
+                                width: 5
+                                height: Math.max(4, modelData * 0.35)
                                 radius: 2
                                 color: Colors.primary
                                 anchors.bottom: parent.bottom
@@ -470,10 +426,6 @@ BarGroup {
                             anchors.margins: -4
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onContainsMouseChanged: {
-                                if (containsMouse) tooltip.mouseInside = true
-                            }
-                            onExited: tooltip.startCloseTimer()
                             onClicked: function(mouse) {
                                 if (musicModule.player && musicModule.length > 0) {
                                     var seekPos = (mouse.x / progressBar.width) * musicModule.length
@@ -532,10 +484,6 @@ BarGroup {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: musicModule.canPrevious ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onContainsMouseChanged: {
-                                if (containsMouse) tooltip.mouseInside = true
-                            }
-                            onExited: tooltip.startCloseTimer()
                             onClicked: {
                                 if (musicModule.canPrevious && musicModule.player) {
                                     musicModule.player.previous()
@@ -564,10 +512,6 @@ BarGroup {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onContainsMouseChanged: {
-                                if (containsMouse) tooltip.mouseInside = true
-                            }
-                            onExited: tooltip.startCloseTimer()
                             onClicked: {
                                 if (musicModule.player && musicModule.player.canTogglePlaying) {
                                     musicModule.player.togglePlaying()
@@ -597,10 +541,6 @@ BarGroup {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: musicModule.canNext ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onContainsMouseChanged: {
-                                if (containsMouse) tooltip.mouseInside = true
-                            }
-                            onExited: tooltip.startCloseTimer()
                             onClicked: {
                                 if (musicModule.canNext && musicModule.player) {
                                     musicModule.player.next()

@@ -1,0 +1,8 @@
+module components
+
+SettingsSection 1.0 SettingsSection.qml
+SettingRow 1.0 SettingRow.qml
+ToggleSwitch 1.0 ToggleSwitch.qml
+NumberInput 1.0 NumberInput.qml
+SettingsTextInput 1.0 SettingsTextInput.qml
+DropdownSelect 1.0 DropdownSelect.qml

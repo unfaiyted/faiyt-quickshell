@@ -6,7 +6,7 @@ import Quickshell.Io
 Singleton {
     id: cavaService
 
-    property int barCount: 6
+    property int barCount: 40
     property var values: []
     property var rawValues: []  // Raw cava values
     property var simulatedValues: []  // Simulated animation values
