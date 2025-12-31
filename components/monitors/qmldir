@@ -1,0 +1,8 @@
+module monitors
+
+singleton MonitorsState 1.0 MonitorsState.qml
+MonitorsWindow 1.0 MonitorsWindow.qml
+MonitorsPanel 1.0 MonitorsPanel.qml
+MonitorCanvas 1.0 MonitorCanvas.qml
+MonitorItem 1.0 MonitorItem.qml
+MonitorSettings 1.0 MonitorSettings.qml

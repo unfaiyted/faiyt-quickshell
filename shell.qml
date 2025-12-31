@@ -10,6 +10,7 @@ import "components/wallpaper"
 import "components/launcher"
 import "components/overview"
 import "components/settings"
+import "components/monitors"
 import "services"
 
 ShellRoot {
@@ -36,4 +37,5 @@ ShellRoot {
     LauncherWindow {}
     Overview {}
     SettingsWindow {}
+    MonitorsWindow {}
 }

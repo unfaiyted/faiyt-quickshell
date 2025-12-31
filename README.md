@@ -94,7 +94,7 @@ Developer tools panel with search and category filtering:
 Full-featured settings overlay for customizing the shell:
 
 **Sections:**
-- **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode
+- **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode, display settings
 - **Time & Weather** - Time format, weather city, temperature unit (C/F)
 - **Search/Launcher** - Max results, feature toggles (actions, commands, math results, directory search, AI search, web search)
 - **Search Evaluators** - Toggle individual evaluators (math, base converter, color, date/time, percentage, units)
@@ -108,6 +108,22 @@ Full-featured settings overlay for customizing the shell:
 - Persistent JSON configuration at `~/.config/faiyt-qs/config.json`
 - ESC or click outside to close
 - Smooth open/close animations
+
+### Monitor Configuration
+Visual monitor arrangement and configuration panel:
+
+**Features:**
+- Drag-and-drop monitor positioning with edge snapping
+- Visual representation of monitor layout at scale
+- Resolution and refresh rate selection
+- Scale factor configuration (1x, 1.25x, 1.5x, 2x, etc.)
+- Transform/rotation options (0°, 90°, 180°, 270°, flipped variants)
+- Auto-align monitors in a row
+- Apply, Reset, and Auto-align buttons
+
+**Access:**
+- Settings panel → Appearance → "Open Display Settings" button
+- IPC: `qs ipc call monitors toggle`
 
 ### Launcher
 Application launcher with instant evaluators and multiple search modes:
@@ -311,18 +327,25 @@ faiyt-qs/
 │   │   ├── OverviewWidget.qml    # Workspace grid layout
 │   │   ├── OverviewWindow.qml    # Individual window preview
 │   │   └── HyprlandData.qml      # Hyprctl data singleton
-│   └── settings/
-│       ├── SettingsWindow.qml    # Full-screen overlay
-│       ├── SettingsPanel.qml     # Main panel with all sections
-│       ├── SettingsState.qml     # Singleton state + IPC
-│       ├── ThemeSelector.qml     # Theme picker with previews
-│       └── components/           # Reusable settings components
-│           ├── SettingsSection.qml
-│           ├── SettingRow.qml
-│           ├── ToggleSwitch.qml
-│           ├── NumberInput.qml
-│           ├── SettingsTextInput.qml
-│           └── DropdownSelect.qml
+│   ├── settings/
+│   │   ├── SettingsWindow.qml    # Full-screen overlay
+│   │   ├── SettingsPanel.qml     # Main panel with all sections
+│   │   ├── SettingsState.qml     # Singleton state + IPC
+│   │   ├── ThemeSelector.qml     # Theme picker with previews
+│   │   └── components/           # Reusable settings components
+│   │       ├── SettingsSection.qml
+│   │       ├── SettingRow.qml
+│   │       ├── ToggleSwitch.qml
+│   │       ├── NumberInput.qml
+│   │       ├── SettingsTextInput.qml
+│   │       └── DropdownSelect.qml
+│   └── monitors/
+│       ├── MonitorsWindow.qml    # Full-screen overlay
+│       ├── MonitorsPanel.qml     # Main panel with canvas + settings
+│       ├── MonitorsState.qml     # Singleton state + IPC
+│       ├── MonitorCanvas.qml     # Monitor arrangement canvas
+│       ├── MonitorItem.qml       # Draggable monitor representation
+│       └── MonitorSettings.qml   # Resolution/scale/transform settings
 ├── services/
 │   ├── BluetoothService.qml     # Bluetooth device management singleton
 │   ├── CavaService.qml          # Audio visualization (cava) singleton
@@ -405,6 +428,11 @@ qs ipc call overview close       # Close overview
 qs ipc call settings toggle      # Toggle settings panel
 qs ipc call settings open        # Open settings panel
 qs ipc call settings close       # Close settings panel
+
+# Monitor Configuration
+qs ipc call monitors toggle      # Toggle monitor configuration
+qs ipc call monitors open        # Open monitor configuration
+qs ipc call monitors close       # Close monitor configuration
 
 # System Resources
 qs ipc call sysresources setNetSpeed 930  # Set max network speed in Mbps

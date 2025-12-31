@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell.Io
 import "../../theme"
 import "../../services"
+import "../../components/monitors"
 import "components"
 
 Rectangle {
@@ -182,6 +183,56 @@ Rectangle {
 
                     ThemeSelector {
                         visible: contentColumn.matchesSearch("theme")
+                    }
+
+                    // Display Settings button
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("display") || contentColumn.matchesSearch("monitor")
+                        label: "Display Settings"
+                        description: "Configure monitor layout and resolution"
+
+                        Rectangle {
+                            width: displayBtnText.width + 24
+                            height: 32
+                            radius: 8
+                            color: displayBtnArea.containsMouse
+                                ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
+                                : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                            border.width: 1
+                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                Text {
+                                    text: "󰍹"
+                                    font.family: "Symbols Nerd Font"
+                                    font.pixelSize: 14
+                                    color: Colors.foreground
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Text {
+                                    id: displayBtnText
+                                    text: "Open Display Settings"
+                                    font.pixelSize: 12
+                                    color: Colors.foreground
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: displayBtnArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    SettingsState.close()
+                                    MonitorsState.open()
+                                }
+                            }
+                        }
                     }
 
                     SettingRow {
