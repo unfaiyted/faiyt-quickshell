@@ -276,6 +276,9 @@ Singleton {
         return scales
     }
 
+    // Buffer for accumulating stdout data
+    property string monitorDataBuffer: ""
+
     // Process to get monitor data
     Process {
         id: getMonitorsProcess
@@ -283,13 +286,20 @@ Singleton {
 
         stdout: SplitParser {
             onRead: data => {
+                monitorsState.monitorDataBuffer += data
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && monitorDataBuffer.length > 0) {
                 try {
-                    const parsed = JSON.parse(data)
+                    const parsed = JSON.parse(monitorDataBuffer)
                     monitorsState.monitors = parsed
                     console.log("MonitorsState: Loaded", parsed.length, "monitors")
                 } catch (e) {
                     console.log("MonitorsState: Failed to parse monitor data:", e)
                 }
+                monitorDataBuffer = ""
             }
         }
     }
