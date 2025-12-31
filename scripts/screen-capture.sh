@@ -37,6 +37,10 @@ Commands:
       HDMI-A-1           - Record HDMI-A-1 display as GIF
       stop               - Stop current recording
 
+  annotate <target>      Take screenshot and open in napkin for annotation
+    Targets:
+      selection           - Screenshot selected area and annotate
+
   status                 Check if recording is active (exit 0 if recording, 1 if not)
 
   convert <format>       Convert recordings
@@ -52,6 +56,7 @@ Examples:
   $SCRIPT_NAME record-hq eDP-1
   $SCRIPT_NAME record-gif selection
   $SCRIPT_NAME record stop
+  $SCRIPT_NAME annotate selection
   $SCRIPT_NAME convert gif
 
 EOF
@@ -352,7 +357,26 @@ case "$COMMAND" in
         ;;
     esac
     ;;
-  
+
+  "annotate")
+    case "$TARGET" in
+      "selection")
+        grim -g "$(slurp)" "$IMG"
+        if [ -f "$IMG" ]; then
+          wl-copy <"$IMG"
+          ~/.local/bin/napkin --filename "$IMG" &
+          # Wait for napkin to open and force fullscreen via Hyprland
+          sleep 0.3
+          hyprctl dispatch fullscreen 0
+        fi
+        ;;
+      *)
+        echo "Error: Invalid annotate target '$TARGET'"
+        usage
+        ;;
+    esac
+    ;;
+
   "status")
     # Check if wf-recorder is running
     if pgrep -x "wf-recorder" >/dev/null; then

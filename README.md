@@ -161,7 +161,10 @@ Real-time calculations displayed on the right side of the input as you type:
 Screenshot and screen recording functionality with area selection:
 
 **Screenshots:**
-- Click the screenshot button or use IPC
+- Left-click the screenshot button to take a screenshot
+- Right-click to select screenshot mode before capturing:
+  - **Screenshot** - Regular screenshot (copies to clipboard, shows notification)
+  - **Screenshot + Annotate** - Opens screenshot in napkin for annotation (fullscreen)
 - Select area with slurp
 - Saved to `~/Pictures/Screenshots/` with timestamp
 - Copied to clipboard automatically
@@ -228,6 +231,7 @@ Toast notifications that appear when notifications arrive:
 - `wf-recorder` - Screen recording for Wayland
 - `hyprpicker` - Color picker for Hyprland
 - `notify-send` - Desktop notifications (libnotify)
+- `napkin` - Image annotation tool (optional, for screenshot annotation)
 
 **Music Visualization:**
 - `cava` - Audio visualizer for animated bars in the music module
@@ -281,8 +285,10 @@ faiyt-qs/
 │   │       ├── Weather.qml
 │   │       ├── Utilities.qml
 │   │       ├── UtilityButton.qml
+│   │       ├── ScreenshotButton.qml  # Screenshot with annotation menu
+│   │       ├── ScreenshotState.qml   # Singleton screenshot state
 │   │       ├── RecordingButton.qml
-│   │       └── RecordingState.qml  # Singleton recording state + IPC
+│   │       └── RecordingState.qml    # Singleton recording state + IPC
 │   ├── sidebar/
 │   │   ├── SidebarState.qml     # Shared sidebar state
 │   │   ├── SidebarOverlay.qml   # Click-away overlay

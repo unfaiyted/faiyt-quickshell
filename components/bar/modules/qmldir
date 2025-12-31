@@ -14,5 +14,7 @@ SystemResources 1.0 SystemResources.qml
 ResourceIndicator 1.0 ResourceIndicator.qml
 Utilities 1.0 Utilities.qml
 UtilityButton 1.0 UtilityButton.qml
+singleton ScreenshotState 1.0 ScreenshotState.qml
+ScreenshotButton 1.0 ScreenshotButton.qml
 singleton RecordingState 1.0 RecordingState.qml
 RecordingButton 1.0 RecordingButton.qml

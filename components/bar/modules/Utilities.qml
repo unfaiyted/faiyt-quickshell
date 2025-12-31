@@ -15,13 +15,8 @@ BarGroup {
         anchors.centerIn: parent
         spacing: 8
 
-        // Screenshot button - use hyprctl dispatch exec for proper Wayland access
-        UtilityButton {
-            property string scriptPath: Quickshell.env("HOME") + "/codebase/faiyt-qs/scripts/screen-capture.sh"
-            icon: "󰄀"
-            tooltip: "Screenshot"
-            command: ["hyprctl", "dispatch", "exec", scriptPath + " screenshot selection"]
-        }
+        // Screenshot button with right-click context menu for annotation
+        ScreenshotButton {}
 
         // Recording button
         RecordingButton {}

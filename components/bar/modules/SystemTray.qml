@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -16,6 +17,74 @@ BarGroup {
 
     // Track currently open menu
     property var activeMenu: null
+
+    // Query D-Bus to get app names for tray items based on their process cmdline
+    // This is the most reliable way to identify Electron apps
+    property var trayAppMapping: ({})
+
+    Process {
+        id: trayMapperProc
+        command: ["bash", "-c", `
+            busctl --user get-property org.kde.StatusNotifierWatcher /StatusNotifierWatcher org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems 2>/dev/null | grep -oE ':[0-9]+\\.[0-9]+' | while read service; do
+                pid=$(busctl --user list 2>/dev/null | grep "^$service " | awk '{print $2}')
+                if [ -n "$pid" ] && [ -d "/proc/$pid" ]; then
+                    cmdline=$(tr '\\0' ' ' < /proc/$pid/cmdline 2>/dev/null | tr '[:upper:]' '[:lower:]')
+                    exe=$(readlink /proc/$pid/exe 2>/dev/null | xargs basename 2>/dev/null | tr '[:upper:]' '[:lower:]')
+                    # Extract app name from cmdline or exe
+                    if echo "$cmdline" | grep -q "goofcord"; then app="goofcord"
+                    elif echo "$cmdline" | grep -q "legcord"; then app="legcord"
+                    elif echo "$cmdline" | grep -q "webcord"; then app="webcord"
+                    elif echo "$cmdline" | grep -q "discord"; then app="discord"
+                    elif echo "$cmdline" | grep -q "slack"; then app="slack"
+                    elif echo "$cmdline" | grep -q "teams"; then app="teams"
+                    elif echo "$cmdline" | grep -q "element"; then app="element"
+                    elif echo "$cmdline" | grep -q "signal"; then app="signal"
+                    elif echo "$cmdline" | grep -q "spotify"; then app="spotify"
+                    else app="$exe"
+                    fi
+                    echo "$app"
+                else
+                    echo "unknown"
+                fi
+            done
+        `]
+
+        property string outputBuffer: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                trayMapperProc.outputBuffer += data + "\n"
+            }
+        }
+
+        onExited: function(exitCode, exitStatus) {
+            let lines = outputBuffer.trim().split("\n").filter(l => l.length > 0)
+            // Map by index since multiple Electron apps can have the same ID
+            tray.trayAppMapping = lines
+            outputBuffer = ""
+        }
+    }
+
+    // Refresh mapping when tray items change
+    Connections {
+        target: SystemTray.items
+        function onValuesChanged() {
+            trayMapperProc.running = true
+        }
+    }
+
+    // Initial mapping on load
+    Component.onCompleted: {
+        trayMapperProc.running = true
+    }
+
+    // Get app name for a tray item by index
+    function getAppForTrayIndex(index) {
+        if (Array.isArray(trayAppMapping) && index >= 0 && index < trayAppMapping.length) {
+            return trayAppMapping[index]
+        }
+        return ""
+    }
 
     // Focus window by app name/class
     function focusAppWindow(appName) {
@@ -84,74 +153,98 @@ BarGroup {
 
                 property var trayData: modelData
 
-                // Known Electron apps mapping (id pattern -> app name)
-                readonly property var electronApps: ({
-                    "slack": "slack",
-                    "discord": "discord",
-                    "teams": "teams",
-                    "element": "element",
-                    "signal": "signal",
-                    "goofcord": "goofcord",
-                    "legcord": "legcord",
-                    "webcord": "webcord"
+                // Pretty display names for known apps
+                readonly property var prettyNames: ({
+                    "spotify": "Spotify",
+                    "spotify-client": "Spotify",
+                    "spotify_client": "Spotify",
+                    "slack": "Slack",
+                    "discord": "Discord",
+                    "goofcord": "Goofcord",
+                    "legcord": "Legcord",
+                    "webcord": "Webcord",
+                    "teams": "Microsoft Teams",
+                    "element": "Element",
+                    "signal": "Signal",
+                    "steam": "Steam",
+                    "nm-applet": "Network Manager",
+                    "blueman": "Bluetooth",
+                    "blueman-applet": "Bluetooth",
+                    "pavucontrol": "Volume Control",
+                    "flameshot": "Flameshot",
+                    "copyq": "CopyQ",
+                    "kdeconnect": "KDE Connect",
+                    "dropbox": "Dropbox",
+                    "nextcloud": "Nextcloud",
+                    "syncthing": "Syncthing",
+                    "1password": "1Password",
+                    "bitwarden": "Bitwarden"
                 })
 
-                // For Electron apps, identify which app this tray icon belongs to
-                function findElectronApp() {
-                    // First, check the icon path - it usually contains the app name
-                    let iconStr = String(trayData.icon || "")
-                    let iconLower = iconStr.toLowerCase()
-                    for (let appName in electronApps) {
-                        if (iconLower.includes(appName)) {
-                            return electronApps[appName]
-                        }
-                    }
-
-                    // Fallback: check if any known electron app is running
-                    for (let appName in electronApps) {
-                        for (let toplevel of ToplevelManager.toplevels.values) {
-                            if (!toplevel.HyprlandToplevel) continue
-                            const address = "0x" + toplevel.HyprlandToplevel.address
-                            const winData = HyprlandData.windowByAddress[address]
-                            if (!winData) continue
-                            let winClass = (winData.class || "").toLowerCase()
-                            if (winClass === appName || winClass.includes(appName)) {
-                                return electronApps[appName]
-                            }
-                        }
-                    }
-                    return ""
+                // Get the app name from D-Bus process mapping (most reliable for Electron apps)
+                property string dbusAppName: {
+                    // Force re-evaluation when mapping changes
+                    let _ = tray.trayAppMapping
+                    return tray.getAppForTrayIndex(index)
                 }
 
-                // Use title/tooltipTitle for icon lookup when id is a chrome status icon (Electron apps)
-                property string trayId: {
-                    let id = trayData.id || ""
-                    if (id.startsWith("chrome_status_icon")) {
-                        // For Electron apps, try to match against known apps with open windows
-                        let found = findElectronApp()
-                        if (found) return found
+                // Check if this is an Electron app (chrome_status_icon)
+                property bool isElectronTray: (trayData.id || "").startsWith("chrome_status_icon")
 
-                        // Check title/tooltipTitle only if they look like app names (not status messages)
-                        let title = trayData.title || ""
-                        let tooltip = trayData.tooltipTitle || ""
-                        let statusWords = ["unread", "message", "notification", "online", "offline", "away", "busy", "idle", "connecting"]
-                        let titleLower = title.toLowerCase()
-                        let isStatus = statusWords.some(w => titleLower.includes(w))
-
-                        if (title.length > 0 && title.length < 30 && !isStatus) {
-                            return title
-                        }
-                        if (tooltip.length > 0 && tooltip.length < 30 && !statusWords.some(w => tooltip.toLowerCase().includes(w))) {
-                            return tooltip
-                        }
-                        return id
+                // Get the effective app name for this tray item
+                property string effectiveAppName: {
+                    // For Electron apps, use D-Bus mapping (based on process cmdline)
+                    if (isElectronTray && dbusAppName && dbusAppName !== "unknown") {
+                        return dbusAppName
                     }
-                    return id || trayData.title || ""
+                    // Fall back to tray id
+                    return trayData.id || trayData.title || ""
                 }
+
+                // Track if this is an unidentified Electron app (use system icon)
+                property bool isUnidentifiedElectron: isElectronTray && (!dbusAppName || dbusAppName === "unknown" || dbusAppName === "electron")
+
+                // Get the tray ID (used for icon lookup)
+                property string trayId: effectiveAppName
+
+                // Get a nice display name for the tray item
+                function getDisplayName() {
+                    let name = effectiveAppName.toLowerCase()
+
+                    // Check pretty names first (exact match)
+                    if (prettyNames[name]) {
+                        return prettyNames[name]
+                    }
+
+                    // Check pretty names (partial match)
+                    for (let key in prettyNames) {
+                        if (name.includes(key) || key.includes(name)) {
+                            return prettyNames[key]
+                        }
+                    }
+
+                    // Clean up the name
+                    name = effectiveAppName
+                    name = name.replace(/[-_]client$/i, "")
+                    name = name.replace(/[-_]applet$/i, "")
+
+                    // If still chrome_status_icon or unknown, show generic name
+                    if (name.match(/^chrome_status_icon/i) || name === "unknown" || name === "electron") {
+                        return "Application"
+                    }
+
+                    // Capitalize first letter of each word
+                    return name.split(/[-_\s]+/).map(word =>
+                        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                    ).join(" ")
+                }
+
+                property string displayName: getDisplayName()
                 // Check if we have a NerdFont icon for this tray item
-                property bool hasNerdIcon: IconService.hasIcon(trayId)
+                // Don't use NerdFont for unidentified Electron apps - use their actual icon
+                property bool hasNerdIcon: IconService.hasIcon(trayId) && !isUnidentifiedElectron
 
-                // NerdFont icon (preferred - use if we have a mapping)
+                // NerdFont icon (preferred - use if we have a mapping and can identify the app)
                 Text {
                     anchors.centerIn: parent
                     visible: trayItemContainer.hasNerdIcon
@@ -161,7 +254,7 @@ BarGroup {
                     color: Colors.foreground
                 }
 
-                // System tray icon (fallback for items without NerdFont mapping)
+                // System tray icon (fallback for items without NerdFont mapping, or unidentified Electron apps)
                 Image {
                     id: trayIcon
                     anchors.fill: parent
@@ -247,7 +340,7 @@ BarGroup {
                             spacing: 2
 
                             Text {
-                                text: trayItemContainer.trayId || "Unknown"
+                                text: trayItemContainer.displayName || "Unknown"
                                 color: Colors.foreground
                                 font.pixelSize: 11
                                 font.bold: true
