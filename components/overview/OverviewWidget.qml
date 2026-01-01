@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import "../../theme"
+import "../../services"
 import "."
 
 Item {
@@ -15,10 +16,10 @@ Item {
     readonly property var monitor: Hyprland.monitorFor(panelWindow.screen)
     readonly property var toplevels: ToplevelManager.toplevels
 
-    // Configuration
-    readonly property int rows: 2
-    readonly property int columns: 5
-    readonly property int workspacesShown: rows * columns
+    // Configuration (from ConfigService)
+    readonly property int columns: ConfigService.overviewItemsPerRow
+    readonly property int workspacesShown: ConfigService.overviewTotalItems
+    readonly property int rows: Math.ceil(workspacesShown / columns)
     readonly property int workspaceGroup: Math.floor((monitor.activeWorkspace?.id - 1) / workspacesShown)
 
     property var windows: HyprlandData.windowList

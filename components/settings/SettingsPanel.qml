@@ -277,6 +277,49 @@ Rectangle {
                     }
                 }
 
+                // Overview Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("overview") ||
+                             contentColumn.matchesSearch("items per row") ||
+                             contentColumn.matchesSearch("total items") ||
+                             contentColumn.matchesSearch("grid")
+                    title: "Overview"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("items per row") || contentColumn.matchesSearch("columns")
+                        label: "Items Per Row"
+                        description: "Number of workspaces shown per row"
+
+                        NumberInput {
+                            value: ConfigService.overviewItemsPerRow
+                            min: 2
+                            max: 10
+                            step: 1
+                            onValueModified: (v) => {
+                                ConfigService.setValue("overview.itemsPerRow", v)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("total items") || contentColumn.matchesSearch("workspaces")
+                        label: "Total Items"
+                        description: "Total number of workspaces shown in overview"
+
+                        NumberInput {
+                            value: ConfigService.overviewTotalItems
+                            min: 4
+                            max: 20
+                            step: 1
+                            onValueModified: (v) => {
+                                ConfigService.setValue("overview.totalItems", v)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
                 // Bar Modules Section
                 SettingsSection {
                     visible: contentColumn.matchesSearch("bar module") || contentColumn.matchesSearch("distro") ||

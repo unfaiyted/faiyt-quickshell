@@ -1,10 +1,13 @@
 import QtQuick
 import Quickshell
 import "../../../theme"
+import "../../../services"
 import "../../sidebar"
 
 PanelWindow {
     id: cornerRight
+
+    visible: ConfigService.windowBarEnabled && ConfigService.windowBarCorners
 
     anchors {
         top: true

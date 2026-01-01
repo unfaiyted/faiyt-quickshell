@@ -7,6 +7,8 @@ import "modules"
 PanelWindow {
     id: bar
 
+    visible: ConfigService.windowBarEnabled
+
     // Position at top, span full width
     anchors {
         top: true

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 
 PanelWindow {
     id: wallpaperWindow
@@ -33,7 +34,7 @@ PanelWindow {
     // Keyboard focus mode
     WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    visible: expanded || animating
+    visible: ConfigService.windowWallpaperEnabled && (expanded || animating)
 
     // Click-outside overlay
     Rectangle {

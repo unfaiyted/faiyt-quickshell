@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 
 PanelWindow {
     id: launcherWindow
@@ -24,7 +25,7 @@ PanelWindow {
     // Keyboard focus
     WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    visible: expanded || hideAnimation.running
+    visible: ConfigService.windowLauncherEnabled && (expanded || hideAnimation.running)
 
     // Click outside to close
     MouseArea {

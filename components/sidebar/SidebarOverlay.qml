@@ -1,10 +1,14 @@
 import QtQuick
 import Quickshell
+import "../../services"
 
 PanelWindow {
     id: overlay
 
-    property bool isOpen: SidebarState.leftOpen || SidebarState.rightOpen
+    // Only consider sidebars open if they're enabled in config
+    property bool leftEffectivelyOpen: SidebarState.leftOpen && ConfigService.windowSidebarLeftEnabled
+    property bool rightEffectivelyOpen: SidebarState.rightOpen && ConfigService.windowSidebarRightEnabled
+    property bool isOpen: leftEffectivelyOpen || rightEffectivelyOpen
 
     anchors {
         top: true
@@ -17,8 +21,8 @@ PanelWindow {
     margins.top: 0
 
     // Exclude sidebar areas so they remain clickable
-    margins.left: SidebarState.leftOpen ? 475 : 0   // left sidebar width
-    margins.right: SidebarState.rightOpen ? 396 : 0  // right sidebar width
+    margins.left: leftEffectivelyOpen ? 475 : 0   // left sidebar width
+    margins.right: rightEffectivelyOpen ? 396 : 0  // right sidebar width
 
     // Stay visible while fading out
     visible: isOpen || fadeAnim.running

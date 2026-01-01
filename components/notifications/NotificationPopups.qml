@@ -4,11 +4,13 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "."
 
 PanelWindow {
     id: root
 
+    visible: ConfigService.windowNotificationsEnabled
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "notification_popups"
     color: "transparent"

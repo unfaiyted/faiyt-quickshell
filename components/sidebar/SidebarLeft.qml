@@ -26,8 +26,8 @@ PanelWindow {
     // Keyboard focus for Escape key
     WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    // Hide window when not expanded (after animation completes)
-    visible: expanded || slideAnimation.running || bgFadeAnim.running
+    // Hide window when not expanded (after animation completes) or disabled in config
+    visible: ConfigService.windowSidebarLeftEnabled && (expanded || slideAnimation.running || bgFadeAnim.running)
 
     // Dark background to match overlay (curved top-left to avoid bar corner)
     Canvas {

@@ -122,12 +122,13 @@ Full-featured settings overlay for customizing the shell:
 - **Battery** - Low and critical battery thresholds
 - **Animations** - Duration and choreography delay
 - **Windows & Components** - Enable/disable bar, corners, launcher, sidebars, overlays, notifications
+- **Overview** - Configure items per row and total items shown in overview grid
 
 **Features:**
 - Searchable settings (type to filter)
 - Theme preview with color swatches
 - All settings persist to JSON configuration at `~/.config/faiyt-qs/config.json`
-- Settings apply immediately without restart (except Windows & Components)
+- All settings apply immediately without restart
 - ESC or click outside to close
 - Smooth open/close animations
 
@@ -214,7 +215,7 @@ Screenshot and screen recording functionality with area selection:
 ### Overview Mode
 Full-screen workspace overview with live window previews:
 
-- **2x5 Workspace Grid** - Shows all 10 workspaces at once
+- **Configurable Workspace Grid** - Default 2x5 (10 workspaces), configurable in Settings
 - **Live Window Previews** - Real-time screencopy of all windows
 - **App Icons** - Centered icon overlay on each window
 - **Keyboard Navigation**:

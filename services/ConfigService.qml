@@ -81,6 +81,12 @@ Singleton {
             maxResults: 10
         },
 
+        // Overview
+        overview: {
+            itemsPerRow: 5,    // columns
+            totalItems: 10     // total workspaces shown
+        },
+
         // Search features
         search: {
             enableFeatures: {
@@ -262,6 +268,8 @@ Singleton {
     property int batteryCritical: config.battery?.critical || 10
     property int animationDuration: config.animations?.durationSmall || 200
     property int launcherMaxResults: config.launcher?.maxResults || 10
+    property int overviewItemsPerRow: config.overview?.itemsPerRow || 5
+    property int overviewTotalItems: config.overview?.totalItems || 10
 
     // Bar module visibility convenience properties
     property bool barModuleDistroIcon: config.bar?.modules?.distroIcon !== false
@@ -293,6 +301,16 @@ Singleton {
     property string recordingDefaultMode: config.utilities?.recording?.defaultMode || "record"
     property bool screenshotAnnotateEnabled: config.utilities?.screenshot?.annotateEnabled || false
 
+    // Window enable/disable convenience properties
+    property bool windowBarEnabled: config.windows?.bar?.enabled !== false
+    property bool windowBarCorners: config.windows?.bar?.corners !== false
+    property bool windowLauncherEnabled: config.windows?.launcher?.enabled !== false
+    property bool windowSidebarLeftEnabled: config.windows?.sidebar?.leftEnabled !== false
+    property bool windowSidebarRightEnabled: config.windows?.sidebar?.rightEnabled !== false
+    property bool windowOverlaysEnabled: config.windows?.overlays?.enabled !== false
+    property bool windowNotificationsEnabled: config.windows?.overlays?.notifications !== false
+    property bool windowWallpaperEnabled: config.windows?.overlays?.wallpaper !== false
+
     // AI convenience accessors (API key from env var only)
     property string aiDefaultModel: config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
     property var aiModels: config.ai?.models || []
@@ -313,6 +331,8 @@ Singleton {
         batteryCritical = config.battery?.critical || 10
         animationDuration = config.animations?.durationSmall || 200
         launcherMaxResults = config.launcher?.maxResults || 10
+        overviewItemsPerRow = config.overview?.itemsPerRow || 5
+        overviewTotalItems = config.overview?.totalItems || 10
 
         // Bar module visibility
         barModuleDistroIcon = config.bar?.modules?.distroIcon !== false
@@ -351,5 +371,15 @@ Singleton {
         aiTemperature = config.ai?.temperature || 1.0
         aiSystemPrompt = config.ai?.systemPrompt || ""
         aiMcpServers = config.ai?.mcpServers || []
+
+        // Window enable/disable
+        windowBarEnabled = config.windows?.bar?.enabled !== false
+        windowBarCorners = config.windows?.bar?.corners !== false
+        windowLauncherEnabled = config.windows?.launcher?.enabled !== false
+        windowSidebarLeftEnabled = config.windows?.sidebar?.leftEnabled !== false
+        windowSidebarRightEnabled = config.windows?.sidebar?.rightEnabled !== false
+        windowOverlaysEnabled = config.windows?.overlays?.enabled !== false
+        windowNotificationsEnabled = config.windows?.overlays?.notifications !== false
+        windowWallpaperEnabled = config.windows?.overlays?.wallpaper !== false
     }
 }

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "modules"
 
 PanelWindow {
@@ -24,8 +25,8 @@ PanelWindow {
     // Keyboard focus for Escape key
     WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    // Hide window when not expanded (after animation completes)
-    visible: expanded || slideAnimation.running || bgFadeAnim.running
+    // Hide window when not expanded (after animation completes) or disabled in config
+    visible: ConfigService.windowSidebarRightEnabled && (expanded || slideAnimation.running || bgFadeAnim.running)
 
     // Dark background to match overlay (curved top-right to avoid bar corner)
     Canvas {

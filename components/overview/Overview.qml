@@ -7,6 +7,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import "../../theme"
+import "../../services"
 import "."
 
 Scope {
@@ -88,9 +89,8 @@ Scope {
                         return
                     }
 
-                    const rows = 2
-                    const columns = 5
-                    const workspacesPerGroup = rows * columns
+                    const columns = ConfigService.overviewItemsPerRow
+                    const workspacesPerGroup = ConfigService.overviewTotalItems
                     const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1
                     const currentGroup = Math.floor((currentId - 1) / workspacesPerGroup)
                     const minWorkspaceId = currentGroup * workspacesPerGroup + 1
