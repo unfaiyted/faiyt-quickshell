@@ -74,9 +74,24 @@ Slide-out panel with multiple tabs:
 - Idle inhibitor (caffeine mode)
 
 ### Left Sidebar
-Developer tools panel with search and category filtering:
+Dual-purpose panel with AI Chat and Developer Tools:
 
-**Categories:** All, Dev, System, Network, Monitor
+**AI Chat Tab:**
+- **Claude Integration** - Chat with Claude AI (Anthropic)
+- **Markdown Rendering** - Full markdown support in responses:
+  - Headers, bold, italic, strikethrough
+  - Bullet and numbered lists
+  - Inline code with styling
+  - Code blocks with syntax highlighting (JS, Python, Bash, Rust, Go, C++, QML, CSS, JSON)
+  - Links, blockquotes, horizontal rules
+- **Code Blocks** - Language detection, line numbers, one-click copy
+- **Conversation Management** - Save, rename, delete conversations
+- **Model Selection** - Switch between Claude models (Sonnet 4.5, Haiku 4.5, Opus 4.5)
+- **Streaming Responses** - Real-time response streaming with typing indicator
+- **Collapsible Conversation Sidebar** - Quick access to chat history
+
+**Developer Tools Tab:**
+Categories: All, Dev, System, Network, Monitor
 
 **Available Tools:**
 - Git Status - Check repository status
@@ -294,17 +309,33 @@ faiyt-qs/
 │   │   ├── SidebarOverlay.qml   # Click-away overlay
 │   │   ├── SidebarLeft.qml      # Left sidebar panel
 │   │   ├── SidebarRight.qml     # Right sidebar panel
+│   │   ├── AIState.qml          # AI chat state singleton
 │   │   └── modules/
 │   │       ├── Header.qml
 │   │       ├── QuickToggles.qml
 │   │       ├── TabBar.qml
+│   │       ├── LeftTabBar.qml   # AI/Tools tab switcher
 │   │       ├── Notifications.qml
 │   │       ├── AudioControl.qml
 │   │       ├── BluetoothPanel.qml
 │   │       ├── WiFiPanel.qml
 │   │       ├── Calendar.qml
 │   │       ├── Tools.qml
-│   │       └── ToolItem.qml
+│   │       ├── ToolItem.qml
+│   │       └── ai/              # AI chat components
+│   │           ├── AIPanel.qml
+│   │           ├── AISettings.qml
+│   │           ├── AITabBar.qml
+│   │           ├── ChatContainer.qml
+│   │           ├── ChatHeader.qml
+│   │           ├── ChatInput.qml
+│   │           ├── ChatMessage.qml
+│   │           ├── ChatMessages.qml
+│   │           ├── CodeBlock.qml
+│   │           ├── ConversationSidebar.qml
+│   │           ├── MessageContent.qml
+│   │           ├── MarkdownParser.js
+│   │           └── SyntaxHighlighter.js
 │   ├── launcher/
 │   │   ├── LauncherState.qml    # Singleton launcher state + IPC
 │   │   ├── LauncherWindow.qml   # Launcher overlay window
@@ -355,7 +386,9 @@ faiyt-qs/
 ├── services/
 │   ├── BluetoothService.qml     # Bluetooth device management singleton
 │   ├── CavaService.qml          # Audio visualization (cava) singleton
+│   ├── ClaudeService.qml        # Claude AI API integration
 │   ├── ConfigService.qml        # Settings persistence (JSON config)
+│   ├── ConversationManager.qml  # AI conversation storage (~/.local/share)
 │   └── IconService.qml          # Centralized NerdFont icon mappings
 ├── scripts/
 │   └── screen-capture.sh        # Screenshot and recording script
@@ -369,6 +402,9 @@ faiyt-qs/
 ```bash
 # Set max network speed for system resources (in Mbps)
 export QS_NET_SPEED_MBPS=930
+
+# Claude AI API key (required for AI chat)
+export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 ### Keybindings (Hyprland)

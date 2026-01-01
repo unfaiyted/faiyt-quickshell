@@ -69,7 +69,7 @@ PopupWindow {
 
                 Loader {
                     property var entry: modelData
-                    sourceComponent: entry.isSeparator ? separatorComponent : menuItemComponent
+                    sourceComponent: (entry?.isSeparator ?? false) ? separatorComponent : menuItemComponent
                 }
             }
         }
@@ -93,7 +93,7 @@ PopupWindow {
             width: Math.max(itemRow.width + 24, 150)
             height: 28
             radius: 4
-            color: itemMouse.containsMouse && entry.enabled ? Colors.overlay : "transparent"
+            color: itemMouse.containsMouse && (entry?.enabled ?? false) ? Colors.overlay : "transparent"
 
             Row {
                 id: itemRow
@@ -104,13 +104,13 @@ PopupWindow {
 
                 // Checkbox/Radio indicator
                 Text {
-                    visible: entry.buttonType !== 0
+                    visible: (entry?.buttonType ?? 0) !== 0
                     text: {
-                        if (entry.checkState === Qt.Checked) return "󰄵"
-                        if (entry.checkState === Qt.PartiallyChecked) return "󰡖"
+                        if ((entry?.checkState ?? Qt.Unchecked) === Qt.Checked) return "󰄵"
+                        if ((entry?.checkState ?? Qt.Unchecked) === Qt.PartiallyChecked) return "󰡖"
                         return "󰄱"
                     }
-                    color: entry.enabled ? Colors.foreground : Colors.muted
+                    color: (entry?.enabled ?? false) ? Colors.foreground : Colors.muted
                     font.pixelSize: 12
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -118,18 +118,18 @@ PopupWindow {
                 // Icon - NerdFont preferred, system icon fallback
                 Text {
                     id: nerdIcon
-                    visible: entry.icon && entry.icon.length > 0 && IconService.hasIcon(entry.icon)
-                    text: IconService.getIcon(entry.icon)
+                    visible: !!(entry?.icon) && entry.icon.length > 0 && IconService.hasIcon(entry.icon)
+                    text: IconService.getIcon(entry?.icon ?? "")
                     font.family: "Symbols Nerd Font"
                     font.pixelSize: 14
-                    color: entry.enabled ? Colors.foreground : Colors.muted
+                    color: (entry?.enabled ?? false) ? Colors.foreground : Colors.muted
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Image {
                     id: menuIcon
-                    visible: entry.icon && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && status === Image.Ready
-                    source: (entry.icon && !IconService.hasIcon(entry.icon)) ? entry.icon : ""
+                    visible: !!(entry?.icon) && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && status === Image.Ready
+                    source: (entry?.icon && !IconService.hasIcon(entry.icon)) ? entry.icon : ""
                     width: 14
                     height: 14
                     anchors.verticalCenter: parent.verticalCenter
@@ -137,25 +137,25 @@ PopupWindow {
 
                 // Default icon when system icon fails
                 Text {
-                    visible: entry.icon && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && menuIcon.status !== Image.Ready
+                    visible: !!(entry?.icon) && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && menuIcon.status !== Image.Ready
                     text: IconService.getIcon("")
                     font.family: "Symbols Nerd Font"
                     font.pixelSize: 14
-                    color: entry.enabled ? Colors.foreground : Colors.muted
+                    color: (entry?.enabled ?? false) ? Colors.foreground : Colors.muted
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 // Text
                 Text {
-                    text: entry.text || ""
-                    color: entry.enabled ? Colors.foreground : Colors.muted
+                    text: entry?.text ?? ""
+                    color: (entry?.enabled ?? false) ? Colors.foreground : Colors.muted
                     font.pixelSize: 11
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 // Submenu indicator
                 Text {
-                    visible: entry.hasChildren
+                    visible: entry?.hasChildren ?? false
                     text: "󰅂"
                     color: Colors.muted
                     font.pixelSize: 10
@@ -167,15 +167,15 @@ PopupWindow {
                 id: itemMouse
                 anchors.fill: parent
                 hoverEnabled: true
-                cursorShape: entry.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                cursorShape: (entry?.enabled ?? false) ? Qt.PointingHandCursor : Qt.ArrowCursor
 
                 onClicked: {
-                    if (entry.enabled && !entry.hasChildren) {
+                    if ((entry?.enabled ?? false) && !(entry?.hasChildren ?? false)) {
                         // Focus app window before executing menu action
                         if (menuPopup.focusAppFunction && menuPopup.appId) {
                             menuPopup.focusAppFunction(menuPopup.appId)
                         }
-                        entry.triggered()
+                        entry?.triggered()
                         menuPopup.visible = false
                     }
                 }

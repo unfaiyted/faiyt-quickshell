@@ -24,7 +24,35 @@ Singleton {
     readonly property real canvasScale: 0.10
     readonly property int snapThreshold: 100
     readonly property int gridSize: 10
-    readonly property int canvasPadding: 20
+    readonly property int canvasPadding: 40
+
+    // Canvas dimensions (set by MonitorCanvas)
+    property real canvasWidth: 400
+    property real canvasHeight: 300
+
+    // Calculate bounding box of all monitors
+    property var monitorBounds: {
+        if (monitors.length === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, height: 0 }
+
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+
+        for (const mon of monitors) {
+            const pos = getMonitorPosition(mon.name)
+            minX = Math.min(minX, pos.x)
+            minY = Math.min(minY, pos.y)
+            maxX = Math.max(maxX, pos.x + mon.width)
+            maxY = Math.max(maxY, pos.y + mon.height)
+        }
+
+        return {
+            minX: minX,
+            minY: minY,
+            maxX: maxX,
+            maxY: maxY,
+            width: maxX - minX,
+            height: maxY - minY
+        }
+    }
 
     // Toggle visibility
     function toggle() {
@@ -192,19 +220,35 @@ Singleton {
         hasChanges = true
     }
 
-    // Convert real coords to canvas coords
+    // Convert real coords to canvas coords (centered in canvas)
     function toCanvasCoords(x, y) {
+        const bounds = monitorBounds
+        const scaledWidth = bounds.width * canvasScale
+        const scaledHeight = bounds.height * canvasScale
+
+        // Calculate offset to center all monitors in the canvas
+        const offsetX = (canvasWidth - scaledWidth) / 2 - bounds.minX * canvasScale
+        const offsetY = (canvasHeight - scaledHeight) / 2 - bounds.minY * canvasScale
+
         return {
-            x: x * canvasScale + canvasPadding,
-            y: y * canvasScale + canvasPadding
+            x: x * canvasScale + offsetX,
+            y: y * canvasScale + offsetY
         }
     }
 
     // Convert canvas coords to real coords
     function toRealCoords(x, y) {
+        const bounds = monitorBounds
+        const scaledWidth = bounds.width * canvasScale
+        const scaledHeight = bounds.height * canvasScale
+
+        // Calculate offset (same as toCanvasCoords)
+        const offsetX = (canvasWidth - scaledWidth) / 2 - bounds.minX * canvasScale
+        const offsetY = (canvasHeight - scaledHeight) / 2 - bounds.minY * canvasScale
+
         return {
-            x: Math.round((x - canvasPadding) / canvasScale),
-            y: Math.round((y - canvasPadding) / canvasScale)
+            x: Math.round((x - offsetX) / canvasScale),
+            y: Math.round((y - offsetY) / canvasScale)
         }
     }
 

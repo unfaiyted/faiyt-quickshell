@@ -87,6 +87,7 @@ Rectangle {
     // Get windows for this workspace from HyprlandData
     property var windowsInWorkspace: {
         return ToplevelManager.toplevels.values.filter(toplevel => {
+            if (!toplevel?.HyprlandToplevel) return false
             const address = "0x" + toplevel.HyprlandToplevel.address
             const win = HyprlandData.windowByAddress[address]
             return win?.workspace?.id === tooltip.workspaceId

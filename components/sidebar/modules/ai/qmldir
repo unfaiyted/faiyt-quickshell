@@ -1,0 +1,12 @@
+module ai
+AIPanel 1.0 AIPanel.qml
+AITabBar 1.0 AITabBar.qml
+AISettings 1.0 AISettings.qml
+ChatContainer 1.0 ChatContainer.qml
+ChatHeader 1.0 ChatHeader.qml
+ChatMessages 1.0 ChatMessages.qml
+ChatMessage 1.0 ChatMessage.qml
+ChatInput 1.0 ChatInput.qml
+ConversationSidebar 1.0 ConversationSidebar.qml
+MessageContent 1.0 MessageContent.qml
+CodeBlock 1.0 CodeBlock.qml

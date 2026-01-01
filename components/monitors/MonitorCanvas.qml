@@ -63,6 +63,14 @@ Rectangle {
             id: monitorsContainer
             anchors.fill: parent
 
+            // Update MonitorsState with canvas dimensions for centering
+            onWidthChanged: MonitorsState.canvasWidth = width
+            onHeightChanged: MonitorsState.canvasHeight = height
+            Component.onCompleted: {
+                MonitorsState.canvasWidth = width
+                MonitorsState.canvasHeight = height
+            }
+
             Repeater {
                 model: MonitorsState.monitors
 

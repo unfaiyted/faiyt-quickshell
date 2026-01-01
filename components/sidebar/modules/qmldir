@@ -1,5 +1,6 @@
 module modules
 TabBar 1.0 TabBar.qml
+LeftTabBar 1.0 LeftTabBar.qml
 Header 1.0 Header.qml
 QuickToggles 1.0 QuickToggles.qml
 Notifications 1.0 Notifications.qml

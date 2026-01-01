@@ -1,5 +1,6 @@
 module sidebar
 singleton SidebarState 1.0 SidebarState.qml
+singleton AIState 1.0 AIState.qml
 SidebarOverlay 1.0 SidebarOverlay.qml
 SidebarRight 1.0 SidebarRight.qml
 SidebarLeft 1.0 SidebarLeft.qml

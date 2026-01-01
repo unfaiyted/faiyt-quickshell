@@ -2,7 +2,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "modules"
+import "modules/ai"
 
 PanelWindow {
     id: leftSidebar
@@ -16,7 +18,7 @@ PanelWindow {
     property bool expanded: SidebarState.leftOpen
 
     // Fixed width - includes padding space
-    implicitWidth: 396  // 380 + 8 left + 8 right padding
+    implicitWidth: 475  // ~20% wider than original 396
     margins.top: 0     // Below the bar
     exclusiveZone: 0
     color: "transparent"
@@ -102,7 +104,7 @@ PanelWindow {
                     anchors.fill: parent
                     spacing: 0
 
-                    // Header
+                    // Dynamic Header based on active tab
                     Item {
                         width: parent.width
                         height: 56
@@ -113,7 +115,7 @@ PanelWindow {
                             spacing: 12
 
                             Text {
-                                text: "󰦖"
+                                text: AIState.activeMainTab === 0 ? "󰚩" : "󰦖"
                                 font.family: "Symbols Nerd Font"
                                 font.pixelSize: 24
                                 color: Colors.primary
@@ -121,7 +123,7 @@ PanelWindow {
                             }
 
                             Text {
-                                text: "Tools"
+                                text: AIState.activeMainTab === 0 ? "AI Chat" : "Tools"
                                 font.pixelSize: 18
                                 font.bold: true
                                 color: Colors.foreground
@@ -138,10 +140,33 @@ PanelWindow {
                         }
                     }
 
-                    // Tools module
-                    Tools {
+                    // Tab bar
+                    LeftTabBar {
+                        id: mainTabBar
                         width: parent.width
-                        height: parent.height - 56
+                        tabData: [
+                            { icon: "󰚩", label: "AI" },
+                            { icon: "󰦖", label: "Tools" }
+                        ]
+                        currentIndex: AIState.activeMainTab
+                        onTabClicked: index => AIState.activeMainTab = index
+                    }
+
+                    // Tab content
+                    Loader {
+                        width: parent.width
+                        height: parent.height - 56 - mainTabBar.height
+                        sourceComponent: AIState.activeMainTab === 0 ? aiPanelComponent : toolsComponent
+                    }
+
+                    Component {
+                        id: aiPanelComponent
+                        AIPanel {}
+                    }
+
+                    Component {
+                        id: toolsComponent
+                        Tools {}
                     }
                 }
             }

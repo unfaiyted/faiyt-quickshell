@@ -1,5 +1,8 @@
 module services
 singleton BluetoothService 1.0 BluetoothService.qml
 singleton CavaService 1.0 CavaService.qml
+singleton ClaudeService 1.0 ClaudeService.qml
 singleton ConfigService 1.0 ConfigService.qml
+singleton ConversationManager 1.0 ConversationManager.qml
 singleton IconService 1.0 IconService.qml
+singleton MCPClient 1.0 MCPClient.qml

@@ -139,11 +139,13 @@ Item {
                 model: ScriptModel {
                     values: {
                         return ToplevelManager.toplevels.values.filter((toplevel) => {
+                            if (!toplevel?.HyprlandToplevel) return false
                             const address = "0x" + toplevel.HyprlandToplevel.address
                             var win = root.windowByAddress[address]
                             const inWorkspaceGroup = (root.workspaceGroup * root.workspacesShown < win?.workspace?.id && win?.workspace?.id <= (root.workspaceGroup + 1) * root.workspacesShown)
                             return inWorkspaceGroup
                         }).sort((a, b) => {
+                            if (!a?.HyprlandToplevel || !b?.HyprlandToplevel) return 0
                             const addrA = "0x" + a.HyprlandToplevel.address
                             const addrB = "0x" + b.HyprlandToplevel.address
                             const winA = root.windowByAddress[addrA]
@@ -165,7 +167,7 @@ Item {
                     required property var modelData
                     required property int index
 
-                    property var address: "0x" + modelData.HyprlandToplevel.address
+                    property var address: modelData?.HyprlandToplevel ? "0x" + modelData.HyprlandToplevel.address : ""
                     property var winData: root.windowByAddress[address]
                     property int monitorId: winData?.monitor
                     property var winMonitor: HyprlandData.monitors.find(m => m.id === monitorId)

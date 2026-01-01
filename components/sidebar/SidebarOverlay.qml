@@ -17,8 +17,8 @@ PanelWindow {
     margins.top: 0
 
     // Exclude sidebar areas so they remain clickable
-    margins.left: SidebarState.leftOpen ? 396 : 0   // sidebar width
-    margins.right: SidebarState.rightOpen ? 396 : 0  // sidebar width
+    margins.left: SidebarState.leftOpen ? 475 : 0   // left sidebar width
+    margins.right: SidebarState.rightOpen ? 396 : 0  // right sidebar width
 
     // Stay visible while fading out
     visible: isOpen || fadeAnim.running

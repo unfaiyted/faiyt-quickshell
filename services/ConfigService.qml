@@ -7,8 +7,8 @@ Singleton {
     id: configService
 
     // Config file path
-    readonly property string configPath: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/faiyt-qs/config.json"
-    readonly property string configDir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/faiyt-qs"
+    readonly property string configDir: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/faiyt-qs"
+    readonly property string configPath: configDir + "/config.json"
 
     // Default configuration
     property var defaultConfig: ({
@@ -66,6 +66,23 @@ Singleton {
             }
         },
 
+        // AI Configuration (API keys use environment variables for security)
+        ai: {
+            // API key from ANTHROPIC_API_KEY env var - never stored in config
+            defaultModel: "claude-sonnet-4-5-20250929",
+            models: [
+                "claude-sonnet-4-5-20250929",
+                "claude-haiku-4-5-20251015",
+                "claude-opus-4-5-20251101",
+                "claude-sonnet-4-20250514",
+                "claude-opus-4-1-20250805"
+            ],
+            maxTokens: 4096,
+            temperature: 1.0,
+            systemPrompt: "",
+            mcpServers: []  // [{id, name, command, env, enabled}]
+        },
+
         // Windows & Components
         windows: {
             bar: {
@@ -113,21 +130,33 @@ Singleton {
 
     // Load configuration from file
     function loadConfig() {
+        configBuffer = ""
         loadProcess.running = true
     }
+
+    property string configBuffer: ""
 
     Process {
         id: loadProcess
         command: ["cat", configService.configPath]
         stdout: SplitParser {
             onRead: data => {
+                configService.configBuffer += data + "\n"
+            }
+        }
+        onRunningChanged: {
+            if (!running && configBuffer.length > 0) {
                 try {
-                    const loaded = JSON.parse(data)
+                    const loaded = JSON.parse(configBuffer)
                     // Deep merge with defaults
                     configService.config = deepMerge(JSON.parse(JSON.stringify(configService.defaultConfig)), loaded)
+                    console.log("ConfigService: Config loaded successfully")
                 } catch (e) {
-                    console.log("ConfigService: No existing config or parse error, using defaults")
+                    console.log("ConfigService: Parse error, using defaults:", e)
                 }
+                configBuffer = ""
+            } else if (!running) {
+                console.log("ConfigService: No config file, using defaults")
             }
         }
     }
@@ -196,6 +225,14 @@ Singleton {
     property int animationDuration: config.animations?.durationSmall || 200
     property int launcherMaxResults: config.launcher?.maxResults || 10
 
+    // AI convenience accessors (API key from env var only)
+    property string aiDefaultModel: config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
+    property var aiModels: config.ai?.models || []
+    property int aiMaxTokens: config.ai?.maxTokens || 4096
+    property real aiTemperature: config.ai?.temperature || 1.0
+    property string aiSystemPrompt: config.ai?.systemPrompt || ""
+    property var aiMcpServers: config.ai?.mcpServers || []
+
     // Update convenience properties when config changes
     onConfigChanged: {
         theme = config.theme || "rose-pine"
@@ -207,5 +244,12 @@ Singleton {
         batteryCritical = config.battery?.critical || 10
         animationDuration = config.animations?.durationSmall || 200
         launcherMaxResults = config.launcher?.maxResults || 10
+        // AI config (API key from env var only)
+        aiDefaultModel = config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
+        aiModels = config.ai?.models || []
+        aiMaxTokens = config.ai?.maxTokens || 4096
+        aiTemperature = config.ai?.temperature || 1.0
+        aiSystemPrompt = config.ai?.systemPrompt || ""
+        aiMcpServers = config.ai?.mcpServers || []
     }
 }
