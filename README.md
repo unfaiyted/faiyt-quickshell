@@ -14,6 +14,7 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
   - Click windows in tooltip to focus them
   - Middle-click windows to close them
 - **Window Title** - Active window name with app icon
+- **Mic Mute Indicator** - Shows when microphone is muted (click to unmute)
 - **System Resources** - Resource monitors with circular progress and nerd font icons:
   - RAM usage with used/total details
   - Swap usage
@@ -70,10 +71,17 @@ Slide-out panel with multiple tabs:
 - Settings button (opens Settings Panel)
 - Power button
 
-**Quick Toggles:**
+**Quick Toggles (2x3 Grid):**
 - WiFi on/off
 - Bluetooth on/off
-- Idle inhibitor (caffeine mode)
+- Caffeine mode (idle inhibitor) / Focus Mode (optional)
+- Microphone mute toggle
+- Night Light (hyprsunset integration)
+- VPN toggle (nmcli) / Power Saver (optional)
+
+**Optional Toggles (configurable in Settings):**
+- Focus Mode - Enables DND + Caffeine + switches bar to focus mode
+- Power Saver - Toggles between balanced and power-saver profiles
 
 ### Left Sidebar
 Dual-purpose panel with AI Chat and Developer Tools:
@@ -112,7 +120,12 @@ Full-featured settings overlay for customizing the shell:
 
 **Sections:**
 - **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode, workspaces per page, display settings
-- **Bar Modules** - Toggle individual bar modules (Window Title, Workspaces, System Resources, Utilities, Music, System Tray, Network, Battery, Clock, Weather)
+- **Bar Modules** - Toggle individual bar modules (Window Title, Workspaces, Mic Indicator, System Resources, Utilities, Music, System Tray, Network, Battery, Clock, Weather)
+- **Quick Toggles** - Configure sidebar quick toggles:
+  - Enable Focus Mode toggle (replaces Caffeine)
+  - Enable Power Saver toggle (replaces VPN)
+  - VPN connection name for nmcli
+  - Night Light color temperature (2500K-6500K)
 - **Utility Buttons** - Toggle individual utility buttons (Screenshot, Recording, Color Picker, Wallpaper)
 - **System Resources** - Toggle individual resource indicators (RAM, Swap, CPU, Download, Upload)
 - **Default Modes** - Set default recording mode (Standard/High Quality/GIF) and screenshot mode (Screenshot/Annotate)
@@ -256,6 +269,10 @@ Toast notifications that appear when notifications arrive:
 - `notify-send` - Desktop notifications (libnotify)
 - `napkin` - Image annotation tool (optional, for screenshot annotation)
 
+**Quick Toggles Dependencies:**
+- `hyprsunset` - Hyprland night light / blue light filter (optional)
+- `powerprofilesctl` - Power profile switching (optional)
+
 **Music Visualization:**
 - `cava` - Audio visualizer for animated bars in the music module
 
@@ -300,6 +317,7 @@ faiyt-qs/
 │   │       ├── Clock.qml
 │   │       ├── Workspaces.qml
 │   │       ├── WindowTitle.qml
+│   │       ├── MicIndicator.qml
 │   │       ├── SystemResources.qml
 │   │       ├── Battery.qml
 │   │       ├── Music.qml

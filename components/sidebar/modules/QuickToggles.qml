@@ -1,16 +1,27 @@
 import QtQuick
 import Quickshell.Io
+import "../../../services"
 import "../../../theme"
+import "../../notifications" as Notifications
 
 Item {
     id: quickToggles
 
-    implicitHeight: 88
+    implicitHeight: 170
     implicitWidth: parent.width
 
+    // Toggle states
     property bool wifiEnabled: true
     property bool bluetoothEnabled: false
     property bool idleInhibited: false
+    property bool micMuted: false
+    property bool nightLightEnabled: false
+    property bool vpnConnected: false
+    property bool focusModeEnabled: false
+    property bool powerSaverEnabled: false
+
+    // Store previous bar mode for focus mode restore
+    property string previousBarMode: "normal"
 
     // Check WiFi status
     Process {
@@ -36,6 +47,91 @@ Item {
                 if (data.includes("Powered:")) {
                     quickToggles.bluetoothEnabled = data.includes("yes")
                 }
+            }
+        }
+    }
+
+    // Check Mic mute status via wpctl
+    Process {
+        id: micStatusProcess
+        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SOURCE@"]
+        running: true
+
+        stdout: SplitParser {
+            onRead: data => {
+                // Output is like "Volume: 1.00" or "Volume: 1.00 [MUTED]"
+                quickToggles.micMuted = data.includes("[MUTED]")
+            }
+        }
+    }
+
+    // Toggle Mic mute via wpctl
+    Process {
+        id: micToggleProcess
+        command: ["wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle"]
+        onRunningChanged: {
+            if (!running) {
+                micStatusProcess.running = true
+            }
+        }
+    }
+
+    // Check Night Light status (hyprsunset running)
+    Process {
+        id: nightLightStatusProcess
+        command: ["pgrep", "-x", "hyprsunset"]
+        running: true
+        property bool foundProcess: false
+
+        stdout: SplitParser {
+            onRead: data => {
+                // pgrep outputs PID if process is found
+                if (data.trim().length > 0) {
+                    nightLightStatusProcess.foundProcess = true
+                }
+            }
+        }
+
+        onRunningChanged: {
+            if (!running) {
+                quickToggles.nightLightEnabled = foundProcess
+                foundProcess = false  // Reset for next check
+            }
+        }
+    }
+
+    // Check VPN status
+    Process {
+        id: vpnStatusProcess
+        command: ["nmcli", "-t", "-f", "NAME,TYPE,STATE", "connection", "show", "--active"]
+        running: true
+        property string vpnName: ConfigService.quickToggleVpnName
+
+        stdout: SplitParser {
+            onRead: data => {
+                if (vpnStatusProcess.vpnName && data.includes(vpnStatusProcess.vpnName) && data.includes("activated")) {
+                    quickToggles.vpnConnected = true
+                }
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && !vpnConnected) {
+                // Reset if no match found
+                quickToggles.vpnConnected = false
+            }
+        }
+    }
+
+    // Check Power Profile status
+    Process {
+        id: powerProfileStatusProcess
+        command: ["powerprofilesctl", "get"]
+        running: true
+
+        stdout: SplitParser {
+            onRead: data => {
+                quickToggles.powerSaverEnabled = data.trim() === "power-saver"
             }
         }
     }
@@ -66,7 +162,62 @@ Item {
     Process {
         id: idleInhibitProcess
         command: ["systemd-inhibit", "--what=idle", "--who=quickshell", "--why=User requested", "sleep", "infinity"]
-        running: quickToggles.idleInhibited
+        running: quickToggles.idleInhibited || quickToggles.focusModeEnabled
+    }
+
+    // Toggle Night Light ON
+    Process {
+        id: nightLightOnProcess
+        command: ["hyprsunset", "-t", ConfigService.quickToggleNightTemp.toString()]
+        onRunningChanged: {
+            if (!running) {
+                nightLightStatusProcess.running = true
+            }
+        }
+    }
+
+    // Toggle Night Light OFF
+    Process {
+        id: nightLightOffProcess
+        command: ["pkill", "-x", "hyprsunset"]
+        onRunningChanged: {
+            if (!running) {
+                nightLightStatusProcess.running = true
+            }
+        }
+    }
+
+    // Toggle VPN ON
+    Process {
+        id: vpnOnProcess
+        command: ["nmcli", "connection", "up", ConfigService.quickToggleVpnName]
+        onRunningChanged: {
+            if (!running) {
+                vpnStatusProcess.running = true
+            }
+        }
+    }
+
+    // Toggle VPN OFF
+    Process {
+        id: vpnOffProcess
+        command: ["nmcli", "connection", "down", ConfigService.quickToggleVpnName]
+        onRunningChanged: {
+            if (!running) {
+                quickToggles.vpnConnected = false
+            }
+        }
+    }
+
+    // Toggle Power Profile
+    Process {
+        id: powerProfileToggleProcess
+        command: ["powerprofilesctl", "set", quickToggles.powerSaverEnabled ? "balanced" : "power-saver"]
+        onRunningChanged: {
+            if (!running) {
+                powerProfileStatusProcess.running = true
+            }
+        }
     }
 
     // Refresh status periodically
@@ -77,6 +228,32 @@ Item {
         onTriggered: {
             wifiStatusProcess.running = true
             btStatusProcess.running = true
+            micStatusProcess.running = true
+            nightLightStatusProcess.running = true
+            if (ConfigService.quickToggleVpnName) {
+                vpnStatusProcess.running = true
+            }
+            if (ConfigService.quickTogglePowerSaver) {
+                powerProfileStatusProcess.running = true
+            }
+        }
+    }
+
+    // Focus Mode toggle function
+    function toggleFocusMode() {
+        if (!focusModeEnabled) {
+            // Enable Focus Mode
+            previousBarMode = ConfigService.barMode
+            Notifications.NotificationState.doNotDisturb = true
+            ConfigService.setValue("bar.mode", "focus")
+            ConfigService.saveConfig()
+            focusModeEnabled = true
+        } else {
+            // Disable Focus Mode
+            Notifications.NotificationState.doNotDisturb = false
+            ConfigService.setValue("bar.mode", previousBarMode)
+            ConfigService.saveConfig()
+            focusModeEnabled = false
         }
     }
 
@@ -91,40 +268,121 @@ Item {
         border.width: 1
         border.color: Colors.border
 
-        Row {
+        Grid {
             anchors.fill: parent
             anchors.margins: 12
+            columns: 3
+            rows: 2
             spacing: 8
 
-            // WiFi Toggle
+            // Row 1: WiFi, Bluetooth, Caffeine/Focus
             ToggleButton {
                 width: (parent.width - 16) / 3
-                height: parent.height
+                height: (parent.height - 8) / 2
                 active: quickToggles.wifiEnabled
                 icon: quickToggles.wifiEnabled ? "󰤨" : "󰤭"
                 label: "WiFi"
+                tooltip: quickToggles.wifiEnabled ? "Disable WiFi" : "Enable WiFi"
                 onClicked: wifiToggleProcess.running = true
             }
 
-            // Bluetooth Toggle
             ToggleButton {
                 width: (parent.width - 16) / 3
-                height: parent.height
+                height: (parent.height - 8) / 2
                 active: quickToggles.bluetoothEnabled
                 icon: quickToggles.bluetoothEnabled ? "󰂯" : "󰂲"
                 label: "BT"
+                tooltip: quickToggles.bluetoothEnabled ? "Disable Bluetooth" : "Enable Bluetooth"
                 onClicked: btToggleProcess.running = true
             }
 
-            // Idle Inhibitor Toggle
+            // Caffeine or Focus Mode (Focus replaces Caffeine when enabled)
             ToggleButton {
                 width: (parent.width - 16) / 3
-                height: parent.height
+                height: (parent.height - 8) / 2
+                visible: !ConfigService.quickToggleFocusMode
                 active: quickToggles.idleInhibited
                 icon: quickToggles.idleInhibited ? "󰅶" : "󰛊"
                 label: "Caffeine"
+                tooltip: quickToggles.idleInhibited ? "Allow Idle Sleep" : "Prevent Idle Sleep"
                 activeColor: Colors.gold
                 onClicked: quickToggles.idleInhibited = !quickToggles.idleInhibited
+            }
+
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: (parent.height - 8) / 2
+                visible: ConfigService.quickToggleFocusMode
+                active: quickToggles.focusModeEnabled
+                icon: quickToggles.focusModeEnabled ? "󱥿" : "󰀜"
+                label: "Focus"
+                tooltip: quickToggles.focusModeEnabled ? "Disable Focus Mode" : "Enable Focus Mode (DND + Caffeine)"
+                activeColor: Colors.iris
+                onClicked: quickToggles.toggleFocusMode()
+            }
+
+            // Row 2: Mic, Night Light, VPN/Power
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: (parent.height - 8) / 2
+                active: !quickToggles.micMuted
+                icon: quickToggles.micMuted ? "󰍭" : "󰍬"
+                label: "Mic"
+                tooltip: quickToggles.micMuted ? "Unmute Microphone" : "Mute Microphone"
+                onClicked: micToggleProcess.running = true
+            }
+
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: (parent.height - 8) / 2
+                active: quickToggles.nightLightEnabled
+                icon: quickToggles.nightLightEnabled ? "󱩌" : "󰖨"
+                label: "Night"
+                tooltip: quickToggles.nightLightEnabled ? "Disable Night Light" : "Enable Night Light (" + ConfigService.quickToggleNightTemp + "K)"
+                activeColor: Colors.gold
+                onClicked: {
+                    if (quickToggles.nightLightEnabled) {
+                        quickToggles.nightLightEnabled = false  // Optimistic update
+                        nightLightOffProcess.running = true
+                    } else {
+                        quickToggles.nightLightEnabled = true  // Optimistic update
+                        nightLightOnProcess.running = true
+                    }
+                }
+            }
+
+            // VPN or Power Saver (Power Saver replaces VPN when enabled)
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: (parent.height - 8) / 2
+                visible: !ConfigService.quickTogglePowerSaver
+                active: quickToggles.vpnConnected
+                icon: quickToggles.vpnConnected ? "󰖁" : "󰖂"
+                label: "VPN"
+                tooltip: ConfigService.quickToggleVpnName === "" ? "Configure VPN in Settings" : (quickToggles.vpnConnected ? "Disconnect " + ConfigService.quickToggleVpnName : "Connect " + ConfigService.quickToggleVpnName)
+                activeColor: Colors.pine
+                enabled: ConfigService.quickToggleVpnName !== ""
+                onClicked: {
+                    if (ConfigService.quickToggleVpnName) {
+                        if (quickToggles.vpnConnected) {
+                            vpnOffProcess.running = true
+                        } else {
+                            vpnOnProcess.running = true
+                        }
+                    }
+                }
+            }
+
+            ToggleButton {
+                width: (parent.width - 16) / 3
+                height: (parent.height - 8) / 2
+                visible: ConfigService.quickTogglePowerSaver
+                active: quickToggles.powerSaverEnabled
+                icon: quickToggles.powerSaverEnabled ? "󰌪" : "󱐋"
+                label: "Power"
+                tooltip: quickToggles.powerSaverEnabled ? "Switch to Balanced Profile" : "Switch to Power Saver"
+                activeColor: Colors.foam
+                onClicked: powerProfileToggleProcess.running = true
             }
         }
     }
@@ -134,18 +392,24 @@ Item {
         id: toggleBtn
 
         property bool active: false
+        property bool enabled: true
         property string icon: ""
         property string label: ""
+        property string tooltip: ""
         property color activeColor: Colors.primary
         signal clicked()
 
         spacing: 4
+        opacity: enabled ? 1.0 : 0.5
 
         // Main toggle button
         Rectangle {
+            id: btnRect
             width: parent.width
             height: parent.height - oblongIndicator.height - parent.spacing
             radius: 12
+
+            property bool hovered: false
 
             // Semi-transparent background
             color: toggleBtn.active
@@ -192,20 +456,58 @@ Item {
                 }
             }
 
+            // Tooltip
+            Rectangle {
+                id: tooltipRect
+                visible: btnRect.hovered && toggleBtn.tooltip !== "" && tooltipTimer.running === false
+                anchors.bottom: parent.top
+                anchors.bottomMargin: 6
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: tooltipText.width + 16
+                height: tooltipText.height + 8
+                radius: 6
+                color: Colors.surface
+                border.width: 1
+                border.color: Colors.border
+                z: 100
+
+                Text {
+                    id: tooltipText
+                    anchors.centerIn: parent
+                    text: toggleBtn.tooltip
+                    font.pixelSize: 11
+                    color: Colors.foreground
+                }
+            }
+
+            Timer {
+                id: tooltipTimer
+                interval: 500
+                repeat: false
+            }
+
             MouseArea {
                 anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
+                cursorShape: toggleBtn.enabled ? Qt.PointingHandCursor : Qt.ForbiddenCursor
                 hoverEnabled: true
 
-                onClicked: toggleBtn.clicked()
+                onClicked: {
+                    if (toggleBtn.enabled) {
+                        toggleBtn.clicked()
+                    }
+                }
 
                 onEntered: {
-                    if (!toggleBtn.active) {
+                    tooltipTimer.restart()
+                    btnRect.hovered = true
+                    if (toggleBtn.enabled && !toggleBtn.active) {
                         parent.color = Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.7)
                     }
                 }
 
                 onExited: {
+                    tooltipTimer.stop()
+                    btnRect.hovered = false
                     if (!toggleBtn.active) {
                         parent.color = Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.5)
                     }

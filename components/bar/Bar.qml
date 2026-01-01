@@ -57,15 +57,18 @@ PanelWindow {
             visible: ConfigService.barModuleWorkspaces
         }
 
-        // Center-Left: System Resources (anchored to left of Workspaces)
+        // Center-Left: Mic Indicator + System Resources (anchored to left of Workspaces)
         Row {
             anchors.right: workspaces.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
-            visible: ConfigService.barModuleSystemResources
 
-            SystemResources {}
+            MicIndicator {}
+
+            SystemResources {
+                visible: ConfigService.barModuleSystemResources
+            }
         }
 
         // Center-Right: Utilities + Music (anchored to right of Workspaces)

@@ -10,6 +10,7 @@ TrayMenu 1.0 TrayMenu.qml
 Workspaces 1.0 Workspaces.qml
 WorkspaceTooltip 1.0 WorkspaceTooltip.qml
 WindowTitle 1.0 WindowTitle.qml
+MicIndicator 1.0 MicIndicator.qml
 SystemResources 1.0 SystemResources.qml
 ResourceIndicator 1.0 ResourceIndicator.qml
 Utilities 1.0 Utilities.qml

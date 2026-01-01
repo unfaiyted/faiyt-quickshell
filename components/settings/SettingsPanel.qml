@@ -327,7 +327,8 @@ Rectangle {
                              contentColumn.matchesSearch("workspaces") || contentColumn.matchesSearch("system resources") ||
                              contentColumn.matchesSearch("music") || contentColumn.matchesSearch("system tray") ||
                              contentColumn.matchesSearch("network") || contentColumn.matchesSearch("battery") ||
-                             contentColumn.matchesSearch("clock") || contentColumn.matchesSearch("weather")
+                             contentColumn.matchesSearch("clock") || contentColumn.matchesSearch("weather") ||
+                             contentColumn.matchesSearch("mic") || contentColumn.matchesSearch("microphone")
                     title: "Bar Modules"
 
                     SettingRow {
@@ -367,6 +368,20 @@ Rectangle {
                             checked: ConfigService.barModuleWorkspaces
                             onToggled: (value) => {
                                 ConfigService.setValue("bar.modules.workspaces", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("mic") || contentColumn.matchesSearch("microphone") || contentColumn.matchesSearch("mute")
+                        label: "Mic Mute Indicator"
+                        description: "Show indicator in bar when microphone is muted"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleMicIndicator
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.micIndicator", value)
                                 ConfigService.saveConfig()
                             }
                         }
@@ -1122,6 +1137,74 @@ Rectangle {
                                     id: restartProcess
                                     command: ["bash", "-c", "quickshell --reload"]
                                 }
+                            }
+                        }
+                    }
+                }
+
+                // Quick Toggles Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("quick toggle") || contentColumn.matchesSearch("focus mode") ||
+                             contentColumn.matchesSearch("power saver") || contentColumn.matchesSearch("vpn") ||
+                             contentColumn.matchesSearch("night light") || contentColumn.matchesSearch("sidebar toggle")
+                    title: "Quick Toggles"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("focus mode")
+                        label: "Focus Mode"
+                        description: "Show Focus Mode toggle (DND + Caffeine + minimal bar)"
+
+                        ToggleSwitch {
+                            checked: ConfigService.quickToggleFocusMode
+                            onToggled: (value) => {
+                                ConfigService.setValue("sidebar.quickToggles.showFocusMode", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("power saver")
+                        label: "Power Saver"
+                        description: "Show Power Saver toggle (replaces VPN)"
+
+                        ToggleSwitch {
+                            checked: ConfigService.quickTogglePowerSaver
+                            onToggled: (value) => {
+                                ConfigService.setValue("sidebar.quickToggles.showPowerSaver", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("vpn")
+                        label: "VPN Connection"
+                        description: "NetworkManager VPN connection name"
+
+                        SettingsTextInput {
+                            text: ConfigService.quickToggleVpnName
+                            placeholder: "my-vpn"
+                            onTextEdited: (value) => {
+                                ConfigService.setValue("sidebar.quickToggles.vpnConnectionName", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("night light") || contentColumn.matchesSearch("temperature")
+                        label: "Night Light Temperature"
+                        description: "Color temperature in Kelvin (lower = warmer)"
+
+                        NumberInput {
+                            value: ConfigService.quickToggleNightTemp
+                            min: 2500
+                            max: 6500
+                            step: 500
+                            onValueModified: (v) => {
+                                ConfigService.setValue("sidebar.quickToggles.nightLightTemp", v)
+                                ConfigService.saveConfig()
                             }
                         }
                     }

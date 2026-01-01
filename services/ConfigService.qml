@@ -21,6 +21,7 @@ Singleton {
                 distroIcon: true,
                 windowTitle: true,
                 workspaces: true,
+                micIndicator: true,
                 systemResources: true,
                 utilities: true,
                 music: true,
@@ -126,6 +127,16 @@ Singleton {
             mcpServers: []  // [{id, name, command, env, enabled}]
         },
 
+        // Sidebar Quick Toggles
+        sidebar: {
+            quickToggles: {
+                showFocusMode: false,      // Off by default
+                showPowerSaver: false,     // Off by default
+                vpnConnectionName: "",     // User configures
+                nightLightTemp: 4500       // Kelvin temperature
+            }
+        },
+
         // Windows & Components
         windows: {
             bar: {
@@ -155,8 +166,12 @@ Singleton {
     // Current configuration (merged with defaults)
     property var config: JSON.parse(JSON.stringify(defaultConfig))
 
+    // Flag to prevent saving before config is loaded
+    property bool configLoaded: false
+
     // Initialize on creation
     Component.onCompleted: {
+        configLoaded = false
         ensureConfigDir()
         loadConfig()
     }
@@ -198,14 +213,21 @@ Singleton {
                     console.log("ConfigService: Parse error, using defaults:", e)
                 }
                 configBuffer = ""
+                configService.configLoaded = true
             } else if (!running) {
                 console.log("ConfigService: No config file, using defaults")
+                configService.configLoaded = true
             }
         }
     }
 
     // Save configuration to file
     function saveConfig() {
+        // Prevent saving defaults before config is loaded
+        if (!configLoaded) {
+            console.log("ConfigService: Skipping save, config not yet loaded")
+            return
+        }
         const jsonStr = JSON.stringify(config, null, 2)
         saveProcess.command = ["bash", "-c", "echo '" + jsonStr.replace(/'/g, "'\\''") + "' > " + configPath]
         saveProcess.running = true
@@ -275,6 +297,7 @@ Singleton {
     property bool barModuleDistroIcon: config.bar?.modules?.distroIcon !== false
     property bool barModuleWindowTitle: config.bar?.modules?.windowTitle !== false
     property bool barModuleWorkspaces: config.bar?.modules?.workspaces !== false
+    property bool barModuleMicIndicator: config.bar?.modules?.micIndicator !== false
     property bool barModuleSystemResources: config.bar?.modules?.systemResources !== false
     property bool barModuleUtilities: config.bar?.modules?.utilities !== false
     property bool barModuleMusic: config.bar?.modules?.music !== false
@@ -311,6 +334,12 @@ Singleton {
     property bool windowNotificationsEnabled: config.windows?.overlays?.notifications !== false
     property bool windowWallpaperEnabled: config.windows?.overlays?.wallpaper !== false
 
+    // Quick Toggles convenience properties
+    property bool quickToggleFocusMode: config.sidebar?.quickToggles?.showFocusMode ?? false
+    property bool quickTogglePowerSaver: config.sidebar?.quickToggles?.showPowerSaver ?? false
+    property string quickToggleVpnName: config.sidebar?.quickToggles?.vpnConnectionName ?? ""
+    property int quickToggleNightTemp: config.sidebar?.quickToggles?.nightLightTemp ?? 4500
+
     // AI convenience accessors (API key from env var only)
     property string aiDefaultModel: config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
     property var aiModels: config.ai?.models || []
@@ -338,6 +367,7 @@ Singleton {
         barModuleDistroIcon = config.bar?.modules?.distroIcon !== false
         barModuleWindowTitle = config.bar?.modules?.windowTitle !== false
         barModuleWorkspaces = config.bar?.modules?.workspaces !== false
+        barModuleMicIndicator = config.bar?.modules?.micIndicator !== false
         barModuleSystemResources = config.bar?.modules?.systemResources !== false
         barModuleUtilities = config.bar?.modules?.utilities !== false
         barModuleMusic = config.bar?.modules?.music !== false
@@ -381,5 +411,11 @@ Singleton {
         windowOverlaysEnabled = config.windows?.overlays?.enabled !== false
         windowNotificationsEnabled = config.windows?.overlays?.notifications !== false
         windowWallpaperEnabled = config.windows?.overlays?.wallpaper !== false
+
+        // Quick Toggles
+        quickToggleFocusMode = config.sidebar?.quickToggles?.showFocusMode ?? false
+        quickTogglePowerSaver = config.sidebar?.quickToggles?.showPowerSaver ?? false
+        quickToggleVpnName = config.sidebar?.quickToggles?.vpnConnectionName ?? ""
+        quickToggleNightTemp = config.sidebar?.quickToggles?.nightLightTemp ?? 4500
     }
 }
