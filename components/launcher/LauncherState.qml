@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "results"
+import "../../services"
 
 Singleton {
     id: launcherState
@@ -41,6 +42,19 @@ Singleton {
     CommandResults { id: commandResults }
     SystemResults { id: systemResults }
     WindowResults { id: windowResults }
+    EmojiResults { id: emojiResults }
+    StickerResults { id: stickerResults }
+    GifResults { id: gifResults }
+
+    // Re-trigger search when GIF results are ready (async)
+    Connections {
+        target: gifResults
+        function onResultsReady() {
+            if (launcherState.searchType === "GIF" && launcherState.visible) {
+                launcherState.performSearch()
+            }
+        }
+    }
 
     // Visibility state
     property bool visible: false
@@ -55,7 +69,7 @@ Singleton {
 
     // Results
     property var results: []
-    property int maxResults: 15
+    property int maxResults: isGridMode ? 48 : 15  // More results for grid modes (emoji/sticker)
 
     // Debounce timer
     property int debounceDelay: 100
@@ -83,6 +97,9 @@ Singleton {
         "command": ["cmd:", "command:", "$:", ">:"],
         "system": ["sys:", "system:"],
         "window": ["win:", "window:", "w:"],
+        "emoji": ["emoji:", "em:", ":"],
+        "sticker": ["sticker:", "st:", "s:"],
+        "gif": ["gif:", "g:"],
         "directory": ["d:", "dir:", "directory:"],
         "clipboard": ["clip:", "clipboard:", "cb:"],
         "search": ["search:", "!g", "!d", "!c"],
@@ -90,6 +107,18 @@ Singleton {
         "kill": ["kill:", "k:"],
         "prefix": ["?"]
     }
+
+    // Grid mode state (emoji, stickers, and gifs use grid view)
+    property bool isEmojiMode: searchType === "EMOJI"
+    property bool isStickerMode: searchType === "STICKER"
+    property bool isGifMode: searchType === "GIF"
+    property bool isGridMode: isEmojiMode || isStickerMode || isGifMode
+    property int gridColumns: isGifMode ? 4 : 6  // 6 columns for emoji/sticker, 4 for gif
+    property string viewMode: isGridMode ? "grid" : "list"
+
+    // Sticker pack bar navigation state
+    property bool packBarFocused: false
+    property int selectedPackIndex: -1  // -1 = "All", 0+ = pack index
 
     // Parse search text for prefix
     function parseSearchText(text) {
@@ -128,6 +157,12 @@ Singleton {
         let query = parsed.query
         let isPrefixSearch = parsed.isPrefixSearch
 
+        // Reset pack bar focus when not in sticker mode
+        if (searchType !== "STICKER") {
+            packBarFocused = false
+            selectedPackIndex = -1
+        }
+
         let allResults = []
 
         // Search based on type
@@ -164,6 +199,12 @@ Singleton {
             allResults = systemResults.search(query, isPrefixSearch)
         } else if (searchType === "WINDOW") {
             allResults = windowResults.search(query, isPrefixSearch)
+        } else if (searchType === "EMOJI") {
+            allResults = emojiResults.search(query, isPrefixSearch)
+        } else if (searchType === "STICKER") {
+            allResults = stickerResults.search(query, isPrefixSearch)
+        } else if (searchType === "GIF") {
+            allResults = gifResults.search(query, isPrefixSearch)
         }
 
         // Limit results
@@ -173,15 +214,88 @@ Singleton {
 
     // Navigation
     function selectNext() {
+        if (packBarFocused && isStickerMode) {
+            // Move from pack bar to grid
+            packBarFocused = false
+            selectedIndex = 0
+            return
+        }
+
         if (results.length > 0) {
-            selectedIndex = (selectedIndex + 1) % results.length
+            if (isGridMode) {
+                // In grid mode, down moves to next row
+                let newIndex = selectedIndex + gridColumns
+                if (newIndex < results.length) {
+                    selectedIndex = newIndex
+                }
+            } else {
+                selectedIndex = (selectedIndex + 1) % results.length
+            }
         }
     }
 
     function selectPrevious() {
-        if (results.length > 0) {
-            selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : results.length - 1
+        if (packBarFocused && isStickerMode) {
+            // Already at pack bar, can't go up further
+            return
         }
+
+        if (results.length > 0) {
+            if (isGridMode) {
+                // In grid mode, up moves to previous row
+                let newIndex = selectedIndex - gridColumns
+                if (newIndex >= 0) {
+                    selectedIndex = newIndex
+                } else if (isStickerMode && StickerService.stickerPacks.length > 0) {
+                    // At top row in sticker mode, move to pack bar
+                    packBarFocused = true
+                }
+            } else {
+                selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : results.length - 1
+            }
+        }
+    }
+
+    // Grid navigation for grid modes (emoji/sticker)
+    function selectLeft() {
+        if (packBarFocused && isStickerMode) {
+            // Navigate left in pack bar (-1 = All, 0+ = pack index)
+            if (selectedPackIndex > -1) {
+                selectedPackIndex = selectedPackIndex - 1
+            }
+            return
+        }
+
+        if (results.length > 0 && selectedIndex > 0) {
+            selectedIndex = selectedIndex - 1
+        }
+    }
+
+    function selectRight() {
+        if (packBarFocused && isStickerMode) {
+            // Navigate right in pack bar
+            const maxIndex = StickerService.stickerPacks.length - 1
+            if (selectedPackIndex < maxIndex) {
+                selectedPackIndex = selectedPackIndex + 1
+            }
+            return
+        }
+
+        if (results.length > 0 && selectedIndex < results.length - 1) {
+            selectedIndex = selectedIndex + 1
+        }
+    }
+
+    // Activate pack in pack bar
+    function activatePackBarSelection() {
+        if (!packBarFocused || !isStickerMode) return
+
+        const packId = selectedPackIndex === -1 ? "" : StickerService.stickerPacks[selectedPackIndex]?.id || ""
+        StickerService.selectedPackId = packId
+        StickerService.selectPack(packId)
+        performSearch()
+        packBarFocused = false
+        selectedIndex = 0
     }
 
     function activateSelected() {
@@ -232,6 +346,8 @@ Singleton {
             searchText = ""
             results = []
             evalResult = null
+            packBarFocused = false
+            selectedPackIndex = -1
         }
     }
 

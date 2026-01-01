@@ -97,6 +97,22 @@ Rectangle {
                     event.accepted = true
                 }
 
+                Keys.onLeftPressed: function(event) {
+                    if (LauncherState.isGridMode && LauncherState.results.length > 0) {
+                        LauncherState.selectLeft()
+                        event.accepted = true
+                    }
+                    // Otherwise let it move cursor in text input
+                }
+
+                Keys.onRightPressed: function(event) {
+                    if (LauncherState.isGridMode && LauncherState.results.length > 0) {
+                        LauncherState.selectRight()
+                        event.accepted = true
+                    }
+                    // Otherwise let it move cursor in text input
+                }
+
                 Keys.onReturnPressed: function(event) {
                     handleEnter()
                     event.accepted = true
@@ -237,6 +253,12 @@ Rectangle {
     }
 
     function handleEnter() {
+        // Check for pack bar focus in sticker mode first
+        if (LauncherState.packBarFocused && LauncherState.isStickerMode) {
+            LauncherState.activatePackBarSelection()
+            return
+        }
+
         // If we have an eval result and no search results, copy and close
         if (LauncherState.evalResult && LauncherState.results.length === 0) {
             copyEvalAndShowFeedback()

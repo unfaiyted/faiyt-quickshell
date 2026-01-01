@@ -16,9 +16,10 @@ PanelWindow {
     }
 
     property bool expanded: LauncherState.visible
+    property int baseWidth: LauncherState.isStickerMode ? 640 : 600
 
-    implicitWidth: 600
-    implicitHeight: expanded ? Math.min(contentColumn.implicitHeight + 32, 500) : 0
+    implicitWidth: baseWidth
+    implicitHeight: expanded ? Math.min(contentColumn.implicitHeight + 32, 650) : 0
     exclusiveZone: 0
     color: "transparent"
 
@@ -36,7 +37,7 @@ PanelWindow {
     // Main content container - centered
     Rectangle {
         id: contentPanel
-        width: 600
+        width: launcherWindow.baseWidth
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: Math.max(100, (parent.height - height) / 3)
@@ -83,59 +84,142 @@ PanelWindow {
                 focus: launcherWindow.expanded
             }
 
-            // Results list
-            ListView {
-                id: resultsList
+            // Results display - grid (emoji/sticker/gif) or list (other)
+            Loader {
+                id: resultsLoader
                 width: parent.width
-                height: Math.min(contentHeight, 350)
-                clip: true
-                spacing: 4
-                model: LauncherState.results
+                sourceComponent: LauncherState.isGifMode ? gifGridComponent :
+                                 LauncherState.isStickerMode ? stickerGridComponent :
+                                 LauncherState.isEmojiMode ? emojiGridComponent : listComponent
 
-                delegate: Loader {
-                    width: resultsList.width
-                    height: modelData?.type === "window" ? 70 : 52
+                Component {
+                    id: gifGridComponent
+                    GifGridView {
+                        width: parent.width
+                        results: LauncherState.results
+                        selectedIndex: LauncherState.selectedIndex
+                        columns: LauncherState.gridColumns
 
-                    sourceComponent: modelData?.type === "window" ? windowResultComponent : resultComponent
-
-                    Component {
-                        id: resultComponent
-                        ResultItem {
-                            width: resultsList.width
-                            result: modelData
-                            isSelected: index === LauncherState.selectedIndex
-
-                            onClicked: {
-                                LauncherState.selectedIndex = index
-                                LauncherState.activateSelected()
-                            }
+                        onSelectedIndexChanged: {
+                            LauncherState.selectedIndex = selectedIndex
                         }
-                    }
 
-                    Component {
-                        id: windowResultComponent
-                        WindowResultItem {
-                            width: resultsList.width
-                            result: modelData
-                            isSelected: index === LauncherState.selectedIndex
+                        onGifClicked: function(index) {
+                            LauncherState.selectedIndex = index
+                            // Don't activate - let the grid view handle the popup
+                        }
 
-                            onClicked: {
-                                LauncherState.selectedIndex = index
-                                LauncherState.activateSelected()
-                            }
+                        onGifActivated: function(index) {
+                            LauncherState.selectedIndex = index
+                            LauncherState.activateSelected()
                         }
                     }
                 }
 
-                // Auto-scroll to selected item
-                onCurrentIndexChanged: {
-                    positionViewAtIndex(LauncherState.selectedIndex, ListView.Contain)
+                Component {
+                    id: stickerGridComponent
+                    StickerGridView {
+                        width: parent.width
+                        results: LauncherState.results
+                        selectedIndex: LauncherState.selectedIndex
+                        columns: LauncherState.gridColumns
+
+                        onSelectedIndexChanged: {
+                            LauncherState.selectedIndex = selectedIndex
+                        }
+
+                        onStickerClicked: function(index) {
+                            LauncherState.selectedIndex = index
+                            LauncherState.activateSelected()
+                        }
+
+                        onStickerActivated: function(index) {
+                            LauncherState.selectedIndex = index
+                            LauncherState.activateSelected()
+                        }
+                    }
                 }
 
-                Connections {
-                    target: LauncherState
-                    function onSelectedIndexChanged() {
-                        resultsList.positionViewAtIndex(LauncherState.selectedIndex, ListView.Contain)
+                Component {
+                    id: emojiGridComponent
+                    EmojiGridView {
+                        width: parent.width
+                        results: LauncherState.results
+                        selectedIndex: LauncherState.selectedIndex
+                        columns: LauncherState.gridColumns
+
+                        onSelectedIndexChanged: {
+                            LauncherState.selectedIndex = selectedIndex
+                        }
+
+                        onEmojiClicked: function(index) {
+                            LauncherState.selectedIndex = index
+                            LauncherState.activateSelected()
+                        }
+
+                        onEmojiActivated: function(index) {
+                            LauncherState.selectedIndex = index
+                            LauncherState.activateSelected()
+                        }
+                    }
+                }
+
+                Component {
+                    id: listComponent
+                    ListView {
+                        id: resultsList
+                        width: parent.width
+                        height: Math.min(contentHeight, 480)
+                        clip: true
+                        spacing: 4
+                        model: LauncherState.results
+
+                        delegate: Loader {
+                            width: resultsList.width
+                            height: modelData?.type === "window" ? 70 : 52
+
+                            sourceComponent: modelData?.type === "window" ? windowResultComponent : resultComponent
+
+                            Component {
+                                id: resultComponent
+                                ResultItem {
+                                    width: resultsList.width
+                                    result: modelData
+                                    isSelected: index === LauncherState.selectedIndex
+
+                                    onClicked: {
+                                        LauncherState.selectedIndex = index
+                                        LauncherState.activateSelected()
+                                    }
+                                }
+                            }
+
+                            Component {
+                                id: windowResultComponent
+                                WindowResultItem {
+                                    width: resultsList.width
+                                    result: modelData
+                                    isSelected: index === LauncherState.selectedIndex
+
+                                    onClicked: {
+                                        LauncherState.selectedIndex = index
+                                        LauncherState.activateSelected()
+                                    }
+                                }
+                            }
+                        }
+
+                        // Auto-scroll to selected item
+                        onCurrentIndexChanged: {
+                            positionViewAtIndex(LauncherState.selectedIndex, ListView.Contain)
+                        }
+
+                        Connections {
+                            target: LauncherState
+                            function onSelectedIndexChanged() {
+                                resultsList.positionViewAtIndex(LauncherState.selectedIndex, ListView.Contain)
+                            }
+                        }
                     }
                 }
             }
@@ -171,7 +255,7 @@ PanelWindow {
                         spacing: 6
 
                         Text {
-                            text: "↑↓"
+                            text: LauncherState.isGridMode ? "←↑↓→" : "↑↓"
                             font.pixelSize: 11
                             font.bold: true
                             color: Colors.foregroundMuted
@@ -196,7 +280,7 @@ PanelWindow {
                         }
 
                         Text {
-                            text: "Open"
+                            text: LauncherState.isGridMode ? "Copy" : "Open"
                             font.pixelSize: 11
                             color: Colors.foregroundAlt
                         }
@@ -246,7 +330,11 @@ PanelWindow {
                     break
                 case Qt.Key_Return:
                 case Qt.Key_Enter:
-                    LauncherState.activateSelected()
+                    if (LauncherState.packBarFocused && LauncherState.isStickerMode) {
+                        LauncherState.activatePackBarSelection()
+                    } else {
+                        LauncherState.activateSelected()
+                    }
                     event.accepted = true
                     break
                 case Qt.Key_J:
@@ -258,6 +346,30 @@ PanelWindow {
                 case Qt.Key_K:
                     if (event.modifiers & Qt.ControlModifier) {
                         LauncherState.selectPrevious()
+                        event.accepted = true
+                    }
+                    break
+                case Qt.Key_Left:
+                    if (LauncherState.isGridMode) {
+                        LauncherState.selectLeft()
+                        event.accepted = true
+                    }
+                    break
+                case Qt.Key_Right:
+                    if (LauncherState.isGridMode) {
+                        LauncherState.selectRight()
+                        event.accepted = true
+                    }
+                    break
+                case Qt.Key_H:
+                    if (LauncherState.isGridMode && event.modifiers & Qt.ControlModifier) {
+                        LauncherState.selectLeft()
+                        event.accepted = true
+                    }
+                    break
+                case Qt.Key_L:
+                    if (LauncherState.isGridMode && event.modifiers & Qt.ControlModifier) {
+                        LauncherState.selectRight()
                         event.accepted = true
                     }
                     break

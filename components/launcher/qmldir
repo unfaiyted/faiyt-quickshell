@@ -4,4 +4,8 @@ LauncherWindow 1.0 LauncherWindow.qml
 LauncherEntry 1.0 LauncherEntry.qml
 ResultItem 1.0 ResultItem.qml
 WindowResultItem 1.0 WindowResultItem.qml
+EmojiGridView 1.0 EmojiGridView.qml
+StickerGridView 1.0 StickerGridView.qml
+StickerPackBar 1.0 StickerPackBar.qml
+GifGridView 1.0 GifGridView.qml
 Evaluator 1.0 Evaluator.qml

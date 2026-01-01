@@ -169,6 +169,9 @@ Application launcher with instant evaluators and multiple search modes:
 - **Windows** (`win:`, `window:`, `w:`) - Search open windows with live previews
 - **Commands** (`cmd:`, `$:`, `>:`) - Run shell commands with history
 - **System** (`sys:`) - Power actions (shutdown, reboot, suspend, lock, logout)
+- **Emoji** (`emoji:`, `e:`) - Search and copy emojis with keyword matching
+- **Stickers** (`sticker:`, `st:`, `s:`) - Signal sticker packs with grid view
+- **GIFs** (`gif:`, `g:`) - Search and copy GIFs via Tenor API
 
 **Instant Evaluators:**
 Real-time calculations displayed on the right side of the input as you type:
@@ -181,6 +184,11 @@ Real-time calculations displayed on the right side of the input as you type:
 | Base | `255 to hex`, `0xFF` | `= 0xFF`, `= 255 (dec)` |
 | Time | `2h 30m to minutes` | `= 150 min` |
 | Color | `#eb6f92`, `red to rgb` | Shows color swatch + formats |
+| Date | `today + 30 days`, `days until dec 25` | Date calculations |
+| Hash | `hash hello`, `md5 hello` | MD5, SHA1, SHA256 hashes |
+| UUID | `uuid`, `uuid4` | Generate random UUID |
+| Password | `password 16`, `pass 12` | Generate secure password |
+| Lorem | `lorem 3`, `lorem 50 words` | Generate placeholder text |
 
 **Features:**
 - Press Enter to copy evaluator result to clipboard
@@ -190,8 +198,32 @@ Real-time calculations displayed on the right side of the input as you type:
 
 **Keyboard Navigation:**
 - `↑`/`↓` or `Ctrl+K`/`Ctrl+J` - Navigate results
+- `←`/`→` - Navigate grid items (emoji, stickers, GIFs)
 - `Enter` - Activate selected / Copy eval result
 - `Escape` - Close launcher
+
+**Emoji Search** (`e:` or `emoji:`):
+- Grid view with 6 columns
+- Search by emoji name or keywords (e.g., `e:smile`, `e:heart`, `e:fire`)
+- Click or press Enter to copy emoji to clipboard
+- Keyboard navigation with arrow keys
+
+**Signal Stickers** (`s:`, `st:`, or `sticker:`):
+- Browse and search Signal sticker packs
+- Grid view with large preview panel
+- Pack selection bar with keyboard navigation (Up arrow to focus, Left/Right to navigate, Enter to select)
+- Search by emoji or pack name
+- Click or press Enter to copy sticker image to clipboard
+- **Adding Packs**: Type `s: add <signal-url>` with a URL from [signalstickers.org](https://signalstickers.org)
+- Stickers are decrypted and cached locally at `~/.cache/faiyt-qs/stickers/`
+- Pack configuration stored in `~/.config/faiyt-qs/config.json`
+
+**GIF Search** (`g:` or `gif:`):
+- Search GIFs via Tenor API
+- Grid view with 4 columns and animated previews
+- Category tabs: Trending, Reactions, Memes, Animals, Anime, Sports
+- Click or press Enter to copy GIF to clipboard
+- Requires `TENOR_API_KEY` environment variable
 
 ### Screen Capture
 Screenshot and screen recording functionality with area selection:
@@ -275,6 +307,12 @@ Toast notifications that appear when notifications arrive:
 
 **Music Visualization:**
 - `cava` - Audio visualizer for animated bars in the music module
+
+**Sticker Support:**
+- `openssl` - For Signal sticker decryption (AES-256-CBC)
+- `python3` - For parsing protobuf manifests
+- `curl` - For downloading stickers from Signal CDN
+- `imagemagick` or `ffmpeg` - For WebP to PNG conversion
 
 ## Installation
 
@@ -369,18 +407,31 @@ faiyt-qs/
 │   │   ├── ResultItem.qml       # Search result item
 │   │   ├── WindowResultItem.qml # Window result with live preview
 │   │   ├── Evaluator.qml        # Evaluator manager
+│   │   ├── EmojiGridView.qml    # Emoji grid display
+│   │   ├── StickerGridView.qml  # Sticker grid with preview panel
+│   │   ├── StickerPackBar.qml   # Sticker pack selection bar
+│   │   ├── GifGridView.qml      # GIF grid with categories
 │   │   ├── results/             # Search providers
 │   │   │   ├── AppResults.qml
 │   │   │   ├── CommandResults.qml
 │   │   │   ├── SystemResults.qml
-│   │   │   └── WindowResults.qml
+│   │   │   ├── WindowResults.qml
+│   │   │   ├── EmojiResults.qml   # Emoji search provider
+│   │   │   ├── StickerResults.qml # Signal sticker search
+│   │   │   └── GifResults.qml     # Tenor GIF search
 │   │   └── evaluators/          # Instant evaluators
 │   │       ├── MathEvaluator.qml
 │   │       ├── PercentageEvaluator.qml
 │   │       ├── UnitEvaluator.qml
 │   │       ├── BaseEvaluator.qml
 │   │       ├── TimeEvaluator.qml
-│   │       └── ColorEvaluator.qml
+│   │       ├── ColorEvaluator.qml
+│   │       ├── DateEvaluator.qml
+│   │       ├── CurrencyEvaluator.qml
+│   │       ├── HashEvaluator.qml
+│   │       ├── LoremEvaluator.qml
+│   │       ├── PasswordEvaluator.qml
+│   │       └── UuidEvaluator.qml
 │   ├── notifications/
 │   │   ├── NotificationServer.qml  # Singleton notification daemon
 │   │   └── NotificationPopups.qml  # Popup windows
@@ -415,9 +466,12 @@ faiyt-qs/
 │   ├── ClaudeService.qml        # Claude AI API integration
 │   ├── ConfigService.qml        # Settings persistence (JSON config)
 │   ├── ConversationManager.qml  # AI conversation storage (~/.local/share)
-│   └── IconService.qml          # Centralized NerdFont icon mappings
+│   ├── IconService.qml          # Centralized NerdFont icon mappings
+│   └── StickerService.qml       # Signal sticker pack management
 ├── scripts/
-│   └── screen-capture.sh        # Screenshot and recording script
+│   ├── screen-capture.sh        # Screenshot and recording script
+│   ├── sticker-decrypt.sh       # Signal sticker decryption (HKDF + AES)
+│   └── parse-sticker-manifest.py  # Protobuf manifest parser
 └── README.md
 ```
 
@@ -431,6 +485,10 @@ export QS_NET_SPEED_MBPS=930
 
 # Claude AI API key (required for AI chat)
 export ANTHROPIC_API_KEY=sk-ant-...
+
+# Tenor API key (required for GIF search)
+# Get one free at https://developers.google.com/tenor/guides/quickstart
+export TENOR_API_KEY=your-tenor-api-key
 ```
 
 ### Keybindings (Hyprland)

@@ -97,7 +97,8 @@ Singleton {
                 mathResults: true,
                 directorySearch: false,
                 aiSearch: false,
-                webSearch: false
+                webSearch: false,
+                gifSearch: true
             },
             evaluators: {
                 mathEvaluator: true,
@@ -108,6 +109,12 @@ Singleton {
                 timeCalculator: true,
                 unitConverter: true
             }
+        },
+
+        // Stickers
+        stickers: {
+            enabled: true,
+            packs: []  // [{id: string, key: string, name: string}]
         },
 
         // AI Configuration (API keys use environment variables for security)
@@ -209,6 +216,8 @@ Singleton {
                     // Deep merge with defaults
                     configService.config = deepMerge(JSON.parse(JSON.stringify(configService.defaultConfig)), loaded)
                     console.log("ConfigService: Config loaded successfully")
+                    console.log("  - Sticker packs in loaded config:", loaded.stickers?.packs?.length || 0)
+                    console.log("  - Sticker packs after merge:", configService.config.stickers?.packs?.length || 0)
                 } catch (e) {
                     console.log("ConfigService: Parse error, using defaults:", e)
                 }
@@ -340,6 +349,10 @@ Singleton {
     property string quickToggleVpnName: config.sidebar?.quickToggles?.vpnConnectionName ?? ""
     property int quickToggleNightTemp: config.sidebar?.quickToggles?.nightLightTemp ?? 4500
 
+    // Sticker convenience properties
+    property bool stickersEnabled: config.stickers?.enabled !== false
+    property var stickerPacks: config.stickers?.packs || []
+
     // AI convenience accessors (API key from env var only)
     property string aiDefaultModel: config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
     property var aiModels: config.ai?.models || []
@@ -417,5 +430,9 @@ Singleton {
         quickTogglePowerSaver = config.sidebar?.quickToggles?.showPowerSaver ?? false
         quickToggleVpnName = config.sidebar?.quickToggles?.vpnConnectionName ?? ""
         quickToggleNightTemp = config.sidebar?.quickToggles?.nightLightTemp ?? 4500
+
+        // Stickers
+        stickersEnabled = config.stickers?.enabled !== false
+        stickerPacks = config.stickers?.packs || []
     }
 }

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Io
 import "../../theme"
 import "../../services"
@@ -315,6 +316,108 @@ Rectangle {
                             onValueModified: (v) => {
                                 ConfigService.setValue("overview.totalItems", v)
                                 ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // Stickers Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("sticker") || contentColumn.matchesSearch("signal")
+                    title: "Stickers"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("sticker") || contentColumn.matchesSearch("enable")
+                        label: "Enable Stickers"
+                        description: "Enable Signal sticker picker in launcher"
+
+                        ToggleSwitch {
+                            checked: ConfigService.stickersEnabled
+                            onToggled: (value) => {
+                                ConfigService.setValue("stickers.enabled", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("sticker") || contentColumn.matchesSearch("pack")
+                        label: "Installed Packs"
+                        description: "Manage your sticker packs"
+
+                        Column {
+                            spacing: 8
+
+                            Text {
+                                text: StickerService.stickerPacks.length === 0 ? "No packs installed" :
+                                      StickerService.stickerPacks.length + " pack(s) installed"
+                                font.pixelSize: 12
+                                color: Colors.foregroundMuted
+                            }
+
+                            Repeater {
+                                model: StickerService.stickerPacks
+
+                                Rectangle {
+                                    width: 200
+                                    height: 36
+                                    radius: 8
+                                    color: Colors.surface
+                                    border.width: 1
+                                    border.color: Colors.border
+
+                                    Row {
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        spacing: 8
+
+                                        Text {
+                                            text: modelData.coverEmoji || "📦"
+                                            font.pixelSize: 16
+                                            font.family: "Noto Color Emoji"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Text {
+                                            text: modelData.name || "Sticker Pack"
+                                            font.pixelSize: 12
+                                            color: Colors.foreground
+                                            elide: Text.ElideRight
+                                            width: parent.width - 60
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Rectangle {
+                                            width: 20
+                                            height: 20
+                                            radius: 4
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            color: removePackArea.containsMouse ? Colors.error + "30" : "transparent"
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "✕"
+                                                font.pixelSize: 10
+                                                color: removePackArea.containsMouse ? Colors.error : Colors.foregroundMuted
+                                            }
+
+                                            MouseArea {
+                                                id: removePackArea
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: StickerService.removePack(modelData.id)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text {
+                                text: "Use 's: add <url>' in launcher to add packs"
+                                font.pixelSize: 11
+                                font.italic: true
+                                color: Colors.foregroundMuted
                             }
                         }
                     }
@@ -821,6 +924,111 @@ Rectangle {
                                 ConfigService.setValue("search.enableFeatures.directorySearch", value)
                                 ConfigService.saveConfig()
                             }
+                        }
+                    }
+                }
+
+                // GIF Search Section
+                SettingsSection {
+                    id: gifSearchSection
+                    visible: contentColumn.matchesSearch("gif") || contentColumn.matchesSearch("tenor") || contentColumn.matchesSearch("api key")
+                    title: "GIF Search"
+
+                    // Check for API key
+                    property string tenorApiKey: Quickshell.env("TENOR_API_KEY") || ""
+                    property bool hasTenorKey: tenorApiKey.length > 0
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("gif") || contentColumn.matchesSearch("enable")
+                        label: "Enable GIF Search"
+                        description: "Search and copy GIFs using gif: prefix"
+
+                        ToggleSwitch {
+                            checked: ConfigService.getValue("search.enableFeatures.gifSearch") ?? true
+                            onToggled: (value) => {
+                                ConfigService.setValue("search.enableFeatures.gifSearch", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("gif") || contentColumn.matchesSearch("tenor") || contentColumn.matchesSearch("api key")
+                        label: "Tenor API Key"
+                        description: gifSearchSection.hasTenorKey ? "API key configured via TENOR_API_KEY" : "Set TENOR_API_KEY environment variable"
+
+                        Row {
+                            spacing: 8
+
+                            // Status icon
+                            Rectangle {
+                                width: 28
+                                height: 28
+                                radius: 6
+                                color: gifSearchSection.hasTenorKey
+                                    ? Qt.rgba(Colors.foam.r, Colors.foam.g, Colors.foam.b, 0.15)
+                                    : Qt.rgba(Colors.gold.r, Colors.gold.g, Colors.gold.b, 0.15)
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: gifSearchSection.hasTenorKey ? "󰄬" : "󰀦"
+                                    font.family: "Symbols Nerd Font"
+                                    font.pixelSize: 14
+                                    color: gifSearchSection.hasTenorKey ? Colors.foam : Colors.gold
+                                }
+                            }
+
+                            // Get API Key link (only if missing)
+                            Rectangle {
+                                visible: !gifSearchSection.hasTenorKey
+                                width: getKeyText.width + 16
+                                height: 28
+                                radius: 6
+                                color: getKeyArea.containsMouse
+                                    ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
+                                    : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                                border.width: 1
+                                border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                Text {
+                                    id: getKeyText
+                                    anchors.centerIn: parent
+                                    text: "Get API Key"
+                                    font.pixelSize: 12
+                                    color: Colors.primary
+                                }
+
+                                MouseArea {
+                                    id: getKeyArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: Qt.openUrlExternally("https://developers.google.com/tenor/guides/quickstart")
+                                }
+                            }
+                        }
+                    }
+
+                    // Info note
+                    Rectangle {
+                        width: parent.width
+                        height: gifInfoText.height + 16
+                        radius: 8
+                        color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                        border.width: 1
+                        border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.1)
+
+                        Text {
+                            id: gifInfoText
+                            anchors.centerIn: parent
+                            width: parent.width - 24
+                            text: "Usage: Type 'gif: cats' to search. Click a GIF to copy URL or image."
+                            font.pixelSize: 12
+                            color: Colors.foregroundMuted
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
                         }
                     }
                 }

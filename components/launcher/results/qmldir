@@ -3,3 +3,6 @@ AppResults 1.0 AppResults.qml
 CommandResults 1.0 CommandResults.qml
 SystemResults 1.0 SystemResults.qml
 WindowResults 1.0 WindowResults.qml
+EmojiResults 1.0 EmojiResults.qml
+StickerResults 1.0 StickerResults.qml
+GifResults 1.0 GifResults.qml

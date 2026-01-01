@@ -5,3 +5,9 @@ UnitEvaluator 1.0 UnitEvaluator.qml
 BaseEvaluator 1.0 BaseEvaluator.qml
 TimeEvaluator 1.0 TimeEvaluator.qml
 ColorEvaluator 1.0 ColorEvaluator.qml
+CurrencyEvaluator 1.0 CurrencyEvaluator.qml
+DateEvaluator 1.0 DateEvaluator.qml
+HashEvaluator 1.0 HashEvaluator.qml
+UuidEvaluator 1.0 UuidEvaluator.qml
+LoremEvaluator 1.0 LoremEvaluator.qml
+PasswordEvaluator 1.0 PasswordEvaluator.qml

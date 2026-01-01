@@ -11,10 +11,22 @@ QtObject {
     property BaseEvaluator baseEval: BaseEvaluator {}
     property TimeEvaluator timeEval: TimeEvaluator {}
     property ColorEvaluator colorEval: ColorEvaluator {}
+    property CurrencyEvaluator currencyEval: CurrencyEvaluator {}
+    property DateEvaluator dateEval: DateEvaluator {}
+    property HashEvaluator hashEval: HashEvaluator {}
+    property UuidEvaluator uuidEval: UuidEvaluator {}
+    property LoremEvaluator loremEval: LoremEvaluator {}
+    property PasswordEvaluator passwordEval: PasswordEvaluator {}
 
     // List of evaluators in priority order
     property var evaluators: [
         colorEval,       // Color conversion (check early for hex patterns)
+        uuidEval,        // UUID generation (exact match)
+        passwordEval,    // Password generation
+        loremEval,       // Lorem ipsum
+        hashEval,        // Hash generation
+        dateEval,        // Date calculations
+        currencyEval,    // Currency conversion
         percentageEval,  // Check percentage first (more specific patterns)
         timeEval,        // Time calculations
         unitEval,        // Unit conversions
