@@ -92,32 +92,24 @@ Item {
     Component {
         id: textBlockComponent
 
-        Text {
+        TextEdit {
             width: parent.width
             text: {
                 const formatted = MarkdownParser.markdownToRichText(blockData.content, themeColors)
-                // Add streaming cursor if this is the last text block during streaming
-                if (isStreaming && isLastBlock && blockData.type === 'text') {
-                    return formatted
-                }
                 return formatted
             }
             font.pixelSize: 12
             color: isError ? Colors.error : Colors.foreground
-            wrapMode: Text.WordWrap
-            textFormat: Text.RichText
-            lineHeight: 1.4
+            wrapMode: TextEdit.Wrap
+            textFormat: TextEdit.RichText
+            readOnly: true
+            selectByMouse: true
+            selectionColor: Colors.primary
+            selectedTextColor: Colors.background
 
             // Handle link clicks
             onLinkActivated: function(link) {
                 Qt.openUrlExternally(link)
-            }
-
-            // Show pointer cursor on links
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.NoButton
-                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
             }
         }
     }

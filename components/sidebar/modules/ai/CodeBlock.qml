@@ -96,20 +96,20 @@ Rectangle {
         Flickable {
             id: codeFlickable
             width: parent.width
-            height: Math.min(codeText.height + 16, 400)
-            contentWidth: codeText.width + 16
-            contentHeight: codeText.height + 16
+            height: Math.min(codeText.contentHeight + 16, 400)
+            contentWidth: codeText.contentWidth + 16
+            contentHeight: codeText.contentHeight + 16
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
             ScrollBar.vertical: ScrollBar {
                 active: true
-                policy: codeText.height > 400 ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+                policy: codeText.contentHeight > 400 ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
             }
 
             ScrollBar.horizontal: ScrollBar {
                 active: true
-                policy: codeText.width > codeFlickable.width ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
+                policy: codeText.contentWidth > codeFlickable.width ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
             }
 
             Row {
@@ -140,20 +140,23 @@ Rectangle {
                 Rectangle {
                     visible: showLineNumbers && code.length > 0
                     width: 1
-                    height: codeText.height
+                    height: codeText.contentHeight
                     color: Colors.border
                 }
 
                 // Highlighted code
-                Text {
+                TextEdit {
                     id: codeText
                     text: SyntaxHighlighter.highlight(code, language)
                     font.family: "JetBrains Mono, monospace"
                     font.pixelSize: 11
                     color: Colors.foreground
-                    textFormat: Text.RichText
-                    lineHeight: 1.4
-                    wrapMode: Text.NoWrap
+                    textFormat: TextEdit.RichText
+                    wrapMode: TextEdit.NoWrap
+                    readOnly: true
+                    selectByMouse: true
+                    selectionColor: Colors.primary
+                    selectedTextColor: Colors.background
                 }
             }
         }
