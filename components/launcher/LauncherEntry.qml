@@ -65,9 +65,16 @@ Rectangle {
                     function onVisibleChanged() {
                         if (LauncherState.visible) {
                             searchField.forceActiveFocus()
-                            searchField.selectAll()
+                            // Delay selectAll to ensure text binding has updated
+                            selectAllTimer.restart()
                         }
                     }
+                }
+
+                Timer {
+                    id: selectAllTimer
+                    interval: 10
+                    onTriggered: searchField.selectAll()
                 }
 
                 // Placeholder text
@@ -98,6 +105,13 @@ Rectangle {
                 }
 
                 Keys.onLeftPressed: function(event) {
+                    // If text is selected, deselect and move cursor to start
+                    if (searchField.selectedText.length > 0) {
+                        searchField.cursorPosition = searchField.selectionStart
+                        searchField.deselect()
+                        event.accepted = true
+                        return
+                    }
                     if (LauncherState.isGridMode && LauncherState.results.length > 0) {
                         LauncherState.selectLeft()
                         event.accepted = true
@@ -106,6 +120,13 @@ Rectangle {
                 }
 
                 Keys.onRightPressed: function(event) {
+                    // If text is selected, deselect and move cursor to end
+                    if (searchField.selectionStart !== searchField.selectionEnd) {
+                        searchField.cursorPosition = searchField.selectionEnd
+                        searchField.deselect()
+                        event.accepted = true
+                        return
+                    }
                     if (LauncherState.isGridMode && LauncherState.results.length > 0) {
                         LauncherState.selectRight()
                         event.accepted = true

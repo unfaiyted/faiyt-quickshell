@@ -19,19 +19,28 @@ Item {
     // Check if we're showing info/loading state instead of grid
     property bool isInfoMode: results.length > 0 && (results[0].type === "gif-info" || results[0].type === "gif-loading")
 
-    // Preview panel properties
+    // Check if we're showing categories
+    property bool isCategoryMode: results.length > 0 && results[0].type === "gif-category"
+
+    // Category grid properties
+    property int categoryColumns: 3
+    property int categoryCellWidth: 180
+    property int categoryCellHeight: 100
+    property int categoryMaxRows: 4
+
+    // Preview panel properties (only for GIF mode, not category mode)
     property int previewHeight: 160
     property int previewPanelHeight: previewHeight + 24
-    property bool showPreview: !isInfoMode && results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length && results[selectedIndex]?.type === "gif"
+    property bool showPreview: !isInfoMode && !isCategoryMode && results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length && results[selectedIndex]?.type === "gif"
 
     signal gifClicked(int index)
     signal gifActivated(int index)
+    signal categorySelected(string searchTerm)
 
     width: parent.width
-    height: isInfoMode ? infoState.height : (
-        (showPreview ? previewPanelHeight : 0) +
-        Math.min(gridView.contentHeight, cellHeight * maxRows) + 8
-    )
+    height: isInfoMode ? infoState.height :
+            isCategoryMode ? (categoryHeader.height + Math.min(categoryGrid.contentHeight, categoryCellHeight * categoryMaxRows) + 16) :
+            ((showPreview ? previewPanelHeight : 0) + Math.min(gridView.contentHeight, cellHeight * maxRows) + 8)
 
     // Reference to GifResults for copy functions
     GifResults {
@@ -366,6 +375,162 @@ Item {
         onClicked: copyMenu.visible = false
     }
 
+    // Category header
+    Column {
+        id: categoryHeader
+        visible: gifGridView.isCategoryMode
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width
+        spacing: 8
+
+        // Title row
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 10
+
+            Text {
+                text: "󰷊"
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 18
+                color: Colors.iris
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                text: "GIF Categories"
+                font.pixelSize: 15
+                font.weight: Font.Medium
+                color: Colors.foreground
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        // Hint
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Select a category or type to search"
+            font.pixelSize: 12
+            color: Colors.foregroundMuted
+        }
+    }
+
+    // Category grid
+    GridView {
+        id: categoryGrid
+        visible: gifGridView.isCategoryMode
+        anchors.top: categoryHeader.bottom
+        anchors.topMargin: 12
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.min(parent.width, gifGridView.categoryColumns * gifGridView.categoryCellWidth)
+        height: Math.min(contentHeight, gifGridView.categoryCellHeight * gifGridView.categoryMaxRows)
+        clip: true
+
+        cellWidth: gifGridView.categoryCellWidth
+        cellHeight: gifGridView.categoryCellHeight
+
+        model: results
+
+        delegate: Item {
+            width: categoryGrid.cellWidth
+            height: gifGridView.categoryCellHeight
+
+            Rectangle {
+                id: categoryCellBg
+                anchors.centerIn: parent
+                width: gifGridView.categoryCellWidth - 8
+                height: gifGridView.categoryCellHeight - 8
+                radius: 10
+                color: index === gifGridView.selectedIndex
+                    ? Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.2)
+                    : categoryMouseArea.containsMouse
+                        ? Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.8)
+                        : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.4)
+                border.width: index === gifGridView.selectedIndex ? 2 : 0
+                border.color: Colors.iris
+                clip: true
+
+                Behavior on color {
+                    ColorAnimation { duration: 100 }
+                }
+
+                // Category preview image (background)
+                AnimatedImage {
+                    id: categoryImage
+                    anchors.fill: parent
+                    source: modelData?.data?.image || ""
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: true
+                    playing: categoryMouseArea.containsMouse || index === gifGridView.selectedIndex
+                    opacity: 0.4
+                    visible: status === Image.Ready
+                }
+
+                // Gradient overlay for text readability
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "transparent" }
+                        GradientStop { position: 0.6; color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.7) }
+                        GradientStop { position: 1.0; color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.95) }
+                    }
+                }
+
+                // Category name
+                Text {
+                    anchors.centerIn: parent
+                    text: modelData?.title || "Category"
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    color: index === gifGridView.selectedIndex ? Colors.iris : Colors.foreground
+                    horizontalAlignment: Text.AlignHCenter
+                    width: parent.width - 16
+                    wrapMode: Text.WordWrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                }
+
+                // Selection indicator
+                Rectangle {
+                    visible: index === gifGridView.selectedIndex
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottomMargin: 6
+                    width: 24
+                    height: 3
+                    radius: 2
+                    color: Colors.iris
+                }
+
+                MouseArea {
+                    id: categoryMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+
+                    onClicked: {
+                        gifGridView.selectedIndex = index
+                        // Trigger category search
+                        if (modelData?.data?.searchTerm) {
+                            gifGridView.categorySelected(modelData.data.searchTerm)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Auto-scroll to selected item
+        Connections {
+            target: gifGridView
+            function onSelectedIndexChanged() {
+                if (gifGridView.isCategoryMode) {
+                    categoryGrid.positionViewAtIndex(gifGridView.selectedIndex, GridView.Contain)
+                }
+            }
+        }
+    }
+
     // Large preview panel for selected GIF
     Rectangle {
         id: previewPanel
@@ -537,7 +702,7 @@ Item {
 
     GridView {
         id: gridView
-        visible: !gifGridView.isInfoMode
+        visible: !gifGridView.isInfoMode && !gifGridView.isCategoryMode
         anchors.top: previewPanel.visible ? previewPanel.bottom : parent.top
         anchors.topMargin: previewPanel.visible ? 8 : 0
         anchors.horizontalCenter: parent.horizontalCenter
@@ -697,6 +862,11 @@ Item {
     }
 
     // Navigation functions
+    // Get current column count based on mode
+    function getCurrentColumns() {
+        return isCategoryMode ? categoryColumns : columns
+    }
+
     function selectNext() {
         if (results.length > 0) {
             selectedIndex = (selectedIndex + 1) % results.length
@@ -711,7 +881,8 @@ Item {
 
     function selectDown() {
         if (results.length > 0) {
-            let newIndex = selectedIndex + columns
+            let cols = getCurrentColumns()
+            let newIndex = selectedIndex + cols
             if (newIndex < results.length) {
                 selectedIndex = newIndex
             }
@@ -720,7 +891,8 @@ Item {
 
     function selectUp() {
         if (results.length > 0) {
-            let newIndex = selectedIndex - columns
+            let cols = getCurrentColumns()
+            let newIndex = selectedIndex - cols
             if (newIndex >= 0) {
                 selectedIndex = newIndex
             }
@@ -739,10 +911,18 @@ Item {
         }
     }
 
-    // Activate selected (show menu or copy URL)
+    // Activate selected (category search or copy URL)
     function activateSelected() {
         if (selectedIndex >= 0 && selectedIndex < results.length) {
             let result = results[selectedIndex]
+
+            // Handle category selection
+            if (result?.type === "gif-category" && result?.data?.searchTerm) {
+                categorySelected(result.data.searchTerm)
+                return
+            }
+
+            // Handle GIF selection
             if (result?.data && !result.data.isLoading && !result.data.isError) {
                 // Default action: copy URL
                 gifResultsHelper.copyUrl(result.data.fullUrl)

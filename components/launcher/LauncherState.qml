@@ -61,6 +61,7 @@ Singleton {
 
     // Search state
     property string searchText: ""
+    property string lastSearchText: ""  // Saved search for restoration on reopen
     property int selectedIndex: 0  // 0 = first result
     property string searchType: "ALL"
 
@@ -112,8 +113,9 @@ Singleton {
     property bool isEmojiMode: searchType === "EMOJI"
     property bool isStickerMode: searchType === "STICKER"
     property bool isGifMode: searchType === "GIF"
+    property bool isGifCategoryMode: isGifMode && results.length > 0 && results[0].type === "gif-category"
     property bool isGridMode: isEmojiMode || isStickerMode || isGifMode
-    property int gridColumns: isGifMode ? 4 : 6  // 6 columns for emoji/sticker, 4 for gif
+    property int gridColumns: isGifCategoryMode ? 3 : (isGifMode ? 4 : 6)  // 3 for gif categories, 4 for gifs, 6 for emoji/sticker
     property string viewMode: isGridMode ? "grid" : "list"
 
     // Sticker pack bar navigation state
@@ -301,6 +303,13 @@ Singleton {
     function activateSelected() {
         if (selectedIndex >= 0 && selectedIndex < results.length) {
             let result = results[selectedIndex]
+
+            // Handle GIF category selection - don't hide, update search instead
+            if (result?.type === "gif-category" && result?.data?.searchTerm) {
+                searchText = "gif: " + result.data.searchTerm
+                return
+            }
+
             if (result && result.action) {
                 actionTimer.pendingAction = result.action
                 hide()  // Hide first to release keyboard focus
@@ -333,15 +342,23 @@ Singleton {
     function show() {
         if (!visible) {
             visible = true
-            searchText = ""
+            // Restore last search text (will be selected in LauncherEntry)
+            searchText = lastSearchText
             selectedIndex = 0
-            results = []
             evalResult = null
+            // If we have a previous search, re-run it
+            if (searchText.length > 0) {
+                performSearch()
+            } else {
+                results = []
+            }
         }
     }
 
     function hide() {
         if (visible) {
+            // Save current search for restoration on next open
+            lastSearchText = searchText
             visible = false
             searchText = ""
             results = []

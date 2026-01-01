@@ -113,6 +113,11 @@ PanelWindow {
                             LauncherState.selectedIndex = index
                             LauncherState.activateSelected()
                         }
+
+                        onCategorySelected: function(searchTerm) {
+                            // Update search text to search for the category
+                            LauncherState.searchText = "gif: " + searchTerm
+                        }
                     }
                 }
 

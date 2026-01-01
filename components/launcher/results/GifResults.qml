@@ -21,6 +21,11 @@ Item {
     property bool isLoading: false
     property string pendingQuery: ""
 
+    // Category state
+    property var categories: []
+    property bool categoriesLoaded: false
+    property bool categoriesLoading: false
+
     // Signal when results are ready (triggers re-search in LauncherState)
     signal resultsReady()
 
@@ -53,6 +58,25 @@ Item {
             if (pendingQuery) {
                 executeSearch(pendingQuery)
                 pendingQuery = ""
+            }
+        }
+    }
+
+    // Process for fetching categories
+    Process {
+        id: categoryProcess
+        property string output: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                categoryProcess.output += data
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && output) {
+                parseCategoryResponse(output)
+                output = ""
             }
         }
     }
@@ -93,16 +117,23 @@ Item {
             }]
         }
 
-        // Empty query with prefix - show trending
+        // Empty query with prefix - show categories
         if (!queryTrimmed && isPrefixSearch) {
-            if (lastResults.length > 0) {
-                return lastResults
+            // If categories are loaded, return them
+            if (categoriesLoaded && categories.length > 0) {
+                return categories
             }
-            queueSearch("trending")
+
+            // If not loading yet, start fetching categories
+            if (!categoriesLoading) {
+                fetchCategories()
+            }
+
+            // Return loading state
             return [{
                 type: "gif-loading",
-                title: "Loading Trending GIFs",
-                description: "Fetching popular GIFs from Tenor...",
+                title: "Loading Categories",
+                description: "Fetching GIF categories from Tenor...",
                 icon: "󰋚",
                 data: { isLoading: true },
                 action: function() {}
@@ -227,6 +258,80 @@ Item {
                 copyUrl(fullUrl)
             }
         }
+    }
+
+    // Fetch categories from Tenor API
+    function fetchCategories() {
+        if (categoriesLoading || !hasApiKey) return
+
+        categoriesLoading = true
+
+        let url = "https://tenor.googleapis.com/v2/categories"
+            + "?key=" + apiKey
+            + "&type=featured"
+            + "&contentfilter=medium"
+
+        categoryProcess.output = ""
+        categoryProcess.command = ["curl", "-s", url]
+        categoryProcess.running = true
+    }
+
+    // Parse category response from Tenor API
+    function parseCategoryResponse(response) {
+        categoriesLoading = false
+
+        try {
+            let data = JSON.parse(response)
+
+            if (data.tags && data.tags.length > 0) {
+                categories = data.tags.map(function(cat) {
+                    // Extract search term from the path (e.g., "https://...?q=happy" -> "happy")
+                    let searchTerm = cat.searchterm || cat.name || ""
+
+                    return {
+                        type: "gif-category",
+                        title: cat.name || "Category",
+                        icon: "󰷊",
+                        data: {
+                            name: cat.name,
+                            image: cat.image,
+                            searchTerm: searchTerm
+                        },
+                        action: function() {
+                            // This will be handled by GifGridView to trigger a search
+                        }
+                    }
+                })
+
+                categoriesLoaded = true
+                resultsReady()
+            } else {
+                console.log("GifResults: No categories in response")
+                categoriesLoaded = true
+                categories = []
+                resultsReady()
+            }
+        } catch (e) {
+            console.log("GifResults: Failed to parse categories:", e)
+            categoriesLoaded = true
+            categories = []
+            resultsReady()
+        }
+    }
+
+    // Search by category - called when user selects a category
+    function searchCategory(searchTerm) {
+        if (!searchTerm) return
+
+        // Clear category state so we show GIF results
+        lastQuery = ""
+        lastResults = []
+
+        // Queue the search
+        queueSearch(searchTerm)
+
+        // Return the search term so LauncherState can update searchText
+        return searchTerm
     }
 
     function copyUrl(url) {
