@@ -258,6 +258,365 @@ Rectangle {
                             }
                         }
                     }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("workspaces") || contentColumn.matchesSearch("per page")
+                        label: "Workspaces Per Page"
+                        description: "Number of workspaces shown at once (pages automatically)"
+
+                        NumberInput {
+                            value: ConfigService.workspacesPerPage
+                            min: 3
+                            max: 20
+                            step: 1
+                            onValueModified: (v) => {
+                                ConfigService.setValue("bar.workspacesPerPage", v)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // Bar Modules Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("bar module") || contentColumn.matchesSearch("window title") ||
+                             contentColumn.matchesSearch("workspaces") || contentColumn.matchesSearch("system resources") ||
+                             contentColumn.matchesSearch("music") || contentColumn.matchesSearch("system tray") ||
+                             contentColumn.matchesSearch("network") || contentColumn.matchesSearch("battery") ||
+                             contentColumn.matchesSearch("clock") || contentColumn.matchesSearch("weather")
+                    title: "Bar Modules"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("window title")
+                        label: "Window Title"
+                        description: "Show active window title"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleWindowTitle
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.windowTitle", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("workspaces")
+                        label: "Workspaces"
+                        description: "Show workspace indicators"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleWorkspaces
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.workspaces", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("system resources")
+                        label: "System Resources"
+                        description: "Show CPU and memory usage"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleSystemResources
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.systemResources", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("utilities")
+                        label: "Utilities"
+                        description: "Show utility buttons section"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleUtilities
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.utilities", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("music")
+                        label: "Music"
+                        description: "Show music controls"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleMusic
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.music", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("system tray")
+                        label: "System Tray"
+                        description: "Show system tray icons"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleSystemTray
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.systemTray", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("network")
+                        label: "Network"
+                        description: "Show network status"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleNetwork
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.network", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("battery")
+                        label: "Battery"
+                        description: "Show battery status"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleBattery
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.battery", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("clock")
+                        label: "Clock"
+                        description: "Show time display"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleClock
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.clock", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("weather")
+                        label: "Weather"
+                        description: "Show weather information"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleWeather
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.weather", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // Utility Buttons Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("utility button") || contentColumn.matchesSearch("screenshot") ||
+                             contentColumn.matchesSearch("recording") || contentColumn.matchesSearch("color picker") ||
+                             contentColumn.matchesSearch("wallpaper")
+                    title: "Utility Buttons"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("screenshot")
+                        label: "Screenshot"
+                        description: "Show screenshot button"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barUtilityScreenshot
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.utilities.screenshot", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("recording")
+                        label: "Recording"
+                        description: "Show screen recording button"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barUtilityRecording
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.utilities.recording", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("color picker")
+                        label: "Color Picker"
+                        description: "Show color picker button"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barUtilityColorPicker
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.utilities.colorPicker", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("wallpaper")
+                        label: "Wallpaper"
+                        description: "Show wallpaper button"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barUtilityWallpaper
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.utilities.wallpaper", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // System Resources Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("system resource") || contentColumn.matchesSearch("ram") ||
+                             contentColumn.matchesSearch("swap") || contentColumn.matchesSearch("cpu") ||
+                             contentColumn.matchesSearch("download") || contentColumn.matchesSearch("upload") ||
+                             contentColumn.matchesSearch("network speed")
+                    title: "System Resources"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("ram") || contentColumn.matchesSearch("memory")
+                        label: "RAM"
+                        description: "Show memory usage indicator"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barResourceRam
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.systemResources.ram", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("swap")
+                        label: "Swap"
+                        description: "Show swap usage indicator"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barResourceSwap
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.systemResources.swap", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("cpu") || contentColumn.matchesSearch("processor")
+                        label: "CPU"
+                        description: "Show CPU usage indicator"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barResourceCpu
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.systemResources.cpu", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("download") || contentColumn.matchesSearch("network")
+                        label: "Download"
+                        description: "Show network download indicator"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barResourceDownload
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.systemResources.download", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("upload") || contentColumn.matchesSearch("network")
+                        label: "Upload"
+                        description: "Show network upload indicator"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barResourceUpload
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.systemResources.upload", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // Default Modes Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("default mode") || contentColumn.matchesSearch("recording mode") ||
+                             contentColumn.matchesSearch("screenshot mode") || contentColumn.matchesSearch("annotate")
+                    title: "Default Modes"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("recording mode")
+                        label: "Recording Mode"
+                        description: "Default mode when starting a recording"
+
+                        DropdownSelect {
+                            model: [
+                                {label: "Standard", value: "record"},
+                                {label: "High Quality", value: "record-hq"},
+                                {label: "GIF", value: "record-gif"}
+                            ]
+                            currentIndex: {
+                                const mode = ConfigService.recordingDefaultMode
+                                if (mode === "record-hq") return 1
+                                if (mode === "record-gif") return 2
+                                return 0
+                            }
+                            onSelected: (index, value) => {
+                                ConfigService.setValue("utilities.recording.defaultMode", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("screenshot mode") || contentColumn.matchesSearch("annotate")
+                        label: "Screenshot Mode"
+                        description: "Default screenshot behavior"
+
+                        DropdownSelect {
+                            model: [
+                                {label: "Screenshot", value: false},
+                                {label: "Annotate", value: true}
+                            ]
+                            currentIndex: ConfigService.screenshotAnnotateEnabled ? 1 : 0
+                            onSelected: (index, value) => {
+                                ConfigService.setValue("utilities.screenshot.annotateEnabled", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
                 }
 
                 // Time & Weather Section

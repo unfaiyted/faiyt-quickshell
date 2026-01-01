@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import "../../../theme"
+import "../../../services"
 import ".."
 
 Rectangle {
@@ -14,6 +15,15 @@ Rectangle {
 
     // Track which workspace tooltip is open (-1 = none)
     property int openTooltipId: -1
+
+    // Paged workspaces configuration
+    property int perPage: ConfigService.workspacesPerPage
+    property int currentPage: {
+        // Calculate page based on focused workspace
+        const focusedId = Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
+        return Math.floor((focusedId - 1) / perPage)
+    }
+    property int pageStart: currentPage * perPage + 1  // First workspace ID on current page
 
     // Helper function to check if workspace is occupied
     function isWorkspaceOccupied(wsId) {
@@ -31,7 +41,7 @@ Rectangle {
         spacing: 2
 
         Repeater {
-            model: 10
+            model: workspacesContainer.perPage
 
             Rectangle {
                 id: wsIndicator
@@ -40,7 +50,8 @@ Rectangle {
                 radius: 12
 
                 required property int index
-                property int wsId: index + 1
+                // Calculate workspace ID based on current page
+                property int wsId: workspacesContainer.pageStart + index
                 property bool isActive: Hyprland.focusedWorkspace
                     ? Hyprland.focusedWorkspace.id === wsId
                     : false

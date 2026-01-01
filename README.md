@@ -7,6 +7,8 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
 ### Top Bar
 - **Clock** - Time display with click to open calendar
 - **Workspaces** - Hyprland workspace indicators with:
+  - Configurable workspaces per page (default 10, adjustable 3-20)
+  - Automatic paging when navigating beyond visible range
   - Click to switch workspace
   - Hover for live window preview tooltip
   - Click windows in tooltip to focus them
@@ -109,7 +111,11 @@ Categories: All, Dev, System, Network, Monitor
 Full-featured settings overlay for customizing the shell:
 
 **Sections:**
-- **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode, display settings
+- **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode, workspaces per page, display settings
+- **Bar Modules** - Toggle individual bar modules (Window Title, Workspaces, System Resources, Utilities, Music, System Tray, Network, Battery, Clock, Weather)
+- **Utility Buttons** - Toggle individual utility buttons (Screenshot, Recording, Color Picker, Wallpaper)
+- **System Resources** - Toggle individual resource indicators (RAM, Swap, CPU, Download, Upload)
+- **Default Modes** - Set default recording mode (Standard/High Quality/GIF) and screenshot mode (Screenshot/Annotate)
 - **Time & Weather** - Time format, weather city, temperature unit (C/F)
 - **Search/Launcher** - Max results, feature toggles (actions, commands, math results, directory search, AI search, web search)
 - **Search Evaluators** - Toggle individual evaluators (math, base converter, color, date/time, percentage, units)
@@ -120,7 +126,8 @@ Full-featured settings overlay for customizing the shell:
 **Features:**
 - Searchable settings (type to filter)
 - Theme preview with color swatches
-- Persistent JSON configuration at `~/.config/faiyt-qs/config.json`
+- All settings persist to JSON configuration at `~/.config/faiyt-qs/config.json`
+- Settings apply immediately without restart (except Windows & Components)
 - ESC or click outside to close
 - Smooth open/close animations
 

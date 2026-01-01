@@ -366,7 +366,7 @@ case "$COMMAND" in
           wl-copy <"$IMG"
           ~/.local/bin/napkin --filename "$IMG" &
           # Wait for napkin to open and force fullscreen via Hyprland
-          sleep 0.3
+          sleep 0.6
           hyprctl dispatch fullscreen 0
         fi
         ;;

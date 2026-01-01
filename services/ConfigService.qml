@@ -15,7 +15,43 @@ Singleton {
         // Appearance
         theme: "rose-pine",
         bar: {
-            mode: "normal"  // normal, focus, nothing
+            mode: "normal",  // normal, focus, nothing
+            workspacesPerPage: 10,  // Number of workspaces to show at once
+            modules: {
+                windowTitle: true,
+                workspaces: true,
+                systemResources: true,
+                utilities: true,
+                music: true,
+                systemTray: true,
+                network: true,
+                battery: true,
+                clock: true,
+                weather: true
+            },
+            utilities: {
+                screenshot: true,
+                recording: true,
+                colorPicker: true,
+                wallpaper: true
+            },
+            systemResources: {
+                ram: true,
+                swap: true,
+                cpu: true,
+                download: true,
+                upload: true
+            }
+        },
+
+        // Utility defaults
+        utilities: {
+            recording: {
+                defaultMode: "record"  // "record", "record-hq", "record-gif"
+            },
+            screenshot: {
+                annotateEnabled: false
+            }
         },
 
         // Time & Weather
@@ -217,6 +253,7 @@ Singleton {
     // Convenience property accessors for common settings
     property string theme: config.theme || "rose-pine"
     property string barMode: config.bar?.mode || "normal"
+    property int workspacesPerPage: config.bar?.workspacesPerPage || 10
     property string timeFormat: config.time?.format || "%H:%M"
     property string weatherCity: config.weather?.city || ""
     property string temperatureUnit: config.weather?.preferredUnit || "C"
@@ -224,6 +261,35 @@ Singleton {
     property int batteryCritical: config.battery?.critical || 10
     property int animationDuration: config.animations?.durationSmall || 200
     property int launcherMaxResults: config.launcher?.maxResults || 10
+
+    // Bar module visibility convenience properties
+    property bool barModuleWindowTitle: config.bar?.modules?.windowTitle !== false
+    property bool barModuleWorkspaces: config.bar?.modules?.workspaces !== false
+    property bool barModuleSystemResources: config.bar?.modules?.systemResources !== false
+    property bool barModuleUtilities: config.bar?.modules?.utilities !== false
+    property bool barModuleMusic: config.bar?.modules?.music !== false
+    property bool barModuleSystemTray: config.bar?.modules?.systemTray !== false
+    property bool barModuleNetwork: config.bar?.modules?.network !== false
+    property bool barModuleBattery: config.bar?.modules?.battery !== false
+    property bool barModuleClock: config.bar?.modules?.clock !== false
+    property bool barModuleWeather: config.bar?.modules?.weather !== false
+
+    // Bar utility button visibility convenience properties
+    property bool barUtilityScreenshot: config.bar?.utilities?.screenshot !== false
+    property bool barUtilityRecording: config.bar?.utilities?.recording !== false
+    property bool barUtilityColorPicker: config.bar?.utilities?.colorPicker !== false
+    property bool barUtilityWallpaper: config.bar?.utilities?.wallpaper !== false
+
+    // System resource visibility convenience properties
+    property bool barResourceRam: config.bar?.systemResources?.ram !== false
+    property bool barResourceSwap: config.bar?.systemResources?.swap !== false
+    property bool barResourceCpu: config.bar?.systemResources?.cpu !== false
+    property bool barResourceDownload: config.bar?.systemResources?.download !== false
+    property bool barResourceUpload: config.bar?.systemResources?.upload !== false
+
+    // Utility defaults convenience properties
+    property string recordingDefaultMode: config.utilities?.recording?.defaultMode || "record"
+    property bool screenshotAnnotateEnabled: config.utilities?.screenshot?.annotateEnabled || false
 
     // AI convenience accessors (API key from env var only)
     property string aiDefaultModel: config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
@@ -237,6 +303,7 @@ Singleton {
     onConfigChanged: {
         theme = config.theme || "rose-pine"
         barMode = config.bar?.mode || "normal"
+        workspacesPerPage = config.bar?.workspacesPerPage || 10
         timeFormat = config.time?.format || "%H:%M"
         weatherCity = config.weather?.city || ""
         temperatureUnit = config.weather?.preferredUnit || "C"
@@ -244,6 +311,36 @@ Singleton {
         batteryCritical = config.battery?.critical || 10
         animationDuration = config.animations?.durationSmall || 200
         launcherMaxResults = config.launcher?.maxResults || 10
+
+        // Bar module visibility
+        barModuleWindowTitle = config.bar?.modules?.windowTitle !== false
+        barModuleWorkspaces = config.bar?.modules?.workspaces !== false
+        barModuleSystemResources = config.bar?.modules?.systemResources !== false
+        barModuleUtilities = config.bar?.modules?.utilities !== false
+        barModuleMusic = config.bar?.modules?.music !== false
+        barModuleSystemTray = config.bar?.modules?.systemTray !== false
+        barModuleNetwork = config.bar?.modules?.network !== false
+        barModuleBattery = config.bar?.modules?.battery !== false
+        barModuleClock = config.bar?.modules?.clock !== false
+        barModuleWeather = config.bar?.modules?.weather !== false
+
+        // Bar utility button visibility
+        barUtilityScreenshot = config.bar?.utilities?.screenshot !== false
+        barUtilityRecording = config.bar?.utilities?.recording !== false
+        barUtilityColorPicker = config.bar?.utilities?.colorPicker !== false
+        barUtilityWallpaper = config.bar?.utilities?.wallpaper !== false
+
+        // System resource visibility
+        barResourceRam = config.bar?.systemResources?.ram !== false
+        barResourceSwap = config.bar?.systemResources?.swap !== false
+        barResourceCpu = config.bar?.systemResources?.cpu !== false
+        barResourceDownload = config.bar?.systemResources?.download !== false
+        barResourceUpload = config.bar?.systemResources?.upload !== false
+
+        // Utility defaults
+        recordingDefaultMode = config.utilities?.recording?.defaultMode || "record"
+        screenshotAnnotateEnabled = config.utilities?.screenshot?.annotateEnabled || false
+
         // AI config (API key from env var only)
         aiDefaultModel = config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
         aiModels = config.ai?.models || []

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 import "../../../theme"
+import "../../../services"
 import ".."
 
 BarGroup {
@@ -10,8 +11,8 @@ BarGroup {
     implicitWidth: row.width + 16
     implicitHeight: 24
 
-    // Only show if there's a laptop battery
-    visible: UPower.displayDevice && UPower.displayDevice.isLaptopBattery
+    // Only show if enabled in config AND there's a laptop battery
+    visible: ConfigService.barModuleBattery && UPower.displayDevice && UPower.displayDevice.isLaptopBattery
 
     property int percentage: UPower.displayDevice
         ? Math.round(UPower.displayDevice.percentage)

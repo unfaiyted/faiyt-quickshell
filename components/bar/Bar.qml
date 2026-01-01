@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../../theme"
+import "../../services"
 import "modules"
 
 PanelWindow {
@@ -31,12 +32,14 @@ PanelWindow {
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
+            visible: ConfigService.barModuleWindowTitle
         }
 
         // Center-Middle: Workspaces (always perfectly centered)
         Workspaces {
             id: workspaces
             anchors.centerIn: parent
+            visible: ConfigService.barModuleWorkspaces
         }
 
         // Center-Left: System Resources (anchored to left of Workspaces)
@@ -45,6 +48,7 @@ PanelWindow {
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+            visible: ConfigService.barModuleSystemResources
 
             SystemResources {}
         }
@@ -55,9 +59,14 @@ PanelWindow {
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+            visible: ConfigService.barModuleUtilities || ConfigService.barModuleMusic
 
-            Utilities {}
-            Music {}
+            Utilities {
+                visible: ConfigService.barModuleUtilities
+            }
+            Music {
+                visible: ConfigService.barModuleMusic
+            }
         }
 
         // Right section
@@ -67,11 +76,21 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
-            SystemTray {}
-            Network {}
-            Battery {}
-            Clock {}
-            Weather {}
+            SystemTray {
+                visible: ConfigService.barModuleSystemTray
+            }
+            Network {
+                visible: ConfigService.barModuleNetwork
+            }
+            Battery {
+                // Visibility handled internally (checks config + battery presence)
+            }
+            Clock {
+                visible: ConfigService.barModuleClock
+            }
+            Weather {
+                visible: ConfigService.barModuleWeather
+            }
         }
 
         // Bottom border line

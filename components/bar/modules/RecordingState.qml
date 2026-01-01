@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../../../services"
 
 Singleton {
     id: recordingState
@@ -10,7 +11,8 @@ Singleton {
     property bool isRecording: false
 
     // Recording mode: "record", "record-hq", "record-gif"
-    property string recordingMode: "record"
+    // Initialized from config
+    property string recordingMode: ConfigService.recordingDefaultMode
 
     // Script path - using home directory
     property string homeDir: Quickshell.env("HOME") || "/home/faiyt"
@@ -18,6 +20,15 @@ Singleton {
 
     Component.onCompleted: {
         console.log("RecordingState initialized, script path:", scriptPath)
+        console.log("RecordingState default mode from config:", recordingMode)
+    }
+
+    // Save mode to config when changed
+    onRecordingModeChanged: {
+        if (ConfigService.getValue("utilities.recording.defaultMode") !== recordingMode) {
+            ConfigService.setValue("utilities.recording.defaultMode", recordingMode)
+            ConfigService.saveConfig()
+        }
     }
 
     // IPC Handler for external control

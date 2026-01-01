@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../../../theme"
+import "../../../services"
 import ".."
 
 BarGroup {
@@ -9,6 +10,11 @@ BarGroup {
 
     implicitWidth: row.width + 16
     implicitHeight: 30
+
+    // Hide entire group if all resources are hidden
+    visible: ConfigService.barResourceRam || ConfigService.barResourceSwap ||
+             ConfigService.barResourceCpu || ConfigService.barResourceDownload ||
+             ConfigService.barResourceUpload
 
     // Resource values
     property int ramUsage: 0
@@ -166,6 +172,7 @@ BarGroup {
             value: sysResources.ramUsage
             indicatorColor: Colors.info
             tooltipText: sysResources.ramDetails
+            visible: ConfigService.barResourceRam
         }
 
         // Swap indicator - swap arrows icon
@@ -175,6 +182,7 @@ BarGroup {
             value: sysResources.swapUsage
             indicatorColor: Colors.success
             tooltipText: sysResources.swapDetails
+            visible: ConfigService.barResourceSwap
         }
 
         // CPU indicator - gauge/speedometer icon
@@ -184,6 +192,7 @@ BarGroup {
             value: sysResources.cpuUsage
             indicatorColor: Colors.warning
             tooltipText: sysResources.cpuDetails
+            visible: ConfigService.barResourceCpu
         }
 
         // Network download indicator
@@ -193,6 +202,7 @@ BarGroup {
             value: sysResources.netDownUsage
             indicatorColor: Colors.primary
             tooltipText: sysResources.netDownDetails
+            visible: ConfigService.barResourceDownload
         }
 
         // Network upload indicator
@@ -202,6 +212,7 @@ BarGroup {
             value: sysResources.netUpUsage
             indicatorColor: Colors.rose
             tooltipText: sysResources.netUpDetails
+            visible: ConfigService.barResourceUpload
         }
     }
 }

@@ -153,6 +153,7 @@ QtObject {
         "flameshot": "󰹑",
         "spectacle": "󰹑",
         "screenshot": "󰹑",
+        "napkin": "󰏬",
         "peek": "󰑋",
         "kooha": "󰑋",
         "wf-recorder": "󰑋",
