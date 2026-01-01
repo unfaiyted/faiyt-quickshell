@@ -279,12 +279,27 @@ Rectangle {
 
                 // Bar Modules Section
                 SettingsSection {
-                    visible: contentColumn.matchesSearch("bar module") || contentColumn.matchesSearch("window title") ||
+                    visible: contentColumn.matchesSearch("bar module") || contentColumn.matchesSearch("distro") ||
+                             contentColumn.matchesSearch("window title") ||
                              contentColumn.matchesSearch("workspaces") || contentColumn.matchesSearch("system resources") ||
                              contentColumn.matchesSearch("music") || contentColumn.matchesSearch("system tray") ||
                              contentColumn.matchesSearch("network") || contentColumn.matchesSearch("battery") ||
                              contentColumn.matchesSearch("clock") || contentColumn.matchesSearch("weather")
                     title: "Bar Modules"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("distro") || contentColumn.matchesSearch("icon")
+                        label: "Distro Icon"
+                        description: "Show distribution icon"
+
+                        ToggleSwitch {
+                            checked: ConfigService.barModuleDistroIcon
+                            onToggled: (value) => {
+                                ConfigService.setValue("bar.modules.distroIcon", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
 
                     SettingRow {
                         visible: contentColumn.matchesSearch("window title")

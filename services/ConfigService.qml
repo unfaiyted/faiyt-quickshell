@@ -18,6 +18,7 @@ Singleton {
             mode: "normal",  // normal, focus, nothing
             workspacesPerPage: 10,  // Number of workspaces to show at once
             modules: {
+                distroIcon: true,
                 windowTitle: true,
                 workspaces: true,
                 systemResources: true,
@@ -263,6 +264,7 @@ Singleton {
     property int launcherMaxResults: config.launcher?.maxResults || 10
 
     // Bar module visibility convenience properties
+    property bool barModuleDistroIcon: config.bar?.modules?.distroIcon !== false
     property bool barModuleWindowTitle: config.bar?.modules?.windowTitle !== false
     property bool barModuleWorkspaces: config.bar?.modules?.workspaces !== false
     property bool barModuleSystemResources: config.bar?.modules?.systemResources !== false
@@ -313,6 +315,7 @@ Singleton {
         launcherMaxResults = config.launcher?.maxResults || 10
 
         // Bar module visibility
+        barModuleDistroIcon = config.bar?.modules?.distroIcon !== false
         barModuleWindowTitle = config.bar?.modules?.windowTitle !== false
         barModuleWorkspaces = config.bar?.modules?.workspaces !== false
         barModuleSystemResources = config.bar?.modules?.systemResources !== false

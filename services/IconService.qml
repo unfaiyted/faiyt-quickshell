@@ -1,8 +1,117 @@
 pragma Singleton
 import QtQuick
+import Quickshell
+import Quickshell.Io
 
-QtObject {
+Singleton {
     id: iconService
+
+    // Current distro ID (detected from /etc/os-release)
+    property string currentDistro: ""
+
+    // Detect distro on startup
+    Component.onCompleted: {
+        distroProcess.running = true
+    }
+
+    Process {
+        id: distroProcess
+        command: ["bash", "-c", "grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '\"'"]
+        stdout: SplitParser {
+            onRead: data => {
+                iconService.currentDistro = data.trim().toLowerCase()
+                console.log("Detected distro:", iconService.currentDistro)
+            }
+        }
+    }
+
+    // Linux distribution icons (NerdFont - nf-linux-* and nf-md-*)
+    readonly property var distroMap: ({
+        "arch": "󰣇",
+        "archlinux": "󰣇",
+        "endeavouros": "󰣇",  // Arch-based, use Arch icon
+        "manjaro": "󱘊",
+        "artix": "󰣇",
+        "arcolinux": "󰣇",
+        "garuda": "󰣇",
+        "ubuntu": "󰕈",
+        "kubuntu": "󰕈",
+        "xubuntu": "󰕈",
+        "lubuntu": "󰕈",
+        "pop": "󰕈",
+        "popos": "󰕈",
+        "pop_os": "󰕈",
+        "mint": "󰣭",
+        "linuxmint": "󰣭",
+        "debian": "󰣚",
+        "fedora": "󰣛",
+        "centos": "󱄚",
+        "rhel": "󰮤",
+        "redhat": "󰮤",
+        "opensuse": "󰣨",
+        "opensuse-tumbleweed": "󰣨",
+        "opensuse-leap": "󰣨",
+        "suse": "󰣨",
+        "gentoo": "󰣨",
+        "void": "󰣨",
+        "voidlinux": "󰣨",
+        "nixos": "󱄅",
+        "alpine": "󰣨",
+        "kali": "󰣨",
+        "parrot": "󰣨",
+        "elementary": "󰣨",
+        "elementaryos": "󰣨",
+        "zorin": "󰣨",
+        "zorinos": "󰣨",
+        "solus": "󰣨",
+        "mx": "󰣨",
+        "mxlinux": "󰣨",
+        "raspbian": "󰌽",
+        "raspberry": "󰌽",
+        "slackware": "󰣨",
+        "devuan": "󰣚",
+        "deepin": "󰣨",
+        "clearlinux": "󰣨",
+        "linux": "󰌽"  // Generic Linux/Tux fallback
+    })
+
+    // Get the icon for current distro
+    function getDistroIcon() {
+        if (!currentDistro) return distroMap["linux"]
+
+        // Direct match
+        if (distroMap.hasOwnProperty(currentDistro)) {
+            return distroMap[currentDistro]
+        }
+
+        // Partial match
+        for (let key in distroMap) {
+            if (currentDistro.includes(key) || key.includes(currentDistro)) {
+                return distroMap[key]
+            }
+        }
+
+        return distroMap["linux"]
+    }
+
+    // Get icon for a specific distro name
+    function getDistroIconByName(distroName) {
+        if (!distroName) return distroMap["linux"]
+
+        let lower = distroName.toLowerCase()
+
+        if (distroMap.hasOwnProperty(lower)) {
+            return distroMap[lower]
+        }
+
+        for (let key in distroMap) {
+            if (lower.includes(key) || key.includes(lower)) {
+                return distroMap[key]
+            }
+        }
+
+        return distroMap["linux"]
+    }
 
     // Comprehensive Nerd Font icon mappings for common apps
     readonly property var iconMap: ({

@@ -27,10 +27,23 @@ PanelWindow {
     Item {
         anchors.fill: parent
 
+        // Distro icon (leftmost element)
+        Text {
+            id: distroIcon
+            anchors.left: parent.left
+            anchors.leftMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            text: IconService.getDistroIcon()
+            font.family: "Symbols Nerd Font"
+            font.pixelSize: 22
+            color: Colors.primary
+            visible: ConfigService.barModuleDistroIcon
+        }
+
         // Left section - Window Title
         WindowTitle {
-            anchors.left: parent.left
-            anchors.leftMargin: 8
+            anchors.left: distroIcon.visible ? distroIcon.right : parent.left
+            anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             visible: ConfigService.barModuleWindowTitle
         }
