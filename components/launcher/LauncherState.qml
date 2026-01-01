@@ -343,9 +343,9 @@ Singleton {
         if (!visible) {
             visible = true
             // Restore last search text (will be selected in LauncherEntry)
+            // This triggers onSearchTextChanged which re-evaluates automatically
             searchText = lastSearchText
             selectedIndex = 0
-            evalResult = null
             // If we have a previous search, re-run it
             if (searchText.length > 0) {
                 performSearch()
