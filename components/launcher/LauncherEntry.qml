@@ -9,7 +9,7 @@ Rectangle {
     radius: 12
     color: Colors.surface
     border.width: 1
-    border.color: searchField.activeFocus ? Colors.primary : Colors.border
+    border.color: searchField.activeFocus ? Colors.overlay : Qt.rgba(Colors.overlay.r, Colors.overlay.g, Colors.overlay.b, 0.5)
 
     // Copied feedback state
     property bool showCopied: false

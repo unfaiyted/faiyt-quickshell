@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Qt5Compat.GraphicalEffects
 import "../../theme"
 import "results"
 
@@ -454,7 +455,7 @@ Item {
                     ColorAnimation { duration: 100 }
                 }
 
-                // Category preview image (background)
+                // Category preview image (background) with rounded mask
                 AnimatedImage {
                     id: categoryImage
                     anchors.fill: parent
@@ -463,8 +464,24 @@ Item {
                     asynchronous: true
                     cache: true
                     playing: categoryMouseArea.containsMouse || index === gifGridView.selectedIndex
+                    visible: false  // Hidden, rendered through mask
+                    layer.enabled: true
+                }
+
+                Rectangle {
+                    id: categoryImageMask
+                    anchors.fill: parent
+                    radius: categoryCellBg.radius
+                    visible: false
+                    layer.enabled: true
+                }
+
+                OpacityMask {
+                    anchors.fill: parent
+                    source: categoryImage
+                    maskSource: categoryImageMask
                     opacity: 0.4
-                    visible: status === Image.Ready
+                    visible: categoryImage.status === Image.Ready
                 }
 
                 // Gradient overlay for text readability
