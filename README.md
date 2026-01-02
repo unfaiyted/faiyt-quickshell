@@ -119,7 +119,7 @@ Categories: All, Dev, System, Network, Monitor
 Full-featured settings overlay for customizing the shell:
 
 **Sections:**
-- **Appearance** - Theme selector (Rosé Pine, Rosé Pine Moon, Rosé Pine Dawn), bar mode, workspaces per page, display settings
+- **Appearance** - Theme selector with live preview, bar mode, workspaces per page, display settings
 - **Bar Modules** - Toggle individual bar modules (Window Title, Workspaces, Mic Indicator, System Resources, Utilities, Music, System Tray, Network, Battery, Clock, Weather)
 - **Quick Toggles** - Configure sidebar quick toggles:
   - Enable Focus Mode toggle (replaces Caffeine)
@@ -139,11 +139,30 @@ Full-featured settings overlay for customizing the shell:
 
 **Features:**
 - Searchable settings (type to filter)
-- Theme preview with color swatches
+- Theme preview with color swatches and "Customize" button to open Theme Manager
 - All settings persist to JSON configuration at `~/.config/faiyt-qs/config.json`
 - All settings apply immediately without restart
 - ESC or click outside to close
 - Smooth open/close animations
+
+### Theme Manager
+Full-featured theme editor for creating and customizing themes:
+
+**Features:**
+- **Built-in Themes** - Three Rosé Pine variants (Dark, Moon, Dawn)
+- **Custom Themes** - Create new themes or duplicate existing ones
+- **Live Editing** - Changes apply in real-time across all UI components
+- **Full Color Palette** - Edit all 30 theme colors organized by category:
+  - Base colors (base, surface, overlay)
+  - Text colors (text, muted, subtle)
+  - Accent colors (love, gold, rose, pine, foam, iris)
+  - Semantic colors (primary, secondary, accent, success, warning, error, info)
+  - UI component colors (background, foreground, border variants)
+  - State colors (hover, active, focus, disabled)
+- **HSL Color Picker** - Intuitive sliders for hue, saturation, and lightness
+- **Hex Input** - Direct hex color code entry
+- **Theme Metadata** - Edit display name and description
+- Custom themes persist to `~/.config/faiyt-qs/config.json`
 
 ### Monitor Configuration
 Visual monitor arrangement and configuration panel:
@@ -342,7 +361,8 @@ quickshell -p /path/to/faiyt-qs/shell.qml
 faiyt-qs/
 ├── shell.qml                    # Main entry point
 ├── theme/
-│   ├── Colors.qml               # Rosé Pine color definitions
+│   ├── Colors.qml               # Dynamic color bindings to ThemeService
+│   ├── ThemeDefinitions.qml     # Built-in Rose Pine theme definitions
 │   └── qmldir
 ├── components/
 │   ├── bar/
@@ -446,13 +466,20 @@ faiyt-qs/
 │   │   ├── SettingsPanel.qml     # Main panel with all sections
 │   │   ├── SettingsState.qml     # Singleton state + IPC
 │   │   ├── ThemeSelector.qml     # Theme picker with previews
+│   │   ├── ThemePanel.qml        # Theme manager with editor
+│   │   ├── ThemePanelWindow.qml  # Theme panel overlay window
+│   │   ├── ThemePanelState.qml   # Theme panel state + IPC
 │   │   └── components/           # Reusable settings components
 │   │       ├── SettingsSection.qml
 │   │       ├── SettingRow.qml
 │   │       ├── ToggleSwitch.qml
 │   │       ├── NumberInput.qml
 │   │       ├── SettingsTextInput.qml
-│   │       └── DropdownSelect.qml
+│   │       ├── DropdownSelect.qml
+│   │       ├── ThemeCard.qml         # Theme list item with preview
+│   │       ├── ThemeEditorView.qml   # Color editor layout
+│   │       ├── ColorSection.qml      # Collapsible color group
+│   │       └── ColorRow.qml          # Color swatch + hex input
 │   └── monitors/
 │       ├── MonitorsWindow.qml    # Full-screen overlay
 │       ├── MonitorsPanel.qml     # Main panel with canvas + settings
@@ -467,7 +494,8 @@ faiyt-qs/
 │   ├── ConfigService.qml        # Settings persistence (JSON config)
 │   ├── ConversationManager.qml  # AI conversation storage (~/.local/share)
 │   ├── IconService.qml          # Centralized NerdFont icon mappings
-│   └── StickerService.qml       # Signal sticker pack management
+│   ├── StickerService.qml       # Signal sticker pack management
+│   └── ThemeService.qml         # Theme switching and custom theme management
 ├── scripts/
 │   ├── screen-capture.sh        # Screenshot and recording script
 │   ├── sticker-decrypt.sh       # Signal sticker decryption (HKDF + AES)
@@ -565,7 +593,16 @@ qs ipc call sysresources setNetSpeed 930  # Set max network speed in Mbps
 qs ipc call sysresources getNetSpeed      # Get current max network speed
 ```
 
-## Theme (Rosé Pine)
+## Themes
+
+The shell includes three built-in Rosé Pine themes and supports creating custom themes:
+
+**Built-in Themes:**
+- **Rosé Pine** (Dark) - Default theme
+- **Rosé Pine Moon** - Darker variant
+- **Rosé Pine Dawn** - Light variant
+
+**Default Colors (Rosé Pine):**
 
 | Color          | Hex       | Usage                |
 |----------------|-----------|----------------------|
@@ -580,6 +617,8 @@ qs ipc call sysresources getNetSpeed      # Get current max network speed
 | warning        | #f6c177   | Warning (gold)       |
 | success        | #9ccfd8   | Success (foam)       |
 | info           | #31748f   | Info (pine)          |
+
+Themes can be switched live without restart. Custom themes are stored in `~/.config/faiyt-qs/config.json`.
 
 ## Shell Commands Used
 
