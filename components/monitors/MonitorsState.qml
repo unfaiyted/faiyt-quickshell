@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../settings"
 
 Singleton {
     id: monitorsState
@@ -10,6 +11,7 @@ Singleton {
     property bool monitorsOpen: false
     property string selectedMonitor: ""
     property bool hasChanges: false
+    property bool openedFromSettings: false
 
     // Monitor data from hyprctl
     property var monitors: []
@@ -71,6 +73,10 @@ Singleton {
     function close() {
         monitorsOpen = false
         selectedMonitor = ""
+        if (openedFromSettings) {
+            openedFromSettings = false
+            SettingsState.open()
+        }
     }
 
     // Refresh monitor data from Hyprland

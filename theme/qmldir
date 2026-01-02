@@ -1,2 +1,3 @@
 module theme
 singleton Colors 1.0 Colors.qml
+singleton ThemeDefinitions 1.0 ThemeDefinitions.qml

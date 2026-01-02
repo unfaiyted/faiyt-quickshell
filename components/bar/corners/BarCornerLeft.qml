@@ -23,14 +23,19 @@ PanelWindow {
     exclusiveZone: 0
 
     Canvas {
+        id: cornerCanvas
         anchors.fill: parent
+
+        // Repaint when theme changes
+        property color bgColor: Colors.background
+        onBgColorChanged: requestPaint()
 
         onPaint: {
             var ctx = getContext("2d")
             ctx.reset()
 
             // Draw the rounded corner arc
-            ctx.fillStyle = Colors.background
+            ctx.fillStyle = bgColor
             ctx.beginPath()
             ctx.moveTo(0, 0)
             ctx.lineTo(24, 0)

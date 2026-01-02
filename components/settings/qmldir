@@ -1,6 +1,9 @@
 module settings
 
 singleton SettingsState 1.0 SettingsState.qml
+singleton ThemePanelState 1.0 ThemePanelState.qml
 SettingsWindow 1.0 SettingsWindow.qml
 SettingsPanel 1.0 SettingsPanel.qml
 ThemeSelector 1.0 ThemeSelector.qml
+ThemePanelWindow 1.0 ThemePanelWindow.qml
+ThemePanel 1.0 ThemePanel.qml

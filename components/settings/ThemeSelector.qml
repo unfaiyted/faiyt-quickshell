@@ -8,53 +8,7 @@ Column {
     width: parent.width
     spacing: 12
 
-    // Available themes
-    property var themes: [
-        {
-            name: "rose-pine",
-            displayName: "Rosé Pine",
-            description: "Dark theme with muted colors",
-            icon: "󰽥",
-            colors: {
-                base: "#191724",
-                surface: "#1f1d2e",
-                overlay: "#26233a",
-                primary: "#c4a7e7",
-                accent: "#eb6f92",
-                text: "#e0def4"
-            }
-        },
-        {
-            name: "rose-pine-moon",
-            displayName: "Rosé Pine Moon",
-            description: "Darker variant with softer tones",
-            icon: "󰽦",
-            colors: {
-                base: "#232136",
-                surface: "#2a273f",
-                overlay: "#393552",
-                primary: "#c4a7e7",
-                accent: "#eb6f92",
-                text: "#e0def4"
-            }
-        },
-        {
-            name: "rose-pine-dawn",
-            displayName: "Rosé Pine Dawn",
-            description: "Light theme for daytime use",
-            icon: "󰖨",
-            colors: {
-                base: "#faf4ed",
-                surface: "#fffaf3",
-                overlay: "#f2e9e1",
-                primary: "#907aa9",
-                accent: "#b4637a",
-                text: "#575279"
-            }
-        }
-    ]
-
-    property string currentTheme: ConfigService.theme
+    property string currentTheme: ThemeService.currentThemeName
 
     // Header
     Row {
@@ -76,6 +30,51 @@ Column {
             color: Colors.foreground
             anchors.verticalCenter: parent.verticalCenter
         }
+
+        Item { Layout.fillWidth: true; width: 1 }
+
+        // Customize button
+        Rectangle {
+            width: customizeContent.width + 16
+            height: 28
+            radius: 8
+            color: customizeArea.containsMouse ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2) : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+            border.width: 1
+            border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
+            anchors.verticalCenter: parent.verticalCenter
+
+            Row {
+                id: customizeContent
+                anchors.centerIn: parent
+                spacing: 4
+
+                Text {
+                    text: "󰏫"
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 12
+                    color: Colors.primary
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                    text: "Customize"
+                    font.pixelSize: 12
+                    color: Colors.primary
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            MouseArea {
+                id: customizeArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    SettingsState.close()
+                    ThemePanelState.open()
+                }
+            }
+        }
     }
 
     // Theme options
@@ -84,7 +83,7 @@ Column {
         spacing: 10
 
         Repeater {
-            model: themeSelector.themes
+            model: ThemeService.availableThemes.filter(t => t.isBuiltin)
 
             Rectangle {
                 id: themeOption
@@ -97,6 +96,7 @@ Column {
                     ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.5)
                     : Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.1)
 
+                property var themeData: modelData
                 property bool hovered: false
                 property bool isActive: themeSelector.currentTheme === modelData.name
 
@@ -183,41 +183,15 @@ Column {
                         spacing: 5
                         height: 24
 
-                        Rectangle {
-                            width: 24; height: 24; radius: 6
-                            color: modelData.colors.base
-                            border.width: 1
-                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
-                        }
-                        Rectangle {
-                            width: 24; height: 24; radius: 6
-                            color: modelData.colors.surface
-                            border.width: 1
-                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
-                        }
-                        Rectangle {
-                            width: 24; height: 24; radius: 6
-                            color: modelData.colors.overlay
-                            border.width: 1
-                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
-                        }
-                        Rectangle {
-                            width: 24; height: 24; radius: 6
-                            color: modelData.colors.primary
-                            border.width: 1
-                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
-                        }
-                        Rectangle {
-                            width: 24; height: 24; radius: 6
-                            color: modelData.colors.accent
-                            border.width: 1
-                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
-                        }
-                        Rectangle {
-                            width: 24; height: 24; radius: 6
-                            color: modelData.colors.text
-                            border.width: 1
-                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
+                        Repeater {
+                            model: ["base", "surface", "overlay", "primary", "accent", "text"]
+
+                            Rectangle {
+                                width: 24; height: 24; radius: 6
+                                color: themeOption.themeData.colors[modelData] || "#000"
+                                border.width: 1
+                                border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
+                            }
                         }
                     }
                 }
@@ -229,40 +203,60 @@ Column {
                     onEntered: themeOption.hovered = true
                     onExited: themeOption.hovered = false
                     onClicked: {
-                        themeSelector.currentTheme = modelData.name
-                        ConfigService.setValue("theme", modelData.name)
-                        ConfigService.saveConfig()
+                        ThemeService.setTheme(modelData.name)
                     }
                 }
             }
         }
     }
 
-    // Hint text
+    // Custom themes indicator (if any)
     Rectangle {
+        visible: ThemeService.availableThemes.filter(t => !t.isBuiltin).length > 0
         width: parent.width
-        height: hintRow.height + 24
+        height: customThemesRow.height + 24
         radius: 8
         color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.15)
         border.width: 1
         border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.08)
 
         Row {
-            id: hintRow
+            id: customThemesRow
             anchors.centerIn: parent
-            spacing: 5
+            spacing: 8
 
             Text {
-                text: "󰋼"
+                text: "󰏘"
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 14
                 color: Colors.foregroundAlt
             }
 
             Text {
-                text: "Theme changes require a restart to take effect"
+                text: ThemeService.availableThemes.filter(t => !t.isBuiltin).length + " custom theme(s) available"
                 font.pixelSize: 13
                 color: Colors.foregroundAlt
+            }
+
+            Text {
+                text: "→"
+                font.pixelSize: 13
+                color: Colors.primary
+            }
+
+            Text {
+                text: "Open Theme Manager"
+                font.pixelSize: 13
+                color: Colors.primary
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        SettingsState.close()
+                        ThemePanelState.open()
+                    }
+                }
             }
         }
     }

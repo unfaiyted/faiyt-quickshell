@@ -1,47 +1,48 @@
 pragma Singleton
 import QtQuick
+import "../services"
 
 QtObject {
-    // Base Colors (Rosé Pine)
-    readonly property color base: "#191724"
-    readonly property color surface: "#1f1d2e"
-    readonly property color overlay: "#26233a"
+    // Base Colors - bound to ThemeService
+    property color base: ThemeService.currentTheme.base
+    property color surface: ThemeService.currentTheme.surface
+    property color overlay: ThemeService.currentTheme.overlay
 
     // Text Colors
-    readonly property color text: "#e0def4"
-    readonly property color muted: "#6e6a86"
-    readonly property color subtle: "#908caa"
+    property color text: ThemeService.currentTheme.text
+    property color muted: ThemeService.currentTheme.muted
+    property color subtle: ThemeService.currentTheme.subtle
 
     // Accent Colors
-    readonly property color love: "#eb6f92"
-    readonly property color gold: "#f6c177"
-    readonly property color rose: "#ebbcba"
-    readonly property color pine: "#31748f"
-    readonly property color foam: "#9ccfd8"
-    readonly property color iris: "#c4a7e7"
+    property color love: ThemeService.currentTheme.love
+    property color gold: ThemeService.currentTheme.gold
+    property color rose: ThemeService.currentTheme.rose
+    property color pine: ThemeService.currentTheme.pine
+    property color foam: ThemeService.currentTheme.foam
+    property color iris: ThemeService.currentTheme.iris
 
     // Semantic Color Roles
-    readonly property color primary: iris
-    readonly property color secondary: pine
-    readonly property color accent: love
-    readonly property color success: foam
-    readonly property color warning: gold
-    readonly property color error: love
-    readonly property color info: pine
+    property color primary: ThemeService.currentTheme.primary
+    property color secondary: ThemeService.currentTheme.secondary
+    property color accent: ThemeService.currentTheme.accent
+    property color success: ThemeService.currentTheme.success
+    property color warning: ThemeService.currentTheme.warning
+    property color error: ThemeService.currentTheme.error
+    property color info: ThemeService.currentTheme.info
 
     // UI Component Colors
-    readonly property color background: base
-    readonly property color backgroundAlt: surface
-    readonly property color backgroundElevated: overlay
-    readonly property color foreground: text
-    readonly property color foregroundAlt: subtle
-    readonly property color foregroundMuted: muted
-    readonly property color border: overlay
-    readonly property color borderAlt: muted
+    property color background: ThemeService.currentTheme.background
+    property color backgroundAlt: ThemeService.currentTheme.backgroundAlt
+    property color backgroundElevated: ThemeService.currentTheme.backgroundElevated
+    property color foreground: ThemeService.currentTheme.foreground
+    property color foregroundAlt: ThemeService.currentTheme.foregroundAlt
+    property color foregroundMuted: ThemeService.currentTheme.foregroundMuted
+    property color border: ThemeService.currentTheme.border
+    property color borderAlt: ThemeService.currentTheme.borderAlt
 
     // State Colors
-    readonly property color hover: overlay
-    readonly property color active: "#393552"
-    readonly property color focus: iris
-    readonly property color disabled: muted
+    property color hover: ThemeService.currentTheme.hover
+    property color active: ThemeService.currentTheme.active
+    property color focus: ThemeService.currentTheme.focus
+    property color disabled: ThemeService.currentTheme.disabled
 }

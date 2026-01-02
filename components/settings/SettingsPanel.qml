@@ -230,6 +230,7 @@ Rectangle {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     SettingsState.close()
+                                    MonitorsState.openedFromSettings = true
                                     MonitorsState.open()
                                 }
                             }

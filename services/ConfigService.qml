@@ -14,6 +14,7 @@ Singleton {
     property var defaultConfig: ({
         // Appearance
         theme: "rose-pine",
+        customThemes: {},  // User-created custom themes
         bar: {
             mode: "normal",  // normal, focus, nothing
             workspacesPerPage: 10,  // Number of workspaces to show at once
@@ -353,6 +354,9 @@ Singleton {
     property bool stickersEnabled: config.stickers?.enabled !== false
     property var stickerPacks: config.stickers?.packs || []
 
+    // Custom themes convenience property
+    property var customThemes: config.customThemes || {}
+
     // AI convenience accessors (API key from env var only)
     property string aiDefaultModel: config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
     property var aiModels: config.ai?.models || []
@@ -434,5 +438,8 @@ Singleton {
         // Stickers
         stickersEnabled = config.stickers?.enabled !== false
         stickerPacks = config.stickers?.packs || []
+
+        // Custom themes
+        customThemes = config.customThemes || {}
     }
 }

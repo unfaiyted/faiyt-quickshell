@@ -37,5 +37,6 @@ ShellRoot {
     LauncherWindow {}
     Overview {}
     SettingsWindow {}
+    ThemePanelWindow {}
     MonitorsWindow {}
 }

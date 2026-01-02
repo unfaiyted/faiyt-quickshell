@@ -7,3 +7,4 @@ singleton ConversationManager 1.0 ConversationManager.qml
 singleton IconService 1.0 IconService.qml
 singleton MCPClient 1.0 MCPClient.qml
 singleton StickerService 1.0 StickerService.qml
+singleton ThemeService 1.0 ThemeService.qml
