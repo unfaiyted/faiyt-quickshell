@@ -224,21 +224,68 @@ Item {
     Process {
         id: launchProcess
         property string cmd: ""
+        property string appName: ""
+        property string stderrOutput: ""
+
         command: ["bash", "-c", cmd]
+
+        stderr: SplitParser {
+            onRead: data => {
+                launchProcess.stderrOutput += data + "\n"
+            }
+        }
+
+        onRunningChanged: {
+            if (running) {
+                console.log("[AppResults] Launching app: " + appName)
+                console.log("[AppResults] Command: " + cmd)
+                stderrOutput = ""
+            } else {
+                if (stderrOutput.trim()) {
+                    console.log("[AppResults] stderr for '" + appName + "': " + stderrOutput.trim())
+                }
+                console.log("[AppResults] Process finished for: " + appName)
+            }
+        }
+
+        onExited: (code, status) => {
+            if (code !== 0) {
+                console.log("[AppResults] ERROR: '" + appName + "' exited with code " + code + " (status: " + status + ")")
+                if (stderrOutput.trim()) {
+                    console.log("[AppResults] stderr: " + stderrOutput.trim())
+                }
+            } else {
+                console.log("[AppResults] '" + appName + "' launched successfully (exit code 0)")
+            }
+        }
     }
 
     function launchApp(app) {
-        // Clean up exec command (remove %u, %U, %f, %F, etc.)
+        // Clean up exec command (remove %u, %U, %f, %F, etc. and their flags)
         let cmd = app.exec
+            // Remove --flag=%x patterns (e.g., --uri=%u)
+            .replace(/--\w+=%[uUfFdDnNickvm]/g, "")
+            // Remove --flag %x patterns (e.g., --file %f)
+            .replace(/--\w+\s+%[uUfFdDnNickvm]/g, "")
+            // Remove any remaining standalone %x codes
             .replace(/%[uUfFdDnNickvm]/g, "")
+            // Collapse multiple spaces
             .replace(/\s+/g, " ")
             .trim()
 
+        console.log("[AppResults] Original exec: " + app.exec)
+        console.log("[AppResults] Cleaned cmd: " + cmd)
+        console.log("[AppResults] Terminal: " + app.terminal)
+        console.log("[AppResults] Desktop file: " + app.filePath)
+
+        launchProcess.appName = app.name
+
         if (app.terminal) {
-            // Launch in terminal
-            launchProcess.cmd = "kitty -e " + cmd
+            // Launch in terminal (detached so we can launch more apps)
+            launchProcess.cmd = "setsid kitty -e " + cmd + " &"
         } else {
-            launchProcess.cmd = cmd
+            // Launch detached so the Process is freed immediately for more launches
+            launchProcess.cmd = "setsid " + cmd + " >/dev/null 2>&1 &"
         }
         launchProcess.running = true
     }
