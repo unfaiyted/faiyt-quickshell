@@ -12,9 +12,7 @@ Item {
     property int selectedIndex: 0
     property int columns: 4
     property int cellWidth: 140
-    property int cellHeight: 120
-    property int imageWidth: 120
-    property int imageHeight: 80
+    property int cellHeight: 100  // More compact without title
     property int maxRows: 3
 
     // Check if we're showing info/loading state instead of grid
@@ -30,8 +28,7 @@ Item {
     property int categoryMaxRows: 4
 
     // Preview panel properties (only for GIF mode, not category mode)
-    property int previewHeight: 160
-    property int previewPanelHeight: previewHeight + 24
+    property int previewPanelHeight: 210  // carousel height including padding
     property bool showPreview: !isInfoMode && !isCategoryMode && results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length && results[selectedIndex]?.type === "gif"
 
     signal gifClicked(int index)
@@ -459,6 +456,7 @@ Item {
                 AnimatedImage {
                     id: categoryImage
                     anchors.fill: parent
+                    anchors.margins: 2  // Leave room for selection border
                     source: modelData?.data?.image || ""
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
@@ -471,13 +469,15 @@ Item {
                 Rectangle {
                     id: categoryImageMask
                     anchors.fill: parent
-                    radius: categoryCellBg.radius
+                    anchors.margins: 2  // Match image margins
+                    radius: categoryCellBg.radius - 2
                     visible: false
                     layer.enabled: true
                 }
 
                 OpacityMask {
                     anchors.fill: parent
+                    anchors.margins: 2  // Match image margins
                     source: categoryImage
                     maskSource: categoryImageMask
                     opacity: 0.4
@@ -487,6 +487,7 @@ Item {
                 // Gradient overlay for text readability
                 Rectangle {
                     anchors.fill: parent
+                    anchors.margins: 2  // Match image margins
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: "transparent" }
                         GradientStop { position: 0.6; color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.7) }
@@ -548,40 +549,102 @@ Item {
         }
     }
 
-    // Large preview panel for selected GIF
-    Rectangle {
+    // Carousel-style preview with adjacent GIFs
+    Item {
         id: previewPanel
         visible: gifGridView.showPreview
         anchors.top: parent.top
+        anchors.topMargin: 8
         anchors.horizontalCenter: parent.horizontalCenter
-        width: previewContent.width + 32
-        height: previewContent.height + 20
-        radius: 12
-        color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.95)
-        border.width: 1
-        border.color: Colors.border
+        width: parent.width - 32
+        height: 190
 
-        Row {
-            id: previewContent
-            anchors.centerIn: parent
-            spacing: 20
+        // Previous GIF (left side)
+        Item {
+            id: prevGif
+            visible: selectedIndex > 0 && results[selectedIndex - 1]?.type === "gif"
+            anchors.right: centerGif.left
+            anchors.rightMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            width: 70
+            height: 70
+            opacity: 0.4
 
-            // Large GIF preview (animated)
             Rectangle {
-                width: gifGridView.previewHeight
-                height: gifGridView.previewHeight
-                radius: 8
-                color: Colors.overlay
+                anchors.fill: parent
+                radius: 12
+                color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.6)
+                border.width: 1
+                border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.5)
                 clip: true
-                anchors.verticalCenter: parent.verticalCenter
+
+                AnimatedImage {
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    source: {
+                        if (selectedIndex > 0 && results[selectedIndex - 1]) {
+                            return results[selectedIndex - 1]?.data?.previewUrl || ""
+                        }
+                        return ""
+                    }
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    cache: true
+                    playing: false
+                }
+            }
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.bottom
+                anchors.topMargin: 4
+                text: "←"
+                font.pixelSize: 10
+                color: Colors.foregroundMuted
+            }
+        }
+
+        // Center GIF (main preview)
+        Item {
+            id: centerGif
+            anchors.centerIn: parent
+            width: 150
+            height: 150
+
+            // Outer glow layers
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width + 20
+                height: parent.height + 20
+                radius: 22
+                color: Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.08)
+            }
+
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width + 10
+                height: parent.height + 10
+                radius: 18
+                color: Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.12)
+            }
+
+            // Main card
+            Rectangle {
+                id: previewCard
+                anchors.fill: parent
+                radius: 14
+                color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.95)
+                border.width: 1
+                border.color: Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.3)
+                clip: true
 
                 AnimatedImage {
                     id: previewGif
                     anchors.fill: parent
+                    anchors.margins: 6
                     source: {
                         if (results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length) {
                             const item = results[selectedIndex]
-                            // Use full URL for preview for better quality
                             return item?.data?.fullUrl || item?.data?.previewUrl || ""
                         }
                         return ""
@@ -591,128 +654,119 @@ Item {
                     cache: true
                     playing: true
                     visible: status === Image.Ready
+
+                    scale: 1.0
+                    Behavior on source {
+                        SequentialAnimation {
+                            NumberAnimation { target: previewGif; property: "scale"; to: 0.85; duration: 80; easing.type: Easing.InQuad }
+                            NumberAnimation { target: previewGif; property: "scale"; to: 1.0; duration: 150; easing.type: Easing.OutBack }
+                        }
+                    }
                 }
 
                 // Loading state
-                Column {
+                Text {
                     anchors.centerIn: parent
-                    spacing: 8
                     visible: previewGif.status === Image.Loading
+                    text: "󰋚"
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 32
+                    color: Colors.foregroundMuted
 
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "󰋚"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 32
-                        color: Colors.foregroundMuted
-
-                        SequentialAnimation on opacity {
-                            running: previewGif.status === Image.Loading
-                            loops: Animation.Infinite
-                            NumberAnimation { to: 0.3; duration: 500 }
-                            NumberAnimation { to: 1; duration: 500 }
-                        }
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Loading..."
-                        font.pixelSize: 11
-                        color: Colors.foregroundMuted
+                    SequentialAnimation on opacity {
+                        running: previewGif.status === Image.Loading
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 0.3; duration: 500 }
+                        NumberAnimation { to: 1; duration: 500 }
                     }
                 }
 
                 // Error state
-                Column {
+                Text {
                     anchors.centerIn: parent
-                    spacing: 4
                     visible: previewGif.status === Image.Error
+                    text: "󰀦"
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 32
+                    color: Colors.love
+                }
+            }
+
+            // Copy hint below
+            Rectangle {
+                anchors.top: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 6
+                width: hintRow.width + 14
+                height: 22
+                radius: 11
+                color: Colors.surface
+                border.width: 1
+                border.color: Colors.border
+
+                Row {
+                    id: hintRow
+                    anchors.centerIn: parent
+                    spacing: 5
 
                     Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "󰀦"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 32
-                        color: Colors.love
+                        text: "↵"
+                        font.pixelSize: 11
+                        font.bold: true
+                        color: Colors.iris
                     }
 
                     Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Failed to load"
-                        font.pixelSize: 11
+                        text: "copy"
+                        font.pixelSize: 10
                         color: Colors.foregroundMuted
                     }
                 }
             }
+        }
 
-            // GIF info
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
-                width: 180
+        // Next GIF (right side)
+        Item {
+            id: nextGif
+            visible: selectedIndex < results.length - 1 && results[selectedIndex + 1]?.type === "gif"
+            anchors.left: centerGif.right
+            anchors.leftMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            width: 70
+            height: 70
+            opacity: 0.4
 
-                // Title
-                Text {
-                    width: parent.width
-                    text: {
-                        if (results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length) {
-                            return results[selectedIndex]?.title || "GIF"
+            Rectangle {
+                anchors.fill: parent
+                radius: 12
+                color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.6)
+                border.width: 1
+                border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.5)
+                clip: true
+
+                AnimatedImage {
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    source: {
+                        if (selectedIndex < results.length - 1 && results[selectedIndex + 1]) {
+                            return results[selectedIndex + 1]?.data?.previewUrl || ""
                         }
-                        return "GIF"
+                        return ""
                     }
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-                    color: Colors.foreground
-                    wrapMode: Text.WordWrap
-                    maximumLineCount: 3
-                    elide: Text.ElideRight
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    cache: true
+                    playing: false
                 }
+            }
 
-                // Separator
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.5)
-                }
-
-                // Copy options hint
-                Column {
-                    spacing: 4
-
-                    Row {
-                        spacing: 6
-
-                        Text {
-                            text: "󰌹"
-                            font.family: "Symbols Nerd Font"
-                            font.pixelSize: 12
-                            color: Colors.foam
-                        }
-
-                        Text {
-                            text: "Enter → Copy URL"
-                            font.pixelSize: 11
-                            color: Colors.foregroundMuted
-                        }
-                    }
-
-                    Row {
-                        spacing: 6
-
-                        Text {
-                            text: "󰋩"
-                            font.family: "Symbols Nerd Font"
-                            font.pixelSize: 12
-                            color: Colors.iris
-                        }
-
-                        Text {
-                            text: "Click → Copy Options"
-                            font.pixelSize: 11
-                            color: Colors.foregroundMuted
-                        }
-                    }
-                }
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.bottom
+                anchors.topMargin: 4
+                text: "→"
+                font.pixelSize: 10
+                color: Colors.foregroundMuted
             }
         }
     }
@@ -721,7 +775,7 @@ Item {
         id: gridView
         visible: !gifGridView.isInfoMode && !gifGridView.isCategoryMode
         anchors.top: previewPanel.visible ? previewPanel.bottom : parent.top
-        anchors.topMargin: previewPanel.visible ? 8 : 0
+        anchors.topMargin: previewPanel.visible ? 16 : 0
         anchors.horizontalCenter: parent.horizontalCenter
         width: Math.min(parent.width, gifGridView.columns * gifGridView.cellWidth)
         height: Math.min(contentHeight, gifGridView.cellHeight * gifGridView.maxRows)
@@ -758,87 +812,62 @@ Item {
                     NumberAnimation { duration: 100 }
                 }
 
-                Column {
+                // Animated GIF preview with rounded mask
+                AnimatedImage {
+                    id: gifImage
+                    anchors.fill: parent
+                    anchors.margins: 2  // Leave room for selection border
+                    source: modelData?.data?.previewUrl || ""
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: true
+                    playing: mouseArea.containsMouse || index === gifGridView.selectedIndex
+                    visible: false  // Hidden, rendered through mask
+                    layer.enabled: true
+                }
+
+                Rectangle {
+                    id: gifImageMask
+                    anchors.fill: parent
+                    anchors.margins: 2  // Match image margins
+                    radius: cellBackground.radius - 2
+                    visible: false
+                    layer.enabled: true
+                }
+
+                OpacityMask {
+                    anchors.fill: parent
+                    anchors.margins: 2  // Match image margins
+                    source: gifImage
+                    maskSource: gifImageMask
+                    visible: gifImage.status === Image.Ready
+                }
+
+                // Loading placeholder
+                Text {
                     anchors.centerIn: parent
-                    spacing: 4
+                    visible: gifImage.status === Image.Loading || gifImage.status === Image.Null
+                    text: "󰋚"
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 24
+                    color: Colors.foregroundMuted
 
-                    // GIF preview container with rounded corners
-                    Rectangle {
-                        width: gifGridView.imageWidth
-                        height: gifGridView.imageHeight
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        radius: 6
-                        color: Colors.surface
-                        clip: true
-
-                        // Animated GIF preview
-                        AnimatedImage {
-                            id: gifImage
-                            anchors.fill: parent
-                            source: modelData?.data?.previewUrl || ""
-                            fillMode: Image.PreserveAspectFit
-                            asynchronous: true
-                            cache: true
-                            playing: mouseArea.containsMouse || index === gifGridView.selectedIndex
-                            visible: status === Image.Ready
-                        }
-
-                        // Loading placeholder
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 4
-                            visible: gifImage.status === Image.Loading || gifImage.status === Image.Null
-
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: "󰋚"
-                                font.family: "Symbols Nerd Font"
-                                font.pixelSize: 24
-                                color: Colors.foregroundMuted
-
-                                SequentialAnimation on opacity {
-                                    running: gifImage.status === Image.Loading
-                                    loops: Animation.Infinite
-                                    NumberAnimation { to: 0.3; duration: 500 }
-                                    NumberAnimation { to: 1; duration: 500 }
-                                }
-                            }
-                        }
-
-                        // Error state
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 4
-                            visible: gifImage.status === Image.Error
-
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: "󰀦"
-                                font.family: "Symbols Nerd Font"
-                                font.pixelSize: 24
-                                color: Colors.love
-                            }
-
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: "Failed"
-                                font.pixelSize: 9
-                                color: Colors.foregroundMuted
-                            }
-                        }
+                    SequentialAnimation on opacity {
+                        running: gifImage.status === Image.Loading
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 0.3; duration: 500 }
+                        NumberAnimation { to: 1; duration: 500 }
                     }
+                }
 
-                    // Title (truncated)
-                    Text {
-                        width: gifGridView.cellWidth - 16
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: modelData?.title || ""
-                        font.pixelSize: 10
-                        color: Colors.foregroundMuted
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignHCenter
-                        maximumLineCount: 1
-                    }
+                // Error state
+                Text {
+                    anchors.centerIn: parent
+                    visible: gifImage.status === Image.Error
+                    text: "󰀦"
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 24
+                    color: Colors.love
                 }
 
                 MouseArea {

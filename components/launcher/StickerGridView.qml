@@ -1,4 +1,5 @@
 import QtQuick
+import Qt5Compat.GraphicalEffects
 import "../../theme"
 import "../../services"
 
@@ -8,10 +9,9 @@ Item {
     property var results: []
     property int selectedIndex: 0
     property int columns: 6
-    property int cellWidth: 100
-    property int cellHeight: 110
-    property int imageSize: 64
-    property int maxRows: 6
+    property int cellWidth: 95
+    property int cellHeight: 90  // More compact without description
+    property int maxRows: 4
 
     // Check if we're showing info/empty state instead of stickers
     property bool isInfoMode: results.length > 0 && (results[0].type === "sticker-info" || results[0].type === "sticker-add")
@@ -20,8 +20,7 @@ Item {
     signal stickerActivated(int index)
 
     // Properties for preview panel size
-    property int previewSize: 128
-    property int previewPanelHeight: previewSize + 16 + 8  // image + padding + margin
+    property int previewPanelHeight: 210  // carousel height including padding and copy hint
 
     width: parent.width
     height: isInfoMode ? emptyState.height : (
@@ -236,34 +235,98 @@ Item {
         }
     }
 
-    // Large preview panel for selected sticker
-    Rectangle {
+    // Carousel-style preview with adjacent stickers
+    Item {
         id: previewPanel
         visible: !stickerGridView.isInfoMode && results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length
         anchors.top: packBar.bottom
-        anchors.topMargin: packBar.visible ? 8 : 4
+        anchors.topMargin: packBar.visible ? 16 : 12
         anchors.horizontalCenter: parent.horizontalCenter
-        width: previewContent.width + 24
-        height: previewContent.height + 16
-        radius: 12
-        color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.95)
-        border.width: 1
-        border.color: Colors.border
+        width: parent.width - 32
+        height: 190
 
-        Row {
-            id: previewContent
+        // Previous sticker (left side)
+        Item {
+            id: prevSticker
+            visible: selectedIndex > 0
+            anchors.right: centerSticker.left
+            anchors.rightMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            width: 70
+            height: 70
+            opacity: 0.4
+
+            Rectangle {
+                anchors.fill: parent
+                radius: 12
+                color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.6)
+                border.width: 1
+                border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.5)
+
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: 8
+                    source: {
+                        if (selectedIndex > 0 && results[selectedIndex - 1]) {
+                            return results[selectedIndex - 1]?.imagePath ? "file://" + results[selectedIndex - 1].imagePath : ""
+                        }
+                        return ""
+                    }
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    smooth: true
+                    mipmap: true
+                }
+            }
+
+            // Navigation hint
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.bottom
+                anchors.topMargin: 4
+                text: "←"
+                font.pixelSize: 10
+                color: Colors.foregroundMuted
+            }
+        }
+
+        // Center sticker (main preview)
+        Item {
+            id: centerSticker
             anchors.centerIn: parent
-            spacing: 16
+            width: 150
+            height: 150
 
-            // Large sticker preview
-            Item {
-                width: 128
-                height: 128
-                anchors.verticalCenter: parent.verticalCenter
+            // Outer glow layers
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width + 20
+                height: parent.height + 20
+                radius: 22
+                color: Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.08)
+            }
+
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width + 10
+                height: parent.height + 10
+                radius: 18
+                color: Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.12)
+            }
+
+            // Main card
+            Rectangle {
+                id: previewCard
+                anchors.fill: parent
+                radius: 14
+                color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.95)
+                border.width: 1
+                border.color: Qt.rgba(Colors.iris.r, Colors.iris.g, Colors.iris.b, 0.3)
 
                 Image {
                     id: previewImage
                     anchors.fill: parent
+                    anchors.margins: 10
                     source: {
                         if (results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length) {
                             const item = results[selectedIndex]
@@ -276,9 +339,17 @@ Item {
                     visible: status === Image.Ready
                     smooth: true
                     mipmap: true
+
+                    scale: 1.0
+                    Behavior on source {
+                        SequentialAnimation {
+                            NumberAnimation { target: previewImage; property: "scale"; to: 0.85; duration: 80; easing.type: Easing.InQuad }
+                            NumberAnimation { target: previewImage; property: "scale"; to: 1.0; duration: 150; easing.type: Easing.OutBack }
+                        }
+                    }
                 }
 
-                // Fallback emoji when image not loaded
+                // Fallback emoji
                 Text {
                     anchors.centerIn: parent
                     text: {
@@ -287,29 +358,25 @@ Item {
                         }
                         return "?"
                     }
-                    font.pixelSize: 72
+                    font.pixelSize: 64
                     font.family: "Noto Color Emoji"
                     visible: previewImage.status !== Image.Ready
                 }
-            }
-
-            // Sticker info
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 6
-                width: 140
 
                 // Emoji badge
                 Rectangle {
-                    width: emojiText.width + 16
-                    height: 32
-                    radius: 16
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.rightMargin: 6
+                    anchors.bottomMargin: 6
+                    width: 28
+                    height: 28
+                    radius: 14
                     color: Colors.overlay
                     border.width: 1
                     border.color: Colors.border
 
                     Text {
-                        id: emojiText
                         anchors.centerIn: parent
                         text: {
                             if (results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length) {
@@ -317,34 +384,87 @@ Item {
                             }
                             return ""
                         }
-                        font.pixelSize: 18
+                        font.pixelSize: 14
                         font.family: "Noto Color Emoji"
                     }
                 }
+            }
 
-                // Pack title
-                Text {
-                    width: parent.width
-                    text: {
-                        if (results.length > 0 && selectedIndex >= 0 && selectedIndex < results.length) {
-                            return results[selectedIndex]?.description || ""
+            // Copy hint below
+            Rectangle {
+                anchors.top: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 6
+                width: hintRow.width + 14
+                height: 22
+                radius: 11
+                color: Colors.surface
+                border.width: 1
+                border.color: Colors.border
+
+                Row {
+                    id: hintRow
+                    anchors.centerIn: parent
+                    spacing: 5
+
+                    Text {
+                        text: "↵"
+                        font.pixelSize: 11
+                        font.bold: true
+                        color: Colors.iris
+                    }
+
+                    Text {
+                        text: "copy"
+                        font.pixelSize: 10
+                        color: Colors.foregroundMuted
+                    }
+                }
+            }
+        }
+
+        // Next sticker (right side)
+        Item {
+            id: nextSticker
+            visible: selectedIndex < results.length - 1
+            anchors.left: centerSticker.right
+            anchors.leftMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            width: 70
+            height: 70
+            opacity: 0.4
+
+            Rectangle {
+                anchors.fill: parent
+                radius: 12
+                color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.6)
+                border.width: 1
+                border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.5)
+
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: 8
+                    source: {
+                        if (selectedIndex < results.length - 1 && results[selectedIndex + 1]) {
+                            return results[selectedIndex + 1]?.imagePath ? "file://" + results[selectedIndex + 1].imagePath : ""
                         }
                         return ""
                     }
-                    font.pixelSize: 13
-                    font.weight: Font.Medium
-                    color: Colors.foreground
-                    wrapMode: Text.WordWrap
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    smooth: true
+                    mipmap: true
                 }
+            }
 
-                // Hint
-                Text {
-                    text: "Enter to copy"
-                    font.pixelSize: 11
-                    color: Colors.foregroundMuted
-                }
+            // Navigation hint
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.bottom
+                anchors.topMargin: 4
+                text: "→"
+                font.pixelSize: 10
+                color: Colors.foregroundMuted
             }
         }
     }
@@ -353,7 +473,7 @@ Item {
         id: gridView
         visible: !stickerGridView.isInfoMode
         anchors.top: previewPanel.visible ? previewPanel.bottom : packBar.bottom
-        anchors.topMargin: previewPanel.visible ? 8 : (packBar.visible ? 8 : 0)
+        anchors.topMargin: previewPanel.visible ? 16 : (packBar.visible ? 8 : 0)
         anchors.horizontalCenter: parent.horizontalCenter
         width: Math.min(parent.width, stickerGridView.columns * stickerGridView.cellWidth)
         height: Math.min(contentHeight, stickerGridView.cellHeight * stickerGridView.maxRows)
@@ -365,10 +485,8 @@ Item {
         model: results
 
         delegate: Item {
-            id: delegateItem
             width: gridView.cellWidth
             height: stickerGridView.cellHeight
-            z: mouseArea.containsMouse ? 10 : 1
 
             Rectangle {
                 id: cellBackground
@@ -392,85 +510,82 @@ Item {
                     NumberAnimation { duration: 100 }
                 }
 
-                Column {
+                // Sticker image with rounded mask
+                Image {
+                    id: stickerImage
+                    anchors.fill: parent
+                    anchors.margins: 2  // Leave room for selection border
+                    source: modelData?.imagePath ? "file://" + modelData.imagePath : ""
+                    fillMode: Image.PreserveAspectCrop  // Fill cell, crop overflow
+                    asynchronous: true
+                    visible: false  // Hidden, rendered through mask
+                    smooth: true
+                    mipmap: true
+                    layer.enabled: true
+                }
+
+                Rectangle {
+                    id: stickerImageMask
+                    anchors.fill: parent
+                    anchors.margins: 2  // Match image margins
+                    radius: cellBackground.radius - 2
+                    visible: false
+                    layer.enabled: true
+                }
+
+                OpacityMask {
+                    anchors.fill: parent
+                    anchors.margins: 2  // Match image margins
+                    source: stickerImage
+                    maskSource: stickerImageMask
+                    visible: stickerImage.status === Image.Ready
+                }
+
+                // Fallback when image not loaded - large centered emoji
+                Text {
                     anchors.centerIn: parent
-                    spacing: 4
+                    text: modelData?.emoji || "?"
+                    font.pixelSize: 48
+                    font.family: "Noto Color Emoji"
+                    visible: stickerImage.status !== Image.Ready && stickerImage.status !== Image.Loading
+                }
 
-                    // Sticker image with emoji overlay
-                    Item {
-                        width: stickerGridView.imageSize
-                        height: stickerGridView.imageSize
-                        anchors.horizontalCenter: parent.horizontalCenter
+                // Loading indicator
+                Text {
+                    anchors.centerIn: parent
+                    text: "󰋚"
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 24
+                    color: Colors.foregroundMuted
+                    visible: stickerImage.status === Image.Loading
 
-                        Image {
-                            id: stickerImage
-                            anchors.fill: parent
-                            source: modelData?.imagePath ? "file://" + modelData.imagePath : ""
-                            fillMode: Image.PreserveAspectFit
-                            asynchronous: true
-                            visible: status === Image.Ready
-                            smooth: true
-                            mipmap: true
-                        }
-
-                        // Fallback when image not loaded - large centered emoji
-                        Text {
-                            anchors.centerIn: parent
-                            text: modelData?.emoji || "?"
-                            font.pixelSize: 40
-                            font.family: "Noto Color Emoji"
-                            visible: stickerImage.status !== Image.Ready && stickerImage.status !== Image.Loading
-                        }
-
-                        // Loading indicator
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 28
-                            height: 28
-                            radius: 14
-                            color: Colors.surface
-                            visible: stickerImage.status === Image.Loading
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: "..."
-                                font.pixelSize: 12
-                                color: Colors.foregroundMuted
-                            }
-                        }
-
-                        // Emoji overlay badge (bottom-right corner)
-                        Rectangle {
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-                            anchors.rightMargin: -2
-                            anchors.bottomMargin: -2
-                            width: 22
-                            height: 22
-                            radius: 11
-                            color: Colors.overlay
-                            border.width: 1
-                            border.color: Colors.border
-                            visible: stickerImage.status === Image.Ready && modelData?.emoji
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData?.emoji || ""
-                                font.pixelSize: 12
-                                font.family: "Noto Color Emoji"
-                            }
-                        }
+                    SequentialAnimation on opacity {
+                        running: stickerImage.status === Image.Loading
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 0.3; duration: 500 }
+                        NumberAnimation { to: 1; duration: 500 }
                     }
+                }
 
-                    // Pack title (truncated)
+                // Emoji overlay badge (bottom-right corner)
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.rightMargin: 4
+                    anchors.bottomMargin: 4
+                    width: 22
+                    height: 22
+                    radius: 11
+                    color: Colors.overlay
+                    border.width: 1
+                    border.color: Colors.border
+                    visible: stickerImage.status === Image.Ready && modelData?.emoji
+
                     Text {
-                        width: stickerGridView.cellWidth - 16
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: modelData?.description || ""
-                        font.pixelSize: 10
-                        color: Colors.foregroundMuted
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignHCenter
+                        anchors.centerIn: parent
+                        text: modelData?.emoji || ""
+                        font.pixelSize: 12
+                        font.family: "Noto Color Emoji"
                     }
                 }
 
@@ -489,39 +604,6 @@ Item {
                     }
                 }
 
-                // Tooltip with emoji
-                Rectangle {
-                    id: tooltip
-                    visible: mouseArea.containsMouse && modelData?.sticker
-                    anchors.top: parent.bottom
-                    anchors.topMargin: 4
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: tooltipText.width + 16
-                    height: tooltipText.height + 8
-                    radius: 4
-                    color: Colors.overlay
-                    border.width: 1
-                    border.color: Colors.border
-                    z: 100
-
-                    Row {
-                        id: tooltipText
-                        anchors.centerIn: parent
-                        spacing: 6
-
-                        Text {
-                            text: modelData?.emoji || ""
-                            font.pixelSize: 14
-                            font.family: "Noto Color Emoji"
-                        }
-
-                        Text {
-                            text: modelData?.description || ""
-                            font.pixelSize: 11
-                            color: Colors.foreground
-                        }
-                    }
-                }
             }
         }
 
