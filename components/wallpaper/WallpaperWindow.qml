@@ -108,13 +108,13 @@ PanelWindow {
             anchors.leftMargin: 16
             anchors.rightMargin: 16
             anchors.topMargin: 16
-            anchors.bottomMargin: 24
+            anchors.bottomMargin: 34
             spacing: 12
 
             // Header
             Item {
                 width: parent.width
-                height: 32
+                height: 16
 
                 // Title
                 Row {
@@ -313,10 +313,16 @@ PanelWindow {
                 }
             }
 
+            // Spacer to push footer down
+            Item {
+                width: 1
+                height: 1
+            }
+
             // Footer
             Item {
                 width: parent.width
-                height: 1 
+                height: 1
 
                 // Page indicator
                 Text {
