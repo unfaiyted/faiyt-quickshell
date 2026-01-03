@@ -1,5 +1,6 @@
 module launcher
 singleton LauncherState 1.0 LauncherState.qml
+singleton QuickActionState 1.0 QuickActionState.qml
 LauncherWindow 1.0 LauncherWindow.qml
 LauncherEntry 1.0 LauncherEntry.qml
 ResultItem 1.0 ResultItem.qml

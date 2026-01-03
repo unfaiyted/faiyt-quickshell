@@ -58,6 +58,7 @@ Singleton {
     StickerResults { id: stickerResults }
     GifResults { id: gifResults }
     TmuxResults { id: tmuxResults }
+    QuickActionResults { id: quickActionResults }
 
     // Re-trigger search when GIF results are ready (async)
     Connections {
@@ -198,6 +199,10 @@ Singleton {
                 // Apps first
                 let appRes = appResults.search(query, false)
                 allResults = allResults.concat(appRes)
+
+                // Quick Actions (panels, toggles, media, bar modes)
+                let quickRes = quickActionResults.search(query, false)
+                allResults = allResults.concat(quickRes)
 
                 // Windows
                 let winRes = windowResults.search(query, false)
