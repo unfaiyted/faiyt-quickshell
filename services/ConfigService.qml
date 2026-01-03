@@ -107,7 +107,8 @@ Singleton {
                 directorySearch: false,
                 aiSearch: false,
                 webSearch: false,
-                gifSearch: true
+                gifSearch: true,
+                tmuxSearch: true
             },
             evaluators: {
                 mathEvaluator: true,

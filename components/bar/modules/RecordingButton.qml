@@ -74,6 +74,53 @@ Item {
                 }
             }
         }
+        onContainsMouseChanged: {
+            if (containsMouse) {
+                tooltipTimer.start()
+            } else {
+                tooltipTimer.stop()
+                tooltipPopup.visible = false
+            }
+        }
+    }
+
+    Timer {
+        id: tooltipTimer
+        interval: 500
+        onTriggered: if (!modeMenu.visible) tooltipPopup.visible = true
+    }
+
+    PopupWindow {
+        id: tooltipPopup
+        anchor.window: QsWindow.window
+        anchor.onAnchoring: {
+            const pos = recordBtn.mapToItem(QsWindow.window.contentItem, 0, recordBtn.height + 4)
+            anchor.rect = Qt.rect(pos.x - tooltipContent.width / 2 + recordBtn.width / 2, pos.y, 1, 1)
+        }
+        anchor.edges: Edges.Top | Edges.Left
+
+        visible: false
+        implicitWidth: tooltipContent.width
+        implicitHeight: tooltipContent.height
+        color: "transparent"
+
+        Rectangle {
+            id: tooltipContent
+            width: tooltipText.width + 16
+            height: tooltipText.height + 8
+            radius: 6
+            color: Colors.surface
+            border.width: 1
+            border.color: Colors.overlay
+
+            Text {
+                id: tooltipText
+                anchors.centerIn: parent
+                text: RecordingState.isRecording ? "Stop Recording" : "Screen Recording"
+                font.pixelSize: 11
+                color: Colors.foreground
+            }
+        }
     }
 
     // Context menu for recording mode selection

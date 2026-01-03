@@ -2,7 +2,11 @@ import QtQuick
 import Quickshell.Io
 
 QtObject {
+    id: currencyEvaluator
     property string name: "currency"
+
+    // Signal emitted when async result is ready
+    signal resultReady()
 
     // Supported currencies
     property var currencies: [
@@ -21,6 +25,9 @@ QtObject {
     property var fetchProcess: Process {
         id: fetchProcess
         property string output: ""
+        property string pendingCacheKey: ""
+        property string pendingTo: ""
+        property real pendingAmount: 0
 
         stdout: SplitParser {
             onRead: data => {
@@ -109,7 +116,7 @@ QtObject {
         if (isLoading) return
 
         isLoading = true
-        let url = "https://api.frankfurter.dev/latest?amount=" + req.amount + "&from=" + req.from + "&to=" + req.to
+        let url = "https://api.frankfurter.app/latest?amount=" + req.amount + "&from=" + req.from + "&to=" + req.to
 
         fetchProcess.command = ["curl", "-s", url]
         fetchProcess.output = ""
@@ -148,6 +155,9 @@ QtObject {
 
                     lastQuery = cacheKey
                     lastResult = result
+
+                    // Notify that result is ready
+                    currencyEvaluator.resultReady()
                 }
             }
         } catch (e) {

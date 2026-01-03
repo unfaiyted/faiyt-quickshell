@@ -173,7 +173,7 @@ Rectangle {
                             width: 16
                             height: 16
                             radius: 3
-                            visible: LauncherState.evalResult && LauncherState.evalResult.color
+                            visible: !!(LauncherState.evalResult && LauncherState.evalResult.color)
                             color: (LauncherState.evalResult && LauncherState.evalResult.color) || "transparent"
                             border.width: 1
                             border.color: Colors.border

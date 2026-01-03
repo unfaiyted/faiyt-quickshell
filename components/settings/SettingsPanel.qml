@@ -1221,6 +1221,47 @@ Rectangle {
                     }
                 }
 
+                // Tmux Search Section
+                SettingsSection {
+                    visible: contentColumn.matchesSearch("tmux") || contentColumn.matchesSearch("terminal") || contentColumn.matchesSearch("session")
+                    title: "Tmux Sessions"
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("tmux") || contentColumn.matchesSearch("enable")
+                        label: "Enable Tmux Search"
+                        description: "Search and attach to tmux sessions using t: prefix"
+
+                        ToggleSwitch {
+                            checked: ConfigService.getValue("search.enableFeatures.tmuxSearch") ?? true
+                            onToggled: (value) => {
+                                ConfigService.setValue("search.enableFeatures.tmuxSearch", value)
+                                ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    // Info note
+                    Rectangle {
+                        width: parent.width
+                        height: tmuxInfoText.height + 16
+                        radius: 8
+                        color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                        border.width: 1
+                        border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.1)
+
+                        Text {
+                            id: tmuxInfoText
+                            anchors.centerIn: parent
+                            width: parent.width - 24
+                            text: "Usage: Type 't: session' to search. Opens in kitty terminal."
+                            font.pixelSize: 12
+                            color: Colors.foregroundMuted
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                }
+
                 // Search Evaluators Section
                 SettingsSection {
                     visible: contentColumn.matchesSearch("evaluator") || contentColumn.matchesSearch("calculator") || contentColumn.matchesSearch("converter")

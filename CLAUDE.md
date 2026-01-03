@@ -147,6 +147,26 @@ Services.ConfigService.setValue("theme", "rose-pine-moon")
 3. Add config toggle in `ConfigService.defaultConfig.search.evaluators`
 4. Register in `Evaluator.qml` evaluators array
 
+### New Launcher Result Provider
+1. Create `components/launcher/results/MyResults.qml`
+2. Add to `components/launcher/results/qmldir`
+3. Add prefix in `LauncherState.qml` prefixes object
+4. Add instance and search routing in `LauncherState.qml`
+5. Add config toggle in `ConfigService.defaultConfig.search.enableFeatures`
+
+### Launcher Search Prefixes
+| Prefix | Description |
+|--------|-------------|
+| `app:` `a:` | Search applications |
+| `win:` `w:` | Search open windows |
+| `cmd:` `$:` | Run shell command |
+| `emoji:` `:` | Emoji picker |
+| `sticker:` `s:` | Signal stickers |
+| `gif:` `g:` | GIF search (Tenor) |
+| `tmux:` `t:` | Tmux sessions/windows |
+| `sys:` | System actions |
+| `?` | List all prefixes |
+
 ### New Service
 1. Create `services/MyService.qml` with `pragma Singleton`
 2. Add to `services/qmldir`: `singleton MyService 1.0 MyService.qml`

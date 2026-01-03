@@ -4,6 +4,9 @@ import "evaluators"
 QtObject {
     id: evaluator
 
+    // Signal forwarded from async evaluators
+    signal asyncResultReady()
+
     // Individual evaluators
     property MathEvaluator mathEval: MathEvaluator {}
     property PercentageEvaluator percentageEval: PercentageEvaluator {}
@@ -11,7 +14,9 @@ QtObject {
     property BaseEvaluator baseEval: BaseEvaluator {}
     property TimeEvaluator timeEval: TimeEvaluator {}
     property ColorEvaluator colorEval: ColorEvaluator {}
-    property CurrencyEvaluator currencyEval: CurrencyEvaluator {}
+    property CurrencyEvaluator currencyEval: CurrencyEvaluator {
+        onResultReady: evaluator.asyncResultReady()
+    }
     property DateEvaluator dateEval: DateEvaluator {}
     property HashEvaluator hashEval: HashEvaluator {}
     property UuidEvaluator uuidEval: UuidEvaluator {}

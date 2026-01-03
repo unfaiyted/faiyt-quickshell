@@ -37,6 +37,18 @@ Singleton {
     // Evaluator for instant calculations
     Evaluator { id: evaluator }
 
+    // Re-evaluate when async evaluator results are ready
+    Connections {
+        target: evaluator
+        function onAsyncResultReady() {
+            console.log("LauncherState: Received asyncResultReady, visible:", launcherState.visible, "searchText:", launcherState.searchText)
+            if (launcherState.visible && launcherState.searchText.length > 0) {
+                launcherState.evalResult = evaluator.evaluate(launcherState.searchText)
+                console.log("LauncherState: Re-evaluated, result:", JSON.stringify(launcherState.evalResult))
+            }
+        }
+    }
+
     // Result providers
     AppResults { id: appResults }
     CommandResults { id: commandResults }
@@ -45,12 +57,23 @@ Singleton {
     EmojiResults { id: emojiResults }
     StickerResults { id: stickerResults }
     GifResults { id: gifResults }
+    TmuxResults { id: tmuxResults }
 
     // Re-trigger search when GIF results are ready (async)
     Connections {
         target: gifResults
         function onResultsReady() {
             if (launcherState.searchType === "GIF" && launcherState.visible) {
+                launcherState.performSearch()
+            }
+        }
+    }
+
+    // Re-trigger search when tmux results are ready (async)
+    Connections {
+        target: tmuxResults
+        function onSearchReady() {
+            if (launcherState.searchType === "TMUX" && launcherState.visible) {
                 launcherState.performSearch()
             }
         }
@@ -101,6 +124,7 @@ Singleton {
         "emoji": ["emoji:", "em:", ":"],
         "sticker": ["sticker:", "st:", "s:"],
         "gif": ["gif:", "g:"],
+        "tmux": ["tmux:", "t:"],
         "directory": ["d:", "dir:", "directory:"],
         "clipboard": ["clip:", "clipboard:", "cb:"],
         "search": ["search:", "!g", "!d", "!c"],
@@ -207,6 +231,10 @@ Singleton {
             allResults = stickerResults.search(query, isPrefixSearch)
         } else if (searchType === "GIF") {
             allResults = gifResults.search(query, isPrefixSearch)
+        } else if (searchType === "TMUX") {
+            if (ConfigService.getValue("search.enableFeatures.tmuxSearch") ?? true) {
+                allResults = tmuxResults.search(query, isPrefixSearch)
+            }
         }
 
         // Limit results
