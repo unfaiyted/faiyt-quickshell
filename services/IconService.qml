@@ -258,6 +258,10 @@ Singleton {
         "todoist": "󰄬",
         "ticktick": "󰄬",
 
+        // System Notifications
+        "battery": "󰁹",
+        "screen capture": "󰹑",
+
         // Utilities
         "flameshot": "󰹑",
         "spectacle": "󰹑",

@@ -19,6 +19,10 @@ ShellRoot {
     // Create required directories on startup
     Component.onCompleted: {
         initDirs.running = true
+        // Initialize battery monitoring service
+        if (BatteryService.hasBattery) {
+            console.log("Battery monitoring active")
+        }
     }
 
     Process {

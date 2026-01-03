@@ -69,13 +69,11 @@ Singleton {
         }
 
         readonly property Timer timer: Timer {
-            running: true
+            // Critical notifications don't auto-expire
+            running: notif.urgency !== NotificationUrgency.Critical
             interval: {
                 if (notif.notification.expireTimeout > 0) {
                     return notif.notification.expireTimeout
-                }
-                if (notif.urgency === NotificationUrgency.Critical) {
-                    return root.defaultUrgentTimeoutMs
                 }
                 return root.defaultTimeoutMs
             }

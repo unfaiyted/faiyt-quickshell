@@ -1046,61 +1046,6 @@ Rectangle {
                         }
                     }
 
-                    // Restart notice for bar changes
-                    Rectangle {
-                        width: parent.width
-                        height: restartContent.height + 24
-                        radius: 8
-                        color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.1)
-                        border.width: 1
-                        border.color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.2)
-
-                        Column {
-                            id: restartContent
-                            anchors.centerIn: parent
-                            spacing: 8
-
-                            Text {
-                                text: "Some changes require a restart to take effect."
-                                font.pixelSize: 13
-                                font.weight: Font.Medium
-                                color: Colors.warning
-                            }
-
-                            Rectangle {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: restartText.width + 24
-                                height: 32
-                                radius: 6
-                                color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.2)
-                                border.width: 1
-                                border.color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.3)
-
-                                Text {
-                                    id: restartText
-                                    anchors.centerIn: parent
-                                    text: "Restart QuickShell"
-                                    font.pixelSize: 13
-                                    font.weight: Font.Medium
-                                    color: Colors.foreground
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    hoverEnabled: true
-                                    onClicked: {
-                                        restartProcess.running = true
-                                    }
-                                }
-
-                                Process {
-                                    id: restartProcess
-                                    command: ["bash", "-c", "quickshell --reload"]
-                                }
-                            }
-                        }
-                    }
                 }
 
                 // ═══════════════════════════════════════════════════════════════
@@ -1825,6 +1770,62 @@ Rectangle {
                             onToggled: (value) => {
                                 ConfigService.setValue("windows.overlays.notifications", value)
                                 ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // Restart notice
+                Rectangle {
+                    width: parent.width
+                    height: restartContent.height + 24
+                    radius: 8
+                    color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.1)
+                    border.width: 1
+                    border.color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.2)
+
+                    Column {
+                        id: restartContent
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        Text {
+                            text: "Some changes require a restart to take effect."
+                            font.pixelSize: 13
+                            font.weight: Font.Medium
+                            color: Colors.warning
+                        }
+
+                        Rectangle {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: restartText.width + 24
+                            height: 32
+                            radius: 6
+                            color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.2)
+                            border.width: 1
+                            border.color: Qt.rgba(Colors.warning.r, Colors.warning.g, Colors.warning.b, 0.3)
+
+                            Text {
+                                id: restartText
+                                anchors.centerIn: parent
+                                text: "Restart QuickShell"
+                                font.pixelSize: 13
+                                font.weight: Font.Medium
+                                color: Colors.foreground
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                hoverEnabled: true
+                                onClicked: {
+                                    restartProcess.running = true
+                                }
+                            }
+
+                            Process {
+                                id: restartProcess
+                                command: ["bash", "-c", "quickshell --reload"]
                             }
                         }
                     }

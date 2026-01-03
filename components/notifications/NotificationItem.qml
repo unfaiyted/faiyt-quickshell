@@ -16,6 +16,9 @@ Item {
     required property int notifIndex
     required property bool isActivated
 
+    // Check if this is a critical notification
+    readonly property bool isCritical: root.notif?.urgency === NotificationUrgency.Critical
+
     implicitHeight: childrenRect.height
     implicitWidth: parent?.width ?? 380
 
@@ -39,9 +42,11 @@ Item {
         implicitWidth: parent.width
         radius: 12
 
-        color: Colors.background
-        border.color: Colors.border
-        border.width: 1
+        color: root.isCritical
+            ? Qt.tint(Colors.background, Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.15))
+            : Colors.background
+        border.color: root.isCritical ? Colors.error : Colors.border
+        border.width: root.isCritical ? 2 : 1
 
         ColumnLayout {
             id: contentColumn
@@ -60,7 +65,7 @@ Item {
                     Layout.preferredHeight: 24
                     Layout.alignment: Qt.AlignVCenter
                     radius: 6
-                    color: Colors.primary
+                    color: root.isCritical ? Colors.error : Colors.primary
 
                     Text {
                         anchors.centerIn: parent
@@ -120,7 +125,7 @@ Item {
                 Layout.preferredHeight: 1
                 Layout.leftMargin: 12
                 Layout.rightMargin: 12
-                color: Colors.border
+                color: root.isCritical ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.3) : Colors.border
             }
 
             // Summary (title)
