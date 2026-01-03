@@ -234,7 +234,7 @@ Real-time calculations displayed on the right side of the input as you type:
 - Pack selection bar with keyboard navigation (Up arrow to focus, Left/Right to navigate, Enter to select)
 - Search by emoji or pack name
 - Click or press Enter to copy sticker image to clipboard
-- **Adding Packs**: Type `s: add <signal-url>` with a URL from [signalstickers.org](https://signalstickers.org)
+- **Adding Packs**: Via Settings → Launcher → Sticker Packs, or type `s: add <signal-url>` in launcher. Get URLs from [signalstickers.org](https://signalstickers.org) (right-click "Add to Signal" → Copy link)
 - Stickers are decrypted and cached locally at `~/.cache/faiyt-qs/stickers/`
 - Pack configuration stored in `~/.config/faiyt-qs/config.json`
 

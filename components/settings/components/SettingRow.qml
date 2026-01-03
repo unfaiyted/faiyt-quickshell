@@ -10,7 +10,7 @@ Rectangle {
     property bool indent: false
     default property alias control: controlContainer.children
 
-    width: parent.width
+    width: parent.width - (parent.leftPadding || 0) - (parent.rightPadding || 0)
     implicitHeight: Math.max(labelColumn.height, controlContainer.height) + 16
     radius: 8
 

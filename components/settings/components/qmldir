@@ -1,6 +1,7 @@
 module components
 
 SettingsSection 1.0 SettingsSection.qml
+CollapsibleSection 1.0 CollapsibleSection.qml
 SettingRow 1.0 SettingRow.qml
 ToggleSwitch 1.0 ToggleSwitch.qml
 NumberInput 1.0 NumberInput.qml
