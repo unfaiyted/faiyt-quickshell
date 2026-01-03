@@ -23,7 +23,8 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus
+    // Layer shell configuration
+    WlrLayershell.namespace: "quickshell:launcher"
     WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     visible: ConfigService.windowLauncherEnabled && (expanded || hideAnimation.running || overlayAnimation.running)
@@ -32,11 +33,10 @@ PanelWindow {
     Rectangle {
         id: darkenOverlay
         anchors.fill: parent
-        color: "#000000"
-        opacity: launcherWindow.expanded ? 0.4 : 0
+        color: launcherWindow.expanded ? Qt.rgba(0, 0, 0, 0.4) : Qt.rgba(0, 0, 0, 0)
 
-        Behavior on opacity {
-            NumberAnimation {
+        Behavior on color {
+            ColorAnimation {
                 id: overlayAnimation
                 duration: 150
                 easing.type: Easing.OutCubic
