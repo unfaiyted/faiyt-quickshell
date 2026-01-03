@@ -19,10 +19,12 @@ BarGroup {
 
     // Hover state tracking
     property bool hoverModule: false
+    property bool hoverTimezoneRow: false  // Set by timezone row MouseAreas
     property bool hoverPopup: tooltipMouseArea.containsMouse ||
                               dateRowArea.containsMouse ||
                               localTimeArea.containsMouse ||
-                              timestampArea.containsMouse
+                              timestampArea.containsMouse ||
+                              hoverTimezoneRow
 
     // Format time using config (convert strftime to Qt format)
     property string currentTime: {
@@ -79,22 +81,32 @@ BarGroup {
     Process {
         id: tzProcess
 
+        property string currentTzId: ""
         property string buffer: ""
 
         stdout: SplitParser {
             onRead: data => {
-                tzProcess.buffer += data
+                tzProcess.buffer = data.trim()
             }
         }
 
         onRunningChanged: {
             if (!running && buffer.length > 0) {
-                try {
-                    clockContainer.timezoneTimes = JSON.parse(buffer)
-                } catch (e) {
-                    console.log("Clock: Failed to parse timezone data:", e)
+                // Parse "HH:MM|TZ" format
+                let parts = buffer.split("|")
+                if (parts.length === 2) {
+                    let newTimes = JSON.parse(JSON.stringify(clockContainer.timezoneTimes))
+                    newTimes[currentTzId] = {
+                        time: parts[0],
+                        offset: parts[1]
+                    }
+                    clockContainer.timezoneTimes = newTimes
                 }
                 buffer = ""
+
+                // Process next timezone
+                clockContainer.tzUpdateIndex++
+                clockContainer.updateNextTimezone()
             }
         }
     }
@@ -379,8 +391,14 @@ BarGroup {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
 
-                            onEntered: closeTimer.stop()
-                            onExited: closeTimer.start()
+                            onEntered: {
+                                closeTimer.stop()
+                                clockContainer.hoverTimezoneRow = true
+                            }
+                            onExited: {
+                                clockContainer.hoverTimezoneRow = false
+                                closeTimer.start()
+                            }
                             onClicked: clockContainer.copyToClipboard(clockContainer.getTimeInTimezone(modelData.id))
                         }
                     }
