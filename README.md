@@ -35,7 +35,7 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
   - Right-click for context menu
 - **Network** - Connection status indicator
 - **Weather** - Current weather display
-- **Utilities** - Quick action buttons:
+- **Utilities** - Quick action buttons with tooltips:
   - Screenshot (area selection)
   - Screen Recording with status indicator
   - Color Picker
@@ -191,6 +191,7 @@ Application launcher with instant evaluators and multiple search modes:
 - **Emoji** (`emoji:`, `e:`) - Search and copy emojis with keyword matching
 - **Stickers** (`sticker:`, `st:`, `s:`) - Signal sticker packs with grid view
 - **GIFs** (`gif:`, `g:`) - Search and copy GIFs via Tenor API
+- **Tmux** (`tmux:`, `t:`) - Search and attach to tmux sessions in kitty terminal
 
 **Instant Evaluators:**
 Real-time calculations displayed on the right side of the input as you type:
@@ -243,6 +244,14 @@ Real-time calculations displayed on the right side of the input as you type:
 - Category tabs: Trending, Reactions, Memes, Animals, Anime, Sports
 - Click or press Enter to copy GIF to clipboard
 - Requires `TENOR_API_KEY` environment variable
+
+**Tmux Sessions** (`t:` or `tmux:`):
+- List all tmux windows across all sessions
+- Shows window name, session context, and attached status
+- Click or press Enter to attach in a new kitty terminal
+- Type a new name to create a fresh tmux session
+- Icons indicate active windows and attached sessions
+- Can be disabled in Settings → Search Features → Tmux Sessions
 
 ### Screen Capture
 Screenshot and screen recording functionality with area selection:
@@ -438,7 +447,8 @@ faiyt-qs/
 │   │   │   ├── WindowResults.qml
 │   │   │   ├── EmojiResults.qml   # Emoji search provider
 │   │   │   ├── StickerResults.qml # Signal sticker search
-│   │   │   └── GifResults.qml     # Tenor GIF search
+│   │   │   ├── GifResults.qml     # Tenor GIF search
+│   │   │   └── TmuxResults.qml    # Tmux session search
 │   │   └── evaluators/          # Instant evaluators
 │   │       ├── MathEvaluator.qml
 │   │       ├── PercentageEvaluator.qml
