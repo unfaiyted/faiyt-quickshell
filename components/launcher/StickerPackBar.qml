@@ -77,7 +77,7 @@ Item {
                         anchors.centerIn: parent
                         text: modelData.coverEmoji || "📦"
                         font.pixelSize: 18
-                        font.family: "Noto Color Emoji"
+                        font.family: Fonts.emoji
                     }
 
                     MouseArea {

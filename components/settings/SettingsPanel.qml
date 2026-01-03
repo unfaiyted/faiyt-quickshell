@@ -13,12 +13,23 @@ Rectangle {
 
     property string searchQuery: ""
 
+    // Expose dropdown overlay for child components to find
+    property alias dropdownOverlayRef: dropdownOverlay
+
     width: 600
     height: parent ? parent.height * 0.75 : 500
     radius: 20
     color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.85)
     border.width: 1
     border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+    clip: true
+
+    // Dropdown overlay for all dropdowns in this panel
+    DropdownOverlay {
+        id: dropdownOverlay
+        anchors.fill: parent
+        z: 1000
+    }
 
     // Shadow layers
     Rectangle {
@@ -113,7 +124,7 @@ Rectangle {
 
                         Text {
                             text: "󰍉"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 14
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
@@ -208,7 +219,7 @@ Rectangle {
 
                                 Text {
                                     text: "󰍹"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 14
                                     color: Colors.foreground
                                     anchors.verticalCenter: parent.verticalCenter
@@ -375,7 +386,7 @@ Rectangle {
                                         Text {
                                             text: modelData.coverEmoji || "📦"
                                             font.pixelSize: 16
-                                            font.family: "Noto Color Emoji"
+                                            font.family: Fonts.emoji
                                             anchors.verticalCenter: parent.verticalCenter
                                         }
 
@@ -798,7 +809,7 @@ Rectangle {
 
                 // Time & Weather Section
                 SettingsSection {
-                    visible: contentColumn.matchesSearch("time") || contentColumn.matchesSearch("weather") || contentColumn.matchesSearch("clock") || contentColumn.matchesSearch("temperature")
+                    visible: contentColumn.matchesSearch("time") || contentColumn.matchesSearch("weather") || contentColumn.matchesSearch("clock") || contentColumn.matchesSearch("temperature") || contentColumn.matchesSearch("timezone") || contentColumn.matchesSearch("world clock")
                     title: "Time & Weather"
 
                     SettingRow {
@@ -845,6 +856,182 @@ Rectangle {
                             onSelected: (index, value) => {
                                 ConfigService.setValue("weather.preferredUnit", value)
                                 ConfigService.saveConfig()
+                            }
+                        }
+                    }
+
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("timezone") || contentColumn.matchesSearch("world clock")
+                        label: "World Clock Timezones"
+                        description: "Additional timezones to display in clock popup"
+
+                        Column {
+                            spacing: 8
+
+                            // List of configured timezones
+                            Repeater {
+                                model: ConfigService.timezones
+
+                                Rectangle {
+                                    width: 240
+                                    height: 36
+                                    radius: 8
+                                    color: Colors.surface
+                                    border.width: 1
+                                    border.color: Colors.border
+
+                                    Row {
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        spacing: 8
+
+                                        Text {
+                                            text: "󰗶"
+                                            font.family: Fonts.icon
+                                            font.pixelSize: 14
+                                            color: Colors.foam
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Text {
+                                            text: modelData.label + " (" + modelData.id + ")"
+                                            font.pixelSize: 12
+                                            color: Colors.foreground
+                                            width: parent.width - 50
+                                            elide: Text.ElideRight
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Rectangle {
+                                            width: 20
+                                            height: 20
+                                            radius: 4
+                                            color: tzRemoveArea.containsMouse ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.2) : "transparent"
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "✕"
+                                                font.pixelSize: 10
+                                                color: tzRemoveArea.containsMouse ? Colors.error : Colors.foregroundMuted
+                                            }
+
+                                            MouseArea {
+                                                id: tzRemoveArea
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    let tzs = ConfigService.timezones.filter((_, i) => i !== index)
+                                                    ConfigService.setValue("time.timezones", tzs)
+                                                    ConfigService.saveConfig()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Add timezone row
+                            Row {
+                                spacing: 8
+
+                                Rectangle {
+                                    width: 130
+                                    height: 32
+                                    radius: 6
+                                    color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                                    border.width: 1
+                                    border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.1)
+
+                                    TextInput {
+                                        id: newTimezoneId
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        verticalAlignment: Text.AlignVCenter
+                                        font.pixelSize: 12
+                                        color: Colors.foreground
+                                        clip: true
+
+                                        Text {
+                                            anchors.fill: parent
+                                            verticalAlignment: Text.AlignVCenter
+                                            text: "America/New_York"
+                                            font.pixelSize: 12
+                                            color: Colors.foregroundMuted
+                                            visible: newTimezoneId.text.length === 0
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: 80
+                                    height: 32
+                                    radius: 6
+                                    color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                                    border.width: 1
+                                    border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.1)
+
+                                    TextInput {
+                                        id: newTimezoneLabel
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        verticalAlignment: Text.AlignVCenter
+                                        font.pixelSize: 12
+                                        color: Colors.foreground
+                                        clip: true
+
+                                        Text {
+                                            anchors.fill: parent
+                                            verticalAlignment: Text.AlignVCenter
+                                            text: "New York"
+                                            font.pixelSize: 12
+                                            color: Colors.foregroundMuted
+                                            visible: newTimezoneLabel.text.length === 0
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: 32
+                                    height: 32
+                                    radius: 6
+                                    color: addTzArea.containsMouse ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2) : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                                    border.width: 1
+                                    border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "󰐕"
+                                        font.family: Fonts.icon
+                                        font.pixelSize: 14
+                                        color: Colors.primary
+                                    }
+
+                                    MouseArea {
+                                        id: addTzArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            if (newTimezoneId.text && newTimezoneLabel.text) {
+                                                let tzs = ConfigService.timezones.slice()
+                                                tzs.push({id: newTimezoneId.text, label: newTimezoneLabel.text})
+                                                ConfigService.setValue("time.timezones", tzs)
+                                                ConfigService.saveConfig()
+                                                newTimezoneId.text = ""
+                                                newTimezoneLabel.text = ""
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text {
+                                text: "Use IANA timezone IDs (e.g., Europe/London, Asia/Tokyo)"
+                                font.pixelSize: 11
+                                font.italic: true
+                                color: Colors.foregroundMuted
                             }
                         }
                     }
@@ -974,7 +1161,7 @@ Rectangle {
                                 Text {
                                     anchors.centerIn: parent
                                     text: gifSearchSection.hasTenorKey ? "󰄬" : "󰀦"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 14
                                     color: gifSearchSection.hasTenorKey ? Colors.foam : Colors.gold
                                 }

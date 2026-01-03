@@ -80,7 +80,7 @@ Item {
                         if (results[0].data?.isEmpty) return "󰋙"
                         return "󰵸"
                     }
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 48
                     color: {
                         if (results.length === 0) return Colors.foregroundMuted
@@ -217,7 +217,7 @@ Item {
                             anchors.centerIn: parent
                             text: "export TENOR_API_KEY=\"your-key\""
                             font.pixelSize: 11
-                            font.family: "monospace"
+                            font.family: Fonts.mono
                             color: Colors.iris
                         }
                     }
@@ -273,7 +273,7 @@ Item {
 
                     Text {
                         text: "󰌹"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 16
                         color: Colors.foam
                         anchors.verticalCenter: parent.verticalCenter
@@ -327,7 +327,7 @@ Item {
 
                     Text {
                         text: "󰋩"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 16
                         color: Colors.iris
                         anchors.verticalCenter: parent.verticalCenter
@@ -389,7 +389,7 @@ Item {
 
             Text {
                 text: "󰷊"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 18
                 color: Colors.iris
                 anchors.verticalCenter: parent.verticalCenter
@@ -669,7 +669,7 @@ Item {
                     anchors.centerIn: parent
                     visible: previewGif.status === Image.Loading
                     text: "󰋚"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 32
                     color: Colors.foregroundMuted
 
@@ -686,7 +686,7 @@ Item {
                     anchors.centerIn: parent
                     visible: previewGif.status === Image.Error
                     text: "󰀦"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 32
                     color: Colors.love
                 }
@@ -848,7 +848,7 @@ Item {
                     anchors.centerIn: parent
                     visible: gifImage.status === Image.Loading || gifImage.status === Image.Null
                     text: "󰋚"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 24
                     color: Colors.foregroundMuted
 
@@ -865,7 +865,7 @@ Item {
                     anchors.centerIn: parent
                     visible: gifImage.status === Image.Error
                     text: "󰀦"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 24
                     color: Colors.love
                 }

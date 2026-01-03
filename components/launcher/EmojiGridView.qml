@@ -54,7 +54,7 @@ Item {
                     anchors.centerIn: parent
                     text: modelData?.emoji || ""
                     font.pixelSize: emojiGridView.emojiSize
-                    font.family: "Noto Color Emoji"
+                    font.family: Fonts.emoji
                 }
 
                 MouseArea {

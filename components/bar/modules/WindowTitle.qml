@@ -40,7 +40,7 @@ BarGroup {
             anchors.verticalCenter: parent.verticalCenter
             visible: windowTitle.appClass !== "" && content.hasNerdIcon
             text: IconService.getIcon(windowTitle.appClass)
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: 14
             color: Colors.foreground
         }
@@ -61,7 +61,7 @@ BarGroup {
             anchors.verticalCenter: parent.verticalCenter
             visible: windowTitle.appClass !== "" && !content.hasNerdIcon && appIcon.status !== Image.Ready
             text: IconService.getIcon("")
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: 14
             color: Colors.foreground
         }

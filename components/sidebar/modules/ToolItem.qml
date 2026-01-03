@@ -107,7 +107,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: toolIcon
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 18
                         color: Colors.background
                     }
@@ -139,7 +139,7 @@ Rectangle {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: expanded ? "󰅃" : "󰅀"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.foregroundMuted
                 }
@@ -169,7 +169,7 @@ Rectangle {
 
                     Text {
                         text: "󰑓"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 16
                         color: Colors.primary
 
@@ -195,7 +195,7 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 12
                     text: error ? error : result
-                    font.family: "monospace"
+                    font.family: Fonts.mono
                     font.pixelSize: 11
                     color: error ? Colors.error : Colors.foreground
                     wrapMode: Text.WrapAnywhere
@@ -216,7 +216,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "󰆏"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.foregroundMuted
                     }

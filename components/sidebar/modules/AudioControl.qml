@@ -155,7 +155,7 @@ Item {
 
                     Text {
                         text: "󰅀"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 10
                         color: Colors.foreground
                     }
@@ -207,7 +207,7 @@ Item {
 
                             Text {
                                 text: isDefault ? "󰄬" : "󰝦"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 14
                                 color: isDefault ? Colors.primary : Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
@@ -266,7 +266,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: getSpeakerIcon(Pipewire.defaultAudioSink)
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 18
                             color: Colors.background
                         }
@@ -397,7 +397,7 @@ Item {
 
                     Text {
                         text: "󰅀"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 10
                         color: Colors.foreground
                     }
@@ -449,7 +449,7 @@ Item {
 
                             Text {
                                 text: isDefault ? "󰄬" : "󰝦"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 14
                                 color: isDefault ? Colors.foam : Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
@@ -509,7 +509,7 @@ Item {
                             anchors.centerIn: parent
                             text: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio && Pipewire.defaultAudioSource.audio.muted
                                 ? "󰍭" : "󰍬"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 18
                             color: Colors.background
                         }
@@ -643,7 +643,7 @@ Item {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰝚"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 24
                             color: Colors.foregroundMuted
                         }
@@ -694,7 +694,7 @@ Item {
                                         Text {
                                             anchors.centerIn: parent
                                             text: IconService.getIcon(stream ? stream.name : "")
-                                            font.family: "Symbols Nerd Font"
+                                            font.family: Fonts.icon
                                             font.pixelSize: 14
                                             color: isMuted ? Colors.foregroundMuted : Colors.background
                                         }
@@ -743,14 +743,14 @@ Item {
 
                                             Text {
                                                 text: "󰕾"
-                                                font.family: "Symbols Nerd Font"
+                                                font.family: Fonts.icon
                                                 font.pixelSize: 10
                                                 color: Colors.foregroundAlt
                                             }
 
                                             Text {
                                                 text: "󰅀"
-                                                font.family: "Symbols Nerd Font"
+                                                font.family: Fonts.icon
                                                 font.pixelSize: 8
                                                 color: Colors.foregroundAlt
                                             }
@@ -853,7 +853,7 @@ Item {
 
                                             Text {
                                                 text: isDefault ? "󰄬" : "󰝦"
-                                                font.family: "Symbols Nerd Font"
+                                                font.family: Fonts.icon
                                                 font.pixelSize: 12
                                                 color: isDefault ? Colors.primary : Colors.foregroundMuted
                                                 anchors.verticalCenter: parent.verticalCenter

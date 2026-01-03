@@ -65,7 +65,7 @@ Rectangle {
 
             Text {
                 text: themeData?.icon || "󰏘"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 24
                 color: Colors.foreground
                 anchors.verticalCenter: parent.verticalCenter
@@ -100,7 +100,7 @@ Rectangle {
             Text {
                 visible: themeCard.isActive
                 text: "󰄬"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 20
                 color: Colors.primary
                 anchors.verticalCenter: parent.verticalCenter
@@ -148,7 +148,7 @@ Rectangle {
 
                     Text {
                         text: "󰆏"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
@@ -188,7 +188,7 @@ Rectangle {
 
                     Text {
                         text: "󰏫"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
@@ -228,7 +228,7 @@ Rectangle {
 
                     Text {
                         text: "󰆴"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.error
                         anchors.verticalCenter: parent.verticalCenter

@@ -253,7 +253,7 @@ Item {
                             if (wifiPanel.currentSignal >= 20) return "󰤟"
                             return "󰤯"
                         }
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 16
                         color: wifiPanel.enabled ? Colors.background : Colors.foregroundMuted
                     }
@@ -353,7 +353,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰑓"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.foreground
 
@@ -397,7 +397,7 @@ Item {
 
                     Text {
                         text: "󰌾"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 16
                         color: Colors.foreground
                     }
@@ -540,7 +540,7 @@ Item {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰤭"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 32
                             color: Colors.foregroundMuted
                         }
@@ -584,7 +584,7 @@ Item {
                                     if (network.signal >= 20) return "󰤟"
                                     return "󰤯"
                                 }
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 18
                                 color: isConnected ? Colors.primary : Colors.foreground
                                 anchors.verticalCenter: parent.verticalCenter
@@ -593,7 +593,7 @@ Item {
                             // Lock icon for secured networks
                             Text {
                                 text: "󰌾"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 12
                                 color: Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
@@ -640,7 +640,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰑓"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 14
                                     color: Colors.primary
                                     visible: isConnecting
@@ -658,7 +658,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰄬"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 14
                                     color: Colors.success
                                     visible: showSuccess
@@ -668,7 +668,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰅖"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 14
                                     color: Colors.error
                                     visible: showFailed

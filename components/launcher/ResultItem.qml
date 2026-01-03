@@ -35,7 +35,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: result ? (result.icon || "󰀻") : "󰀻"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 18
                 color: isSelected ? Colors.primary : Colors.foreground
             }

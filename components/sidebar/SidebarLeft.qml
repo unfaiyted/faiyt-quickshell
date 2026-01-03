@@ -116,7 +116,7 @@ PanelWindow {
 
                             Text {
                                 text: AIState.activeMainTab === 0 ? "󰚩" : "󰦖"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 24
                                 color: Colors.primary
                                 anchors.verticalCenter: parent.verticalCenter

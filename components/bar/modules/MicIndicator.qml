@@ -60,7 +60,7 @@ BarGroup {
         text: "󰍭"
         color: Colors.love
         font.pixelSize: 14
-        font.family: "Symbols Nerd Font"
+        font.family: Fonts.icon
     }
 
     MouseArea {

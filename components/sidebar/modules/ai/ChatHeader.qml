@@ -31,7 +31,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: AIState.conversationSidebarOpen ? "󰧛" : "󰧜"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 16
                 color: Colors.foreground
             }
@@ -61,7 +61,7 @@ Item {
 
                 Text {
                     text: "󰧑"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 12
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
@@ -76,7 +76,7 @@ Item {
 
                 Text {
                     text: "󰅀"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 8
                     color: Colors.foregroundMuted
                     anchors.verticalCenter: parent.verticalCenter
@@ -182,7 +182,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "󰃢"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 14
                 color: clearArea.containsMouse ? Colors.error : Colors.foregroundMuted
             }
@@ -208,7 +208,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "󰐕"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 14
                 color: newChatArea.containsMouse ? Colors.background : Colors.foreground
             }

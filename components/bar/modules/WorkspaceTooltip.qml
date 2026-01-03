@@ -242,7 +242,7 @@ Rectangle {
                         property real iconSize: Math.min(parent.width, parent.height) * 0.4
                         visible: iconSize >= 12 && windowFrame.hasNerdIcon
                         text: IconService.getIcon(windowFrame.appClass)
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: iconSize
                         color: Colors.foreground
                         opacity: windowItem.hovered ? 0.5 : 0.85
@@ -275,7 +275,7 @@ Rectangle {
                         property real iconSize: Math.min(parent.width, parent.height) * 0.4
                         visible: iconSize >= 12 && !windowFrame.hasNerdIcon && appIcon.status !== Image.Ready
                         text: IconService.getIcon("")
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: iconSize
                         color: Colors.foreground
                         opacity: windowItem.hovered ? 0.5 : 0.85

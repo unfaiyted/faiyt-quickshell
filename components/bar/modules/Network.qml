@@ -8,7 +8,7 @@ BarGroup {
     id: network
 
     implicitWidth: networkText.width + 16
-    implicitHeight: 30 
+    implicitHeight: 30
 
     property string status: "?"
     property bool connected: false
@@ -17,6 +17,30 @@ BarGroup {
     property string ipAddress: ""
     property string gateway: ""
     property string device: ""
+    property bool popupOpen: false
+
+    // Hover state tracking - at module level so accessible everywhere
+    property bool hoverModule: false
+    property bool hoverPopup: tooltipMouseArea.containsMouse ||
+                              ipMouseArea.containsMouse ||
+                              gatewayMouseArea.containsMouse ||
+                              gatewayLinkArea.containsMouse
+
+    // Clipboard process
+    Process {
+        id: copyProcess
+        command: ["wl-copy", ""]
+    }
+
+    function copyToClipboard(text) {
+        copyProcess.command = ["wl-copy", text]
+        copyProcess.running = true
+        popupOpen = false
+    }
+
+    function openGateway() {
+        Qt.openUrlExternally("http://" + network.gateway)
+    }
 
     Process {
         id: netProcess
@@ -72,19 +96,43 @@ BarGroup {
         onTriggered: netProcess.running = true
     }
 
+    // Close timer - gives time to move mouse to popup
+    Timer {
+        id: closeTimer
+        interval: 300
+        repeat: false
+        onTriggered: {
+            // Only close if not hovering either the module or popup
+            if (!network.hoverModule && !network.hoverPopup) {
+                network.popupOpen = false
+            }
+        }
+    }
+
     Text {
         id: networkText
         anchors.centerIn: parent
         text: network.status
         color: network.connected ? Colors.foreground : Colors.error
         font.pixelSize: 14
-        font.family: "Symbols Nerd Font"
+        font.family: Fonts.icon
     }
 
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
+
+        onEntered: {
+            closeTimer.stop()
+            network.hoverModule = true
+            network.popupOpen = true
+        }
+
+        onExited: {
+            network.hoverModule = false
+            closeTimer.start()
+        }
     }
 
     // Custom tooltip popup
@@ -98,7 +146,7 @@ BarGroup {
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom
 
-        visible: mouseArea.containsMouse
+        visible: network.popupOpen
 
         implicitWidth: tooltipContent.width
         implicitHeight: tooltipContent.height
@@ -112,6 +160,27 @@ BarGroup {
             radius: 8
             border.width: 1
             border.color: Colors.overlay
+
+            // Mouse area for the entire popup
+            MouseArea {
+                id: tooltipMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.NoButton  // Don't block clicks to children
+
+                onEntered: closeTimer.stop()
+                onExited: closeTimer.start()
+            }
+
+            // Keyboard handler for Escape
+            Item {
+                anchors.fill: parent
+                focus: network.popupOpen
+
+                Keys.onEscapePressed: {
+                    network.popupOpen = false
+                }
+            }
 
             Column {
                 id: tooltipColumn
@@ -142,22 +211,126 @@ BarGroup {
                     visible: network.connected
                 }
 
-                Text {
+                // IP Address row - clickable to copy
+                Rectangle {
                     visible: network.ipAddress.length > 0
-                    text: "󰩟 " + network.ipAddress
-                    color: Colors.muted
-                    font.pixelSize: 10
+                    width: ipRow.width + 16
+                    height: 24
+                    radius: 4
+                    color: ipMouseArea.containsMouse ? Colors.overlay : "transparent"
                     anchors.horizontalCenter: parent.horizontalCenter
+
+                    Row {
+                        id: ipRow
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        Text {
+                            text: "󰩟 " + network.ipAddress
+                            color: ipMouseArea.containsMouse ? Colors.foreground : Colors.muted
+                            font.pixelSize: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "󰆏"
+                            font.family: Fonts.icon
+                            font.pixelSize: 10
+                            color: ipMouseArea.containsMouse ? Colors.primary : Colors.muted
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: ipMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+
+                        onEntered: closeTimer.stop()
+                        onExited: closeTimer.start()
+                        onClicked: {
+                            // Strip subnet mask (e.g., /24) before copying
+                            var ip = network.ipAddress.split("/")[0]
+                            network.copyToClipboard(ip)
+                        }
+                    }
                 }
 
-                Text {
+                // Gateway row - clickable to copy or open in browser
+                Rectangle {
                     visible: network.gateway.length > 0
-                    text: "󰛳 " + network.gateway
-                    color: Colors.muted
-                    font.pixelSize: 10
+                    width: gatewayRow.width + 16
+                    height: 24
+                    radius: 4
+                    color: gatewayMouseArea.containsMouse || gatewayLinkArea.containsMouse ? Colors.overlay : "transparent"
                     anchors.horizontalCenter: parent.horizontalCenter
+
+                    Row {
+                        id: gatewayRow
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        Text {
+                            text: "󰛳 " + network.gateway
+                            color: gatewayMouseArea.containsMouse ? Colors.foreground : Colors.muted
+                            font.pixelSize: 10
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            MouseArea {
+                                id: gatewayMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+
+                                onEntered: closeTimer.stop()
+                                onExited: closeTimer.start()
+                                onClicked: network.copyToClipboard(network.gateway)
+                            }
+                        }
+
+                        Text {
+                            text: "󰆏"
+                            font.family: Fonts.icon
+                            font.pixelSize: 10
+                            color: gatewayMouseArea.containsMouse || gatewayLinkArea.containsMouse ? Colors.primary : Colors.muted
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        // Open in browser button - always visible with larger hit area
+                        Rectangle {
+                            width: 20
+                            height: 20
+                            radius: 4
+                            color: gatewayLinkArea.containsMouse ? Colors.overlay : "transparent"
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰈁"
+                                font.family: Fonts.icon
+                                font.pixelSize: 12
+                                color: gatewayLinkArea.containsMouse ? Colors.foam : Colors.muted
+                            }
+
+                            MouseArea {
+                                id: gatewayLinkArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+
+                                onEntered: closeTimer.stop()
+                                onExited: closeTimer.start()
+                                onClicked: {
+                                    network.openGateway()
+                                    network.popupOpen = false
+                                }
+                            }
+                        }
+                    }
                 }
 
+                // Device row - not interactive
                 Text {
                     visible: network.device.length > 0
                     text: "󰾲 " + network.device

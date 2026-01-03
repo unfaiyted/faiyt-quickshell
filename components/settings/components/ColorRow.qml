@@ -146,7 +146,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 8
                 font.pixelSize: 13
-                font.family: "monospace"
+                font.family: Fonts.mono
                 color: Colors.foreground
                 selectByMouse: true
                 maximumLength: 7

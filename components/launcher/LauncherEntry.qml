@@ -27,7 +27,7 @@ Rectangle {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: ""
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: 18
             color: Colors.foregroundMuted
         }
@@ -232,7 +232,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "󰅖"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.foregroundMuted
                     }

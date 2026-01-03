@@ -100,7 +100,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰅁"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.foreground
                 }
@@ -149,7 +149,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰅂"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.foreground
                 }
@@ -173,7 +173,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰃭"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.primary
                 }
@@ -262,7 +262,7 @@ Item {
 
                 Text {
                     text: "󰥔"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 20
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter

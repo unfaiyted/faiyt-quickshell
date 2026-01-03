@@ -47,7 +47,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 text: language || "text"
                 font.pixelSize: 10
-                font.family: "monospace"
+                font.family: Fonts.mono
                 color: Colors.foregroundMuted
             }
 
@@ -67,7 +67,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: copyButton.copySuccess ? "󰄬" : "󰆏"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 12
                     color: copyButton.copySuccess ? Colors.success : Colors.foregroundMuted
                 }

@@ -97,7 +97,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: notifications.doNotDisturb ? "󰂛" : "󰂚"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: notifications.doNotDisturb ? Colors.error : Colors.foreground
                 }
@@ -123,7 +123,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰆴"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.foreground
                 }
@@ -151,7 +151,7 @@ Item {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "󰂚"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 48
                     color: Colors.foregroundMuted
                 }
@@ -245,7 +245,7 @@ Item {
                                     Text {
                                         anchors.centerIn: parent
                                         text: getAppIcon(notification ? notification.appName : "")
-                                        font.family: "Symbols Nerd Font"
+                                        font.family: Fonts.icon
                                         font.pixelSize: 18
                                         color: Colors.background
                                     }
@@ -297,7 +297,7 @@ Item {
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰅖"
-                                        font.family: "Symbols Nerd Font"
+                                        font.family: Fonts.icon
                                         font.pixelSize: 14
                                         color: dismissArea.containsMouse ? Colors.background : Colors.foregroundMuted
                                     }
@@ -397,7 +397,7 @@ Item {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: expanded ? "󰅃" : "󰅀"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 12
                                 color: Colors.foregroundMuted
                                 visible: notification && (notification.body || (notification.actions && notification.actions.length > 0))

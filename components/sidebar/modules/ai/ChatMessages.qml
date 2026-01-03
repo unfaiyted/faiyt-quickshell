@@ -23,7 +23,7 @@ Item {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "󰭻"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 56
                 color: Colors.foregroundMuted
             }
@@ -90,7 +90,7 @@ Item {
                 Text {
                     id: spinnerIcon
                     text: "󰑓"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter

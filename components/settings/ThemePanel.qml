@@ -13,11 +13,99 @@ Rectangle {
     property var editingTheme: null
     property bool isEditMode: editingTheme !== null
 
+    // Tab state for main view
+    property string activeTab: "themes"  // "themes" or "fonts"
+    property bool fontsPreloaded: false
+
+    // Preload font models when switching to fonts tab
+    onActiveTabChanged: {
+        if (activeTab === "fonts" && !fontsPreloaded && FontService.loaded) {
+            preloadFontModels()
+        }
+    }
+
+    function preloadFontModels() {
+        // Touch each font model to ensure they're ready
+        let _ = FontService.uiFontModel.slice(0, 25)
+        _ = FontService.monoFontModel.slice(0, 25)
+        _ = FontService.nerdFontModel.slice(0, 25)
+        _ = FontService.emojiFontModel.slice(0, 25)
+        fontsPreloaded = true
+    }
+
     // Color picker state
     property var activePickerRow: null
     property string activePickerKey: ""
     property string activePickerValue: "#000000"
     property bool pickerVisible: false
+
+    // Dropdown state (for font pickers and dropdowns)
+    property var activeDropdownSource: null
+    property var activeDropdownModel: []
+    property int activeDropdownIndex: 0
+    property string activeDropdownPreview: "Aa Bb Cc"
+    property bool activeDropdownIsFont: false
+    property bool dropdownVisible: false
+    property string dropdownSearchText: ""
+    property var filteredDropdownModel: filterDropdownModel()
+    property int dropdownHighlightIndex: 0  // Keyboard navigation index
+    signal dropdownSelected(int index, var value)
+
+    function dropdownKeyNav(key) {
+        let count = filteredDropdownModel.length
+        if (count === 0) return
+
+        if (key === Qt.Key_Down) {
+            dropdownHighlightIndex = (dropdownHighlightIndex + 1) % count
+            ensureHighlightVisible()
+        } else if (key === Qt.Key_Up) {
+            dropdownHighlightIndex = (dropdownHighlightIndex - 1 + count) % count
+            ensureHighlightVisible()
+        } else if (key === Qt.Key_Return || key === Qt.Key_Enter) {
+            if (dropdownHighlightIndex >= 0 && dropdownHighlightIndex < count) {
+                let item = filteredDropdownModel[dropdownHighlightIndex]
+                selectDropdownItem(dropdownHighlightIndex, item.value)
+            }
+        } else if (key === Qt.Key_Escape) {
+            closeDropdown()
+        }
+    }
+
+    function ensureHighlightVisible() {
+        // Scroll to make highlighted item visible
+        let itemHeight = activeDropdownIsFont ? 40 : 32
+        let targetY = dropdownHighlightIndex * (itemHeight + 2)
+        let flickable = dropdownFlickable
+        if (flickable) {
+            if (targetY < flickable.contentY) {
+                flickable.contentY = targetY
+            } else if (targetY + itemHeight > flickable.contentY + flickable.height) {
+                flickable.contentY = targetY + itemHeight - flickable.height
+            }
+        }
+    }
+
+    function filterDropdownModel() {
+        if (!activeDropdownModel || activeDropdownModel.length === 0) return []
+        if (!dropdownSearchText || dropdownSearchText.trim() === "") {
+            // Limit to first 25 items when no search (for performance)
+            return activeDropdownIsFont ? activeDropdownModel.slice(0, 25) : activeDropdownModel
+        }
+        let search = dropdownSearchText.toLowerCase().trim()
+        let filtered = activeDropdownModel.filter(item =>
+            item.label.toLowerCase().includes(search)
+        )
+        // Limit filtered results too
+        return filtered.slice(0, 25)
+    }
+
+    onDropdownSearchTextChanged: {
+        filteredDropdownModel = filterDropdownModel()
+    }
+
+    onActiveDropdownModelChanged: {
+        filteredDropdownModel = filterDropdownModel()
+    }
 
     function openPicker(rowItem, colorKey, colorValue) {
         activePickerRow = rowItem
@@ -32,6 +120,35 @@ Rectangle {
         activePickerRow = null
         activePickerKey = ""
         pickerVisible = false
+    }
+
+    function openDropdown(sourceItem, model, currentIndex, previewText, isFont) {
+        // Close any other open dropdown first
+        if (activeDropdownSource && activeDropdownSource !== sourceItem) {
+            activeDropdownSource.popupOpen = false
+        }
+        activeDropdownSource = sourceItem
+        activeDropdownModel = model
+        activeDropdownIndex = currentIndex
+        activeDropdownPreview = previewText || "Aa Bb Cc"
+        activeDropdownIsFont = isFont || false
+        dropdownHighlightIndex = 0  // Reset keyboard navigation
+        dropdownVisible = true
+        if (sourceItem) sourceItem.popupOpen = true
+    }
+
+    function closeDropdown() {
+        if (activeDropdownSource) activeDropdownSource.popupOpen = false
+        activeDropdownSource = null
+        activeDropdownModel = []
+        dropdownSearchText = ""
+        dropdownVisible = false
+    }
+
+    function selectDropdownItem(index, value) {
+        activeDropdownIndex = index
+        dropdownSelected(index, value)
+        closeDropdown()
     }
 
     // Color conversion helpers
@@ -165,7 +282,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "󰅁"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 14
                         color: Colors.foregroundAlt
                     }
@@ -182,7 +299,7 @@ Rectangle {
                 // Theme icon
                 Text {
                     text: "󰏘"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 20
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
@@ -197,11 +314,104 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
+                // Tab buttons (visible when not in edit mode)
+                Row {
+                    visible: !themePanel.isEditMode
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
+
+                    Rectangle {
+                        width: themesTabContent.width + 16
+                        height: 28
+                        radius: 6
+                        color: themePanel.activeTab === "themes"
+                            ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
+                            : (themesTabArea.containsMouse
+                                ? Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.4)
+                                : "transparent")
+                        border.width: themePanel.activeTab === "themes" ? 1 : 0
+                        border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.3)
+
+                        Row {
+                            id: themesTabContent
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            Text {
+                                text: "󰏘"
+                                font.family: Fonts.icon
+                                font.pixelSize: 12
+                                color: themePanel.activeTab === "themes" ? Colors.primary : Colors.foregroundAlt
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: "Themes"
+                                font.pixelSize: 12
+                                font.weight: themePanel.activeTab === "themes" ? Font.Medium : Font.Normal
+                                color: themePanel.activeTab === "themes" ? Colors.primary : Colors.foregroundAlt
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: themesTabArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: themePanel.activeTab = "themes"
+                        }
+                    }
+
+                    Rectangle {
+                        width: fontsTabContent.width + 16
+                        height: 28
+                        radius: 6
+                        color: themePanel.activeTab === "fonts"
+                            ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
+                            : (fontsTabArea.containsMouse
+                                ? Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.4)
+                                : "transparent")
+                        border.width: themePanel.activeTab === "fonts" ? 1 : 0
+                        border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.3)
+
+                        Row {
+                            id: fontsTabContent
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            Text {
+                                text: "󰛖"
+                                font.family: Fonts.icon
+                                font.pixelSize: 12
+                                color: themePanel.activeTab === "fonts" ? Colors.primary : Colors.foregroundAlt
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: "Fonts"
+                                font.pixelSize: 12
+                                font.weight: themePanel.activeTab === "fonts" ? Font.Medium : Font.Normal
+                                color: themePanel.activeTab === "fonts" ? Colors.primary : Colors.foregroundAlt
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: fontsTabArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: themePanel.activeTab = "fonts"
+                        }
+                    }
+                }
+
                 Item { Layout.fillWidth: true; width: 1 }
 
-                // Create New button (visible in list mode)
+                // Create New button (visible in themes tab only)
                 Rectangle {
-                    visible: !themePanel.isEditMode
+                    visible: !themePanel.isEditMode && themePanel.activeTab === "themes"
                     width: createNewContent.width + 16
                     height: 28
                     radius: 8
@@ -217,7 +427,7 @@ Rectangle {
 
                         Text {
                             text: "󰐕"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 14
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
@@ -284,7 +494,7 @@ Rectangle {
             // Theme list view
             Flickable {
                 id: themeListView
-                visible: !themePanel.isEditMode
+                visible: !themePanel.isEditMode && themePanel.activeTab === "themes"
                 anchors.fill: parent
                 anchors.margins: 16
                 contentHeight: themeListColumn.height
@@ -364,6 +574,14 @@ Rectangle {
                     // Bottom padding
                     Item { width: 1; height: 20 }
                 }
+            }
+
+            // Font settings view
+            FontSection {
+                id: fontSectionView
+                visible: !themePanel.isEditMode && themePanel.activeTab === "fonts"
+                anchors.fill: parent
+                anchors.margins: 16
             }
 
             // Theme editor view
@@ -646,6 +864,252 @@ Rectangle {
                     }
                 }
             }
+        }
+    }
+
+    // Click-outside backdrop to close dropdown
+    MouseArea {
+        anchors.fill: parent
+        visible: themePanel.dropdownVisible
+        z: 200
+        onClicked: themePanel.closeDropdown()
+    }
+
+    // Dropdown overlay (for font pickers and dropdowns)
+    Rectangle {
+        id: dropdownOverlay
+        visible: themePanel.dropdownVisible
+        z: 201
+        width: themePanel.activeDropdownIsFont ? 280 : 180
+        height: {
+            let searchHeight = themePanel.activeDropdownIsFont ? 52 : 0 // search field + results text
+            let listHeight = Math.min(dropdownColumn.height, themePanel.activeDropdownIsFont ? 250 : 280)
+            return searchHeight + listHeight + 16
+        }
+        radius: 8
+        color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.98)
+        border.width: 1
+        border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
+
+        // Position below the source element
+        x: {
+            if (!themePanel.activeDropdownSource) return 100
+            let mapped = themePanel.mapFromItem(themePanel.activeDropdownSource, 0, 0)
+            return Math.max(20, Math.min(themePanel.width - width - 20, mapped.x))
+        }
+        y: {
+            if (!themePanel.activeDropdownSource) return 100
+            let mapped = themePanel.mapFromItem(themePanel.activeDropdownSource, 0, themePanel.activeDropdownSource.height)
+            // Show above if too close to bottom
+            if (mapped.y + height > themePanel.height - 20) {
+                return Math.max(20, mapped.y - themePanel.activeDropdownSource.height - height - 8)
+            }
+            return Math.min(themePanel.height - height - 20, mapped.y + 4)
+        }
+
+        // Prevent clicks from closing
+        MouseArea {
+            anchors.fill: parent
+            onClicked: (event) => event.accepted = true
+        }
+
+        Column {
+            id: dropdownContentColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 4
+            spacing: 4
+
+            // Search field (for font dropdowns)
+            Rectangle {
+                visible: themePanel.activeDropdownIsFont
+                width: parent.width
+                height: 32
+                radius: 6
+                color: Qt.rgba(Colors.background.r, Colors.background.g, Colors.background.b, 0.5)
+                border.width: 1
+                border.color: searchInput.activeFocus
+                    ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.5)
+                    : Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: 8
+                    anchors.rightMargin: 8
+                    spacing: 6
+
+                    Text {
+                        text: "󰍉"
+                        font.family: Fonts.icon
+                        font.pixelSize: 12
+                        color: Colors.foregroundAlt
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextInput {
+                        id: searchInput
+                        width: parent.width - 24
+                        height: parent.height
+                        verticalAlignment: TextInput.AlignVCenter
+                        font.pixelSize: 12
+                        color: Colors.foreground
+                        clip: true
+                        text: themePanel.dropdownSearchText
+                        onTextChanged: {
+                            themePanel.dropdownSearchText = text
+                            themePanel.dropdownHighlightIndex = 0  // Reset on search
+                        }
+
+                        Keys.onPressed: (event) => {
+                            if (event.key === Qt.Key_Down || event.key === Qt.Key_Up ||
+                                event.key === Qt.Key_Return || event.key === Qt.Key_Enter ||
+                                event.key === Qt.Key_Escape) {
+                                themePanel.dropdownKeyNav(event.key)
+                                event.accepted = true
+                            }
+                        }
+
+                        Text {
+                            visible: !searchInput.text && !searchInput.activeFocus
+                            text: "Search fonts..."
+                            font.pixelSize: 12
+                            color: Colors.foregroundMuted
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
+
+            }
+
+            // Focus search when dropdown opens
+            Connections {
+                target: themePanel
+                function onDropdownVisibleChanged() {
+                    if (themePanel.dropdownVisible && themePanel.activeDropdownIsFont) {
+                        searchInput.forceActiveFocus()
+                    }
+                }
+            }
+
+            // Results count hint
+            Text {
+                visible: themePanel.activeDropdownIsFont
+                width: parent.width
+                text: {
+                    let total = themePanel.activeDropdownModel.length
+                    let shown = themePanel.filteredDropdownModel.length
+                    if (themePanel.dropdownSearchText) {
+                        return shown + " matches" + (shown >= 25 ? " (first 25)" : "")
+                    }
+                    return "Showing 25 of " + total + " fonts"
+                }
+                font.pixelSize: 10
+                color: Colors.foregroundMuted
+                horizontalAlignment: Text.AlignRight
+                rightPadding: 4
+            }
+
+            Flickable {
+                id: dropdownFlickable
+                width: parent.width
+                height: Math.min(dropdownColumn.height, themePanel.activeDropdownIsFont ? 250 : 280)
+                contentHeight: dropdownColumn.height
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+
+                Column {
+                    id: dropdownColumn
+                    width: parent.width
+                    spacing: 2
+
+                    Repeater {
+                        model: themePanel.filteredDropdownModel
+
+                    Rectangle {
+                        id: dropdownItem
+                        width: dropdownColumn.width
+                        height: themePanel.activeDropdownIsFont ? 40 : 32
+                        radius: 6
+
+                        property bool isHovered: itemMouseArea.containsMouse
+                        property bool isKeyboardHighlighted: index === themePanel.dropdownHighlightIndex
+                        property bool isSelected: index === themePanel.activeDropdownIndex
+                        property bool isHighlighted: isHovered || isKeyboardHighlighted
+
+                        color: isHighlighted
+                            ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.3)
+                            : (isSelected
+                                ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.15)
+                                : "transparent")
+
+                        Behavior on color { ColorAnimation { duration: 100 } }
+
+                        // Font picker style (with preview)
+                        Column {
+                            visible: themePanel.activeDropdownIsFont
+                            anchors.fill: parent
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
+                            anchors.topMargin: 6
+                            anchors.bottomMargin: 6
+                            spacing: 2
+
+                            Text {
+                                width: parent.width
+                                text: modelData.label
+                                font.pixelSize: 12
+                                color: dropdownItem.isHighlighted || dropdownItem.isSelected ? Colors.foreground : Colors.foregroundAlt
+                                elide: Text.ElideRight
+                            }
+
+                            // Only load actual font when highlighted or selected (huge perf win)
+                            Text {
+                                visible: modelData.value !== "" && (dropdownItem.isHighlighted || dropdownItem.isSelected)
+                                width: parent.width
+                                text: themePanel.activeDropdownPreview
+                                font.pixelSize: 11
+                                font.family: modelData.value
+                                color: Colors.foreground
+                                elide: Text.ElideRight
+                            }
+
+                            // Placeholder when not highlighted
+                            Text {
+                                visible: modelData.value !== "" && !dropdownItem.isHighlighted && !dropdownItem.isSelected
+                                width: parent.width
+                                text: themePanel.activeDropdownPreview
+                                font.pixelSize: 11
+                                font.italic: true
+                                color: Colors.foregroundMuted
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        // Simple dropdown style
+                        Text {
+                            visible: !themePanel.activeDropdownIsFont
+                            anchors.fill: parent
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
+                            verticalAlignment: Text.AlignVCenter
+                            text: modelData.label
+                            font.pixelSize: 13
+                            color: dropdownItem.isHighlighted || dropdownItem.isSelected ? Colors.foreground : Colors.foregroundAlt
+                            elide: Text.ElideRight
+                        }
+
+                        MouseArea {
+                            id: itemMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: themePanel.selectDropdownItem(index, modelData.value)
+                        }
+                    }
+                }
+            }
+        }
         }
     }
 }

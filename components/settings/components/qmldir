@@ -6,7 +6,11 @@ ToggleSwitch 1.0 ToggleSwitch.qml
 NumberInput 1.0 NumberInput.qml
 SettingsTextInput 1.0 SettingsTextInput.qml
 DropdownSelect 1.0 DropdownSelect.qml
+DropdownOverlay 1.0 DropdownOverlay.qml
 ThemeCard 1.0 ThemeCard.qml
 ThemeEditorView 1.0 ThemeEditorView.qml
 ColorSection 1.0 ColorSection.qml
 ColorRow 1.0 ColorRow.qml
+FontPicker 1.0 FontPicker.qml
+ScaleSlider 1.0 ScaleSlider.qml
+FontSection 1.0 FontSection.qml

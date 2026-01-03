@@ -38,7 +38,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: role === "user" ? "󰀄" : "󰧑"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 14
                 color: Colors.background
             }

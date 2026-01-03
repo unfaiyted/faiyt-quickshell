@@ -15,7 +15,7 @@ Item {
         // Video camera when idle, record dot when recording
         text: RecordingState.isRecording ? "󰑋" : "󰕧"
         font.pixelSize: 14
-        font.family: "Symbols Nerd Font"
+        font.family: Fonts.icon
         color: RecordingState.isRecording ? Colors.error :
                (mouseArea.containsMouse ? Colors.rose : Colors.foreground)
 
@@ -145,7 +145,7 @@ Item {
                             text: RecordingState.recordingMode === "record" ? "󰄵" : "󰄱"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -153,7 +153,7 @@ Item {
                             text: "󰕧"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -196,7 +196,7 @@ Item {
                             text: RecordingState.recordingMode === "record-hq" ? "󰄵" : "󰄱"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -204,7 +204,7 @@ Item {
                             text: "󰗃"
                             color: Colors.love
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -247,7 +247,7 @@ Item {
                             text: RecordingState.recordingMode === "record-gif" ? "󰄵" : "󰄱"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -255,7 +255,7 @@ Item {
                             text: "󰵸"
                             color: Colors.foam
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 

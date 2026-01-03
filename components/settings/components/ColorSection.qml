@@ -46,7 +46,7 @@ Rectangle {
 
             Text {
                 text: colorSection.icon
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 16
                 color: Colors.primary
                 anchors.verticalCenter: parent.verticalCenter
@@ -73,7 +73,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: colorSection.collapsed ? "󰅂" : "󰅀"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 14
                     color: Colors.foregroundAlt
 

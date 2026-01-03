@@ -36,7 +36,7 @@ PanelWindow {
             anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             text: IconService.getDistroIcon()
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: 22
             color: Colors.primary
             visible: ConfigService.barModuleDistroIcon

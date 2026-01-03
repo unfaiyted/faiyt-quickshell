@@ -62,7 +62,7 @@ Rectangle {
                 anchors.centerIn: parent
                 visible: !windowPreview.captureSource
                 text: result ? (result.icon || "󰖯") : "󰖯"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 24
                 color: Colors.foregroundMuted
             }

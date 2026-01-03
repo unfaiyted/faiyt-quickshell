@@ -120,7 +120,7 @@ PopupWindow {
                     id: nerdIcon
                     visible: !!(entry?.icon) && entry.icon.length > 0 && IconService.hasIcon(entry.icon)
                     text: IconService.getIcon(entry?.icon ?? "")
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 14
                     color: (entry?.enabled ?? false) ? Colors.foreground : Colors.muted
                     anchors.verticalCenter: parent.verticalCenter
@@ -139,7 +139,7 @@ PopupWindow {
                 Text {
                     visible: !!(entry?.icon) && entry.icon.length > 0 && !IconService.hasIcon(entry.icon) && menuIcon.status !== Image.Ready
                     text: IconService.getIcon("")
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 14
                     color: (entry?.enabled ?? false) ? Colors.foreground : Colors.muted
                     anchors.verticalCenter: parent.verticalCenter

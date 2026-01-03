@@ -85,7 +85,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: tabBar.tabData[index] ? tabBar.tabData[index].icon : tabBar.tabs[index]
                                 color: tabButton.isActive ? Colors.accent : Colors.foregroundAlt
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 13
 
                                 Behavior on color {

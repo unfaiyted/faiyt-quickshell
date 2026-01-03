@@ -81,7 +81,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: AIState.isProcessing ? "󰅖" : "󰒊"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 18
                     color: {
                         if (AIState.isProcessing) {

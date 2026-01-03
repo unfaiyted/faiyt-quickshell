@@ -65,7 +65,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: IconService.getIcon(root.notif?.appName ?? "")
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.background
                     }
@@ -95,7 +95,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: "󰅖"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: closeArea.containsMouse ? Colors.background : Colors.foreground
                     }

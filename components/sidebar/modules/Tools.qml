@@ -61,7 +61,7 @@ Item {
 
                 Text {
                     text: "󰍉"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 16
                     color: Colors.foregroundMuted
                     anchors.verticalCenter: parent.verticalCenter
@@ -108,7 +108,7 @@ Item {
 
                         Text {
                             text: modelData.icon
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 12
                             color: selectedCategory === modelData.id ? Colors.background : Colors.foreground
                         }
@@ -173,7 +173,7 @@ Item {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰍉"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 32
                             color: Colors.foregroundMuted
                         }

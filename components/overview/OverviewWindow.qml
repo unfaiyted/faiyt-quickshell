@@ -80,7 +80,7 @@ Item {
             property real iconSize: Math.min(root.targetWindowWidth, root.targetWindowHeight) * 0.3
             visible: windowFrame.hasNerdIcon
             text: IconService.getIcon(windowFrame.appClass)
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: iconSize
             color: Colors.foreground
             opacity: 0.8
@@ -105,7 +105,7 @@ Item {
             property real iconSize: Math.min(root.targetWindowWidth, root.targetWindowHeight) * 0.3
             visible: !windowFrame.hasNerdIcon && appIcon.status !== Image.Ready
             text: IconService.getIcon("")
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: iconSize
             color: Colors.foreground
             opacity: 0.8

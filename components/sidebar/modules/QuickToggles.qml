@@ -435,7 +435,7 @@ Item {
 
                 Text {
                     text: toggleBtn.icon
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 18
                     color: toggleBtn.active ? toggleBtn.activeColor : Colors.foregroundAlt
 

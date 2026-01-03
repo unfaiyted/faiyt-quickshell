@@ -249,7 +249,7 @@ BarGroup {
                     anchors.centerIn: parent
                     visible: trayItemContainer.hasNerdIcon
                     text: IconService.getIcon(trayItemContainer.trayId)
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 14
                     color: Colors.foreground
                 }
@@ -267,7 +267,7 @@ BarGroup {
                     anchors.centerIn: parent
                     visible: !trayItemContainer.hasNerdIcon && trayIcon.status !== Image.Ready
                     text: IconService.getIcon("")
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 14
                     color: Colors.foreground
                 }

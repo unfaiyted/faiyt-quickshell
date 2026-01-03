@@ -162,7 +162,7 @@ BarGroup {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "󰏤"
                 font.pixelSize: 12
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 color: Colors.foreground
             }
         }
@@ -316,7 +316,7 @@ BarGroup {
                             anchors.centerIn: parent
                             text: "󰎆"
                             font.pixelSize: 32
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             color: Colors.muted
                             visible: albumArt.status !== Image.Ready
                         }
@@ -475,7 +475,7 @@ BarGroup {
                             anchors.centerIn: parent
                             text: "󰒮"
                             font.pixelSize: 16
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             color: Colors.foreground
                         }
 
@@ -503,7 +503,7 @@ BarGroup {
                             anchors.centerIn: parent
                             text: musicModule.isPlaying ? "󰏤" : "󰐊"
                             font.pixelSize: 20
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             color: playArea.containsMouse ? Colors.background : Colors.foreground
                         }
 
@@ -532,7 +532,7 @@ BarGroup {
                             anchors.centerIn: parent
                             text: "󰒭"
                             font.pixelSize: 16
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             color: Colors.foreground
                         }
 

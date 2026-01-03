@@ -64,7 +64,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰐕"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 12
                     color: newConvArea.containsMouse ? Colors.primary : Colors.foregroundMuted
                 }
@@ -182,7 +182,7 @@ Item {
                                     Text {
                                         anchors.centerIn: parent
                                         text: "󰇙"
-                                        font.family: "Symbols Nerd Font"
+                                        font.family: Fonts.icon
                                         font.pixelSize: 10
                                         color: Colors.foregroundMuted
                                     }
@@ -255,7 +255,7 @@ Item {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰍉"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 24
                             color: Colors.foregroundMuted
                         }
@@ -330,7 +330,7 @@ Item {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "󰏫"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.foreground
                     }
@@ -371,7 +371,7 @@ Item {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "󰆴"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: deleteArea.containsMouse ? Colors.error : Colors.foreground
                     }

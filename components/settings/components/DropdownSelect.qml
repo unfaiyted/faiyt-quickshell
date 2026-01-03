@@ -1,29 +1,76 @@
 import QtQuick
-import Quickshell
 import "../../../theme"
 
 Item {
     id: dropdown
 
-    property var model: []  // [{label: "Option", value: "value"}, ...]
+    property var model: []
     property int currentIndex: 0
     property var currentValue: model.length > 0 ? model[currentIndex].value : null
     property string currentLabel: model.length > 0 ? model[currentIndex].label : ""
+    property bool popupOpen: false
+    property bool enableSearch: false  // Optional search feature
+    property string previewText: "Aa Bb Cc"  // For font previews
     signal selected(int index, var value)
+
+    // Find any DropdownOverlay in parent hierarchy
+    property var dropdownOverlay: findDropdownOverlay()
+
+    function findDropdownOverlay() {
+        let p = dropdown.parent
+        while (p) {
+            // Check for dropdownOverlayRef property (panels that have a DropdownOverlay)
+            if (p.dropdownOverlayRef) {
+                return p.dropdownOverlayRef
+            }
+            // Check for ThemePanel which has dropdown functions
+            if (p.openDropdown && p.closeDropdown && p.selectDropdownItem) {
+                return {
+                    isThemePanel: true,
+                    panel: p
+                }
+            }
+            p = p.parent
+        }
+        return null
+    }
 
     width: 150
     height: 32
 
-    // Main button
+    // Listen for selection from overlay
+    Connections {
+        target: dropdown.dropdownOverlay && !dropdown.dropdownOverlay.isThemePanel ? dropdown.dropdownOverlay : null
+        enabled: dropdown.dropdownOverlay !== null && !dropdown.dropdownOverlay.isThemePanel
+        function onItemSelected(index, value) {
+            if (dropdown.dropdownOverlay.activeSource === dropdown) {
+                dropdown.currentIndex = index
+                dropdown.selected(index, value)
+            }
+        }
+    }
+
+    // Listen for ThemePanel dropdown selection
+    Connections {
+        target: dropdown.dropdownOverlay && dropdown.dropdownOverlay.isThemePanel ? dropdown.dropdownOverlay.panel : null
+        enabled: dropdown.dropdownOverlay !== null && dropdown.dropdownOverlay.isThemePanel
+        function onDropdownSelected(index, value) {
+            if (dropdown.dropdownOverlay.panel.activeDropdownSource === dropdown) {
+                dropdown.currentIndex = index
+                dropdown.selected(index, value)
+            }
+        }
+    }
+
     Rectangle {
         id: button
         anchors.fill: parent
         radius: 8
-        color: buttonArea.containsMouse || popup.visible
+        color: buttonArea.containsMouse || dropdown.popupOpen
             ? Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.4)
             : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
         border.width: 1
-        border.color: popup.visible
+        border.color: dropdown.popupOpen
             ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.5)
             : Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
 
@@ -51,8 +98,8 @@ Item {
                 height: parent.height
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
-                text: popup.visible ? "󰅃" : "󰅀"
-                font.family: "Symbols Nerd Font"
+                text: dropdown.popupOpen ? "󰅃" : "󰅀"
+                font.family: Fonts.icon
                 font.pixelSize: 12
                 color: Colors.foregroundAlt
             }
@@ -63,101 +110,42 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: popup.visible = !popup.visible
-        }
-    }
-
-    // Dropdown popup
-    PopupWindow {
-        id: popup
-        anchor.window: QsWindow.window
-        anchor.onAnchoring: {
-            const pos = button.mapToItem(QsWindow.window.contentItem, 0, button.height + 4)
-            anchor.rect = Qt.rect(pos.x, pos.y, button.width, 1)
-        }
-        anchor.edges: Edges.Top
-        anchor.gravity: Edges.Top
-
-        visible: false
-
-        implicitWidth: popupContent.width
-        implicitHeight: popupContent.height
-        color: "transparent"
-
-        // Click outside to close
-        PopupWindow {
-            id: clickCatcher
-            anchor.window: QsWindow.window
-            anchor.rect: Qt.rect(0, 0, 1, 1)
-            anchor.edges: Edges.Top | Edges.Left
-
-            visible: popup.visible
-
-            implicitWidth: Screen.width
-            implicitHeight: Screen.height
-            color: "transparent"
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: popup.visible = false
-            }
-        }
-
-        Rectangle {
-            id: popupContent
-            width: Math.max(dropdown.width, optionsColumn.width + 8)
-            height: optionsColumn.height + 8
-            radius: 8
-            color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.95)
-            border.width: 1
-            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.2)
-
-            // Shadow effect
-            layer.enabled: true
-            layer.effect: null
-
-            Column {
-                id: optionsColumn
-                anchors.centerIn: parent
-                spacing: 2
-
-                Repeater {
-                    model: dropdown.model
-
-                    Rectangle {
-                        width: Math.max(dropdown.width - 8, optionText.implicitWidth + 24)
-                        height: 32
-                        radius: 6
-                        color: optionArea.containsMouse
-                            ? Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.4)
-                            : (index === dropdown.currentIndex
-                                ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
-                                : "transparent")
-
-                        Text {
-                            id: optionText
-                            anchors.fill: parent
-                            anchors.leftMargin: 12
-                            anchors.rightMargin: 12
-                            verticalAlignment: Text.AlignVCenter
-                            text: modelData.label
-                            font.pixelSize: 13
-                            color: index === dropdown.currentIndex ? Colors.foreground : Colors.foregroundAlt
+            onClicked: {
+                if (dropdown.dropdownOverlay) {
+                    if (dropdown.popupOpen) {
+                        if (dropdown.dropdownOverlay.isThemePanel) {
+                            dropdown.dropdownOverlay.panel.closeDropdown()
+                        } else {
+                            dropdown.dropdownOverlay.close()
                         }
-
-                        MouseArea {
-                            id: optionArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                dropdown.currentIndex = index
-                                dropdown.selected(index, modelData.value)
-                                popup.visible = false
-                            }
+                    } else {
+                        if (dropdown.dropdownOverlay.isThemePanel) {
+                            dropdown.dropdownOverlay.panel.openDropdown(dropdown, dropdown.model, dropdown.currentIndex, dropdown.previewText, dropdown.enableSearch)
+                        } else {
+                            dropdown.dropdownOverlay.open(dropdown, dropdown.model, dropdown.currentIndex, dropdown.enableSearch, dropdown.previewText)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    onVisibleChanged: {
+        if (!visible && dropdownOverlay) {
+            if (dropdownOverlay.isThemePanel) {
+                dropdownOverlay.panel.closeDropdown()
+            } else {
+                dropdownOverlay.close()
+            }
+        }
+    }
+
+    function close() {
+        if (dropdownOverlay) {
+            if (dropdownOverlay.isThemePanel) {
+                dropdownOverlay.panel.closeDropdown()
+            } else {
+                dropdownOverlay.close()
             }
         }
     }

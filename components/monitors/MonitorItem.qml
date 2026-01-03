@@ -104,7 +104,7 @@ Rectangle {
         Text {
             text: monitor ? `${monitor.width}x${monitor.height}@${monitor.refreshRate.toFixed(0)}Hz` : ""
             font.pixelSize: 10
-            font.family: "monospace"
+            font.family: Fonts.mono
             color: Colors.foregroundAlt
             elide: Text.ElideRight
             width: parent.width
@@ -113,7 +113,7 @@ Rectangle {
         Text {
             text: monitor ? `${position.x}, ${position.y}` : ""
             font.pixelSize: 9
-            font.family: "monospace"
+            font.family: Fonts.mono
             color: Colors.foregroundMuted
         }
     }

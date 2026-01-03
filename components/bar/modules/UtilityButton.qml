@@ -23,7 +23,7 @@ Item {
         anchors.centerIn: parent
         text: utilBtn.icon
         font.pixelSize: 14
-        font.family: "Symbols Nerd Font"
+        font.family: Fonts.icon
         color: mouseArea.containsMouse ? Colors.rose : Colors.foreground
     }
 

@@ -59,7 +59,7 @@ Item {
 
                     Text {
                         text: "󰅀"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 10
                         color: Colors.foreground
                     }
@@ -111,7 +111,7 @@ Item {
 
                             Text {
                                 text: isSelected ? "󰄬" : "󰝦"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 14
                                 color: isSelected ? Colors.primary : Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
@@ -175,7 +175,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: bluetoothPanel.powered ? "󰂯" : "󰂲"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 16
                         color: bluetoothPanel.powered ? Colors.background : Colors.foregroundMuted
                     }
@@ -283,7 +283,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: "󰑓"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 16
                             color: bluetoothPanel.scanning ? Colors.primary : Colors.foreground
 
@@ -368,7 +368,7 @@ Item {
                                             return "󰊖"
                                         return "󰂯"
                                     }
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 16
                                     color: device.connected ? Colors.background : Colors.foreground
                                 }
@@ -413,7 +413,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰑓"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 16
                                     color: Colors.primary
                                     visible: isConnecting
@@ -430,7 +430,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰄬"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 16
                                     color: Colors.success
                                     visible: device.connected && !isConnecting
@@ -470,7 +470,7 @@ Item {
 
                     Text {
                         text: "󰑓"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 12
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
@@ -547,7 +547,7 @@ Item {
                                             return "󰊖"
                                         return "󰂯"
                                     }
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 16
                                     color: Colors.foreground
                                 }
@@ -583,7 +583,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰑓"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 16
                                     color: Colors.primary
                                     visible: isPairing
@@ -624,7 +624,7 @@ Item {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰂲"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 32
                             color: Colors.foregroundMuted
                         }

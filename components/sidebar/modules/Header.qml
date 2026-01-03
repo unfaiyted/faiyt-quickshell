@@ -221,7 +221,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰒓"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 18
                     color: Colors.foreground
                 }
@@ -245,7 +245,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰐥"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 18
                     color: Colors.error
                 }

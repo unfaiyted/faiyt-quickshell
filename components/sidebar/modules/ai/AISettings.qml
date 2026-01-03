@@ -74,7 +74,7 @@ Item {
 
                         Text {
                             text: "󰧑"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 16
                             color: Colors.primary
                         }
@@ -115,7 +115,7 @@ Item {
 
                                 Text {
                                     text: ClaudeService.hasApiKey() ? "󰄬" : "󰅜"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 14
                                     color: ClaudeService.hasApiKey() ? Colors.success : Colors.error
                                     anchors.verticalCenter: parent.verticalCenter
@@ -179,7 +179,7 @@ Item {
                                     x: modelCombo.width - width - 8
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "󰅀"
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Fonts.icon
                                     font.pixelSize: 10
                                     color: Colors.foregroundMuted
                                 }
@@ -323,7 +323,7 @@ Item {
 
                         Text {
                             text: "󰒓"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 16
                             color: Colors.accent
                         }
@@ -427,7 +427,7 @@ Item {
                                         Text {
                                             anchors.centerIn: parent
                                             text: "󰅖"
-                                            font.family: "Symbols Nerd Font"
+                                            font.family: Fonts.icon
                                             font.pixelSize: 10
                                             color: removeArea.containsMouse ? Colors.error : Colors.foregroundMuted
                                         }
@@ -466,7 +466,7 @@ Item {
 
                             Text {
                                 text: "󰐕"
-                                font.family: "Symbols Nerd Font"
+                                font.family: Fonts.icon
                                 font.pixelSize: 12
                                 color: Colors.primary
                             }

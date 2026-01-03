@@ -124,7 +124,7 @@ PanelWindow {
 
                     Text {
                         text: "󰸉"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 20
                         color: Colors.primary
                     }
@@ -149,7 +149,7 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: "󰅖"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 14
                         color: closeArea.containsMouse ? Colors.background : Colors.foreground
                     }
@@ -183,7 +183,7 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: "󰅁"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 20
                         color: Colors.foreground
                     }
@@ -227,7 +227,7 @@ PanelWindow {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰋩"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 48
                             color: Colors.foregroundMuted
                         }
@@ -262,7 +262,7 @@ PanelWindow {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰑓"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 32
                             color: Colors.primary
 
@@ -298,7 +298,7 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: "󰅂"
-                        font.family: "Symbols Nerd Font"
+                        font.family: Fonts.icon
                         font.pixelSize: 20
                         color: Colors.foreground
                     }

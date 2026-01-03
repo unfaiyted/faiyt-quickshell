@@ -14,7 +14,7 @@ Item {
         anchors.centerIn: parent
         text: "󰄀"
         font.pixelSize: 14
-        font.family: "Symbols Nerd Font"
+        font.family: Fonts.icon
         color: mouseArea.containsMouse ? Colors.rose : Colors.foreground
 
         Behavior on color {
@@ -111,7 +111,7 @@ Item {
                             text: !ScreenshotState.annotateEnabled ? "󰄵" : "󰄱"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -119,7 +119,7 @@ Item {
                             text: "󰄀"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -162,7 +162,7 @@ Item {
                             text: ScreenshotState.annotateEnabled ? "󰄵" : "󰄱"
                             color: Colors.foreground
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -170,7 +170,7 @@ Item {
                             text: "󰏫"
                             color: Colors.iris
                             font.pixelSize: 12
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
 

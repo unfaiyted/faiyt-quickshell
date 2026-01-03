@@ -108,7 +108,7 @@ Rectangle {
                 anchors.centerIn: parent
                 property bool isGenerating: generateThumbnail.running || mkdirProcess.running || wallpaperItem.needsThumbnail
                 text: isGenerating ? "󰑓" : "󰋩"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: isGenerating ? 24 : 32
                 color: Colors.foregroundMuted
 

@@ -17,7 +17,7 @@ Column {
 
         Text {
             text: "󰏘"
-            font.family: "Symbols Nerd Font"
+            font.family: Fonts.icon
             font.pixelSize: 20
             color: Colors.foreground
             anchors.verticalCenter: parent.verticalCenter
@@ -50,7 +50,7 @@ Column {
 
                 Text {
                     text: "󰏫"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 12
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
@@ -140,7 +140,7 @@ Column {
 
                         Text {
                             text: modelData.icon
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 24
                             color: Colors.foreground
                             anchors.verticalCenter: parent.verticalCenter
@@ -170,7 +170,7 @@ Column {
                         Text {
                             visible: themeOption.isActive
                             text: "󰄬"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 20
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
@@ -227,7 +227,7 @@ Column {
 
             Text {
                 text: "󰏘"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 14
                 color: Colors.foregroundAlt
             }

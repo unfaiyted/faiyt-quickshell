@@ -21,8 +21,63 @@ Singleton {
     // Track if we've initialized
     property bool initialized: false
 
+    // Font configuration
+    property var fonts: createFontsObject()
+
+    // Signal when font settings change
+    signal fontSettingsChanged()
+
     Component.onCompleted: {
         refreshAvailableThemes()
+    }
+
+    // Create fonts object from config
+    function createFontsObject() {
+        let config = ConfigService.getValue("fonts") || {}
+        return {
+            ui: config.ui || "",
+            mono: config.mono || "monospace",
+            icon: config.icon || "Symbols Nerd Font",
+            emoji: config.emoji || "Noto Color Emoji",
+            scale: config.scale !== undefined ? config.scale : 1.0
+        }
+    }
+
+    // Set individual font
+    function setFont(category, fontName) {
+        let fontsConfig = ConfigService.getValue("fonts") || {}
+        fontsConfig[category] = fontName
+        ConfigService.setValue("fonts", fontsConfig)
+        ConfigService.saveConfig()
+        fonts = createFontsObject()
+        fontSettingsChanged()
+        console.log("[ThemeService] Set", category, "font to:", fontName)
+    }
+
+    // Set font scale
+    function setFontScale(scale) {
+        let fontsConfig = ConfigService.getValue("fonts") || {}
+        fontsConfig.scale = scale
+        ConfigService.setValue("fonts", fontsConfig)
+        ConfigService.saveConfig()
+        fonts = createFontsObject()
+        fontSettingsChanged()
+        console.log("[ThemeService] Set font scale to:", scale)
+    }
+
+    // Reset fonts to defaults
+    function resetFonts() {
+        ConfigService.setValue("fonts", {
+            ui: "",
+            mono: "monospace",
+            icon: "Symbols Nerd Font",
+            emoji: "Noto Color Emoji",
+            scale: 1.0
+        })
+        ConfigService.saveConfig()
+        fonts = createFontsObject()
+        fontSettingsChanged()
+        console.log("[ThemeService] Reset fonts to defaults")
     }
 
     // Connection to ConfigService for loading saved theme
@@ -269,6 +324,10 @@ Singleton {
         currentThemeName = savedTheme
         refreshAvailableThemes()
         themeChanged(savedTheme)
+
+        // Load fonts
+        fonts = createFontsObject()
+        console.log("[ThemeService] Loaded fonts:", JSON.stringify(fonts))
     }
 
     // Generate a unique theme name

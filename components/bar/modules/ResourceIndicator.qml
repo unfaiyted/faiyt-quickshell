@@ -143,7 +143,7 @@ Item {
         anchors.centerIn: parent
         text: indicator.icon
         font.pixelSize: 12
-        font.family: "Symbols Nerd Font"
+        font.family: Fonts.icon
         color: indicator.indicatorColor
     }
 }

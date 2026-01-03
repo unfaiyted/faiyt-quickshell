@@ -59,7 +59,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: results.length > 0 && results[0].type === "sticker-add" ? "📦" : "🎨"
                     font.pixelSize: 48
-                    font.family: "Noto Color Emoji"
+                    font.family: Fonts.emoji
                 }
 
                 // Title
@@ -118,7 +118,7 @@ Item {
                                 anchors.centerIn: parent
                                 text: "s: add <signal-url>"
                                 font.pixelSize: 12
-                                font.family: "monospace"
+                                font.family: Fonts.mono
                                 color: Colors.primary
                             }
                         }
@@ -151,7 +151,7 @@ Item {
 
                         Text {
                             text: "󰋚"
-                            font.family: "Symbols Nerd Font"
+                            font.family: Fonts.icon
                             font.pixelSize: 16
                             color: addButtonArea.containsMouse ? Colors.background : Colors.iris
                             anchors.verticalCenter: parent.verticalCenter
@@ -197,7 +197,7 @@ Item {
 
             Text {
                 text: "󰋚"
-                font.family: "Symbols Nerd Font"
+                font.family: Fonts.icon
                 font.pixelSize: 14
                 color: Colors.iris
                 anchors.verticalCenter: parent.verticalCenter
@@ -359,7 +359,7 @@ Item {
                         return "?"
                     }
                     font.pixelSize: 64
-                    font.family: "Noto Color Emoji"
+                    font.family: Fonts.emoji
                     visible: previewImage.status !== Image.Ready
                 }
 
@@ -385,7 +385,7 @@ Item {
                             return ""
                         }
                         font.pixelSize: 14
-                        font.family: "Noto Color Emoji"
+                        font.family: Fonts.emoji
                     }
                 }
             }
@@ -546,7 +546,7 @@ Item {
                     anchors.centerIn: parent
                     text: modelData?.emoji || "?"
                     font.pixelSize: 48
-                    font.family: "Noto Color Emoji"
+                    font.family: Fonts.emoji
                     visible: stickerImage.status !== Image.Ready && stickerImage.status !== Image.Loading
                 }
 
@@ -554,7 +554,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "󰋚"
-                    font.family: "Symbols Nerd Font"
+                    font.family: Fonts.icon
                     font.pixelSize: 24
                     color: Colors.foregroundMuted
                     visible: stickerImage.status === Image.Loading
@@ -585,7 +585,7 @@ Item {
                         anchors.centerIn: parent
                         text: modelData?.emoji || ""
                         font.pixelSize: 12
-                        font.family: "Noto Color Emoji"
+                        font.family: Fonts.emoji
                     }
                 }
 

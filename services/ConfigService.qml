@@ -15,6 +15,13 @@ Singleton {
         // Appearance
         theme: "rose-pine",
         customThemes: {},  // User-created custom themes
+        fonts: {
+            ui: "",                      // Empty = system default
+            mono: "monospace",
+            icon: "Symbols Nerd Font",
+            emoji: "Noto Color Emoji",
+            scale: 1.0
+        },
         bar: {
             mode: "normal",  // normal, focus, nothing
             workspacesPerPage: 10,  // Number of workspaces to show at once
@@ -59,7 +66,8 @@ Singleton {
 
         // Time & Weather
         time: {
-            format: "%H:%M"
+            format: "%H:%M",
+            timezones: []  // [{id: "America/New_York", label: "New York"}, ...]
         },
         weather: {
             city: "",
@@ -285,8 +293,8 @@ Singleton {
             current = current[parts[i]]
         }
         current[parts[parts.length - 1]] = value
-        // Force property change notification by reassigning
-        config = config
+        // Force property change notification by cloning the config object
+        config = JSON.parse(JSON.stringify(config))
     }
 
     // Convenience property accessors for common settings
@@ -294,6 +302,7 @@ Singleton {
     property string barMode: config.bar?.mode || "normal"
     property int workspacesPerPage: config.bar?.workspacesPerPage || 10
     property string timeFormat: config.time?.format || "%H:%M"
+    property var timezones: config.time?.timezones || []
     property string weatherCity: config.weather?.city || ""
     property string temperatureUnit: config.weather?.preferredUnit || "C"
     property int batteryLow: config.battery?.low || 20
@@ -371,6 +380,7 @@ Singleton {
         barMode = config.bar?.mode || "normal"
         workspacesPerPage = config.bar?.workspacesPerPage || 10
         timeFormat = config.time?.format || "%H:%M"
+        timezones = config.time?.timezones || []
         weatherCity = config.weather?.city || ""
         temperatureUnit = config.weather?.preferredUnit || "C"
         batteryLow = config.battery?.low || 20
