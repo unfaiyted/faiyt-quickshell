@@ -135,8 +135,8 @@ BarGroup {
         menu.visible = true
     }
 
-    // Only show if there are tray items
-    visible: SystemTray.items.values.length > 0
+    // Only show if enabled and there are tray items
+    visible: ConfigService.barModuleSystemTray && SystemTray.items.values.length > 0
 
     Row {
         id: trayRow

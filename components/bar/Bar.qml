@@ -83,7 +83,7 @@ PanelWindow {
                 visible: ConfigService.barModuleUtilities
             }
             Music {
-                visible: ConfigService.barModuleMusic
+                // Visibility handled internally (checks config + track data)
             }
         }
 
@@ -95,7 +95,7 @@ PanelWindow {
             spacing: 8
 
             SystemTray {
-                visible: ConfigService.barModuleSystemTray
+                // Visibility handled internally (checks config + tray items)
             }
             Network {
                 visible: ConfigService.barModuleNetwork

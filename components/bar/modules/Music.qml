@@ -11,8 +11,8 @@ BarGroup {
     implicitWidth: content.width + 16
     implicitHeight: 30
 
-    // Only show if there's a player
-    visible: Mpris.players.values.length > 0
+    // Only show if enabled, there's a player, and actual track data
+    visible: ConfigService.barModuleMusic && Mpris.players.values.length > 0 && trackTitle.length > 0
 
     // Track the last active player (most recently playing)
     property string lastActivePlayerId: ""
