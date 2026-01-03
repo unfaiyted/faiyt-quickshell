@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Io
+import "../../../services" as Services
 
 Item {
     id: commandResults
@@ -53,6 +54,13 @@ Item {
                 return h.command.toLowerCase().includes(cmd.toLowerCase())
             })
 
+            // Sort history by usage boost
+            historyMatches.sort((a, b) => {
+                let aBoost = Services.UsageStatsService.getBoostScore("cmd:" + hashString(a.command))
+                let bBoost = Services.UsageStatsService.getBoostScore("cmd:" + hashString(b.command))
+                return bBoost - aBoost
+            })
+
             for (let h of historyMatches.slice(0, maxResults - results.length)) {
                 // Don't duplicate the current command
                 if (h.command === cmd) continue
@@ -94,5 +102,15 @@ Item {
         if (history.length > maxHistory) {
             history = history.slice(0, maxHistory)
         }
+    }
+
+    // Simple hash for command identification (matches LauncherState.hashString)
+    function hashString(str) {
+        let hash = 0
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i)
+            hash |= 0
+        }
+        return hash.toString(16)
     }
 }

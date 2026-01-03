@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "results"
-import "../../services"
+import "../../services" as Services
 
 Singleton {
     id: launcherState
@@ -237,9 +237,20 @@ Singleton {
         } else if (searchType === "GIF") {
             allResults = gifResults.search(query, isPrefixSearch)
         } else if (searchType === "TMUX") {
-            if (ConfigService.getValue("search.enableFeatures.tmuxSearch") ?? true) {
+            if (Services.ConfigService.getValue("search.enableFeatures.tmuxSearch") ?? true) {
                 allResults = tmuxResults.search(query, isPrefixSearch)
             }
+        }
+
+        // Global sort by usage boost for unified search
+        if (searchType === "ALL" && allResults.length > 1) {
+            allResults.sort((a, b) => {
+                let aId = getItemId(a)
+                let bId = getItemId(b)
+                let aBoost = aId ? Services.UsageStatsService.getBoostScore(aId) : 0
+                let bBoost = bId ? Services.UsageStatsService.getBoostScore(bId) : 0
+                return bBoost - aBoost
+            })
         }
 
         // Limit results
@@ -281,7 +292,7 @@ Singleton {
                 let newIndex = selectedIndex - gridColumns
                 if (newIndex >= 0) {
                     selectedIndex = newIndex
-                } else if (isStickerMode && StickerService.stickerPacks.length > 0) {
+                } else if (isStickerMode && Services.StickerService.stickerPacks.length > 0) {
                     // At top row in sticker mode, move to pack bar
                     packBarFocused = true
                 }
@@ -309,7 +320,7 @@ Singleton {
     function selectRight() {
         if (packBarFocused && isStickerMode) {
             // Navigate right in pack bar
-            const maxIndex = StickerService.stickerPacks.length - 1
+            const maxIndex = Services.StickerService.stickerPacks.length - 1
             if (selectedPackIndex < maxIndex) {
                 selectedPackIndex = selectedPackIndex + 1
             }
@@ -325,9 +336,9 @@ Singleton {
     function activatePackBarSelection() {
         if (!packBarFocused || !isStickerMode) return
 
-        const packId = selectedPackIndex === -1 ? "" : StickerService.stickerPacks[selectedPackIndex]?.id || ""
-        StickerService.selectedPackId = packId
-        StickerService.selectPack(packId)
+        const packId = selectedPackIndex === -1 ? "" : Services.StickerService.stickerPacks[selectedPackIndex]?.id || ""
+        Services.StickerService.selectedPackId = packId
+        Services.StickerService.selectPack(packId)
         performSearch()
         packBarFocused = false
         selectedIndex = 0
@@ -341,6 +352,12 @@ Singleton {
             if (result?.type === "gif-category" && result?.data?.searchTerm) {
                 searchText = "gif: " + result.data.searchTerm
                 return
+            }
+
+            // Record usage for tracking (before action execution)
+            let itemId = getItemId(result)
+            if (itemId) {
+                Services.UsageStatsService.recordUsage(itemId)
             }
 
             if (result && result.action) {
@@ -369,6 +386,46 @@ Singleton {
             return true
         }
         return false
+    }
+
+    // Generate unique item ID for usage tracking
+    function getItemId(result) {
+        if (!result) return null
+
+        switch (result.type) {
+            case "app":
+                return "app:" + (result.data?.filePath || result.title)
+            case "quickaction":
+                return "quickaction:" + (result.category || "unknown") + ":" + result.title
+            case "system":
+                return "system:" + result.title
+            case "emoji":
+                return "emoji:" + (result.emoji || result.title)
+            case "sticker":
+                return "sticker:" + (result.data?.packId || "") + ":" + (result.data?.id || result.title)
+            case "gif":
+                return "gif:" + (result.data?.id || result.title)
+            case "tmux":
+                // Don't track "create new session" option
+                if (result.data?.isNew) return null
+                return "tmux:" + (result.data?.sessionName || "") + ":" + (result.data?.windowIndex ?? 0)
+            case "cmd":
+                return "cmd:" + hashString(result.data?.command || result.title)
+            case "window":
+                return null  // Windows are ephemeral, don't track
+            default:
+                return null
+        }
+    }
+
+    // Simple hash for command identification
+    function hashString(str) {
+        let hash = 0
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i)
+            hash |= 0
+        }
+        return hash.toString(16)
     }
 
     // Show/hide

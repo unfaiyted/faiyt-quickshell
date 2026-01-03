@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Io
+import "../../../services" as Services
 
 Item {
     id: systemResults
@@ -64,6 +65,24 @@ Item {
 
             let searchText = (action.name + " " + action.description).toLowerCase()
             return searchText.includes(queryLower)
+        })
+
+        // Sort by relevance + usage boost
+        filtered.sort((a, b) => {
+            let aStarts = a.name.toLowerCase().startsWith(queryLower)
+            let bStarts = b.name.toLowerCase().startsWith(queryLower)
+
+            let aBase = aStarts ? 100 : 50
+            let bBase = bStarts ? 100 : 50
+
+            let aBoost = Services.UsageStatsService.getBoostScore("system:" + a.name)
+            let bBoost = Services.UsageStatsService.getBoostScore("system:" + b.name)
+
+            let aTotal = aBase + aBoost
+            let bTotal = bBase + bBoost
+
+            if (aTotal !== bTotal) return bTotal - aTotal
+            return a.name.localeCompare(b.name)
         })
 
         return filtered.slice(0, maxResults).map((action, index) => ({

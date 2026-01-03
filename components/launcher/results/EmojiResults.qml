@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Io
+import "../../../services" as Services
 
 Item {
     id: emojiResults
@@ -484,19 +485,23 @@ Item {
             return e.keywords.some(k => k.includes(queryLower))
         })
 
-        // Sort by relevance (name starts with query first)
+        // Sort by relevance (base score) + usage boost
         filtered.sort((a, b) => {
             let aStarts = a.name.startsWith(queryLower)
             let bStarts = b.name.startsWith(queryLower)
-            if (aStarts && !bStarts) return -1
-            if (!aStarts && bStarts) return 1
 
-            // Check keyword match
-            let aKeyword = a.keywords.some(k => k.startsWith(queryLower))
-            let bKeyword = b.keywords.some(k => k.startsWith(queryLower))
-            if (aKeyword && !bKeyword) return -1
-            if (!aKeyword && bKeyword) return 1
+            // Base scores: name starts = 100, keyword starts = 70, else = 50
+            let aBase = aStarts ? 100 : (a.keywords.some(k => k.startsWith(queryLower)) ? 70 : 50)
+            let bBase = bStarts ? 100 : (b.keywords.some(k => k.startsWith(queryLower)) ? 70 : 50)
 
+            // Apply usage boost
+            let aBoost = Services.UsageStatsService.getBoostScore("emoji:" + a.emoji)
+            let bBoost = Services.UsageStatsService.getBoostScore("emoji:" + b.emoji)
+
+            let aTotal = aBase + aBoost
+            let bTotal = bBase + bBoost
+
+            if (aTotal !== bTotal) return bTotal - aTotal
             return a.name.localeCompare(b.name)
         })
 

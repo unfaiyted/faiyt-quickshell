@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../../../services"
+import "../../../services" as Services
 
 Item {
     id: appResults
@@ -133,10 +133,10 @@ Item {
             let [key, ...valueParts] = line.split("=")
             let value = valueParts.join("=")
 
-            // Handle localized keys (use default or english)
+            // Skip localized keys entirely (e.g., Name[de], Comment[fr])
+            // We only want the base keys which are in English/default
             if (key.includes("[")) {
-                let baseKey = key.split("[")[0]
-                key = baseKey
+                continue
             }
 
             switch (key) {
@@ -199,12 +199,23 @@ Item {
             return searchText.includes(queryLower)
         })
 
-        // Sort by relevance (name starts with query first)
+        // Sort by relevance (base score) + usage boost
         filtered.sort((a, b) => {
             let aStarts = a.name.toLowerCase().startsWith(queryLower)
             let bStarts = b.name.toLowerCase().startsWith(queryLower)
-            if (aStarts && !bStarts) return -1
-            if (!aStarts && bStarts) return 1
+
+            // Calculate base scores (100 for starts-with, 50 for contains)
+            let aBase = aStarts ? 100 : 50
+            let bBase = bStarts ? 100 : 50
+
+            // Apply usage boost from stats service
+            let aBoost = Services.UsageStatsService.getBoostScore("app:" + a.filePath)
+            let bBoost = Services.UsageStatsService.getBoostScore("app:" + b.filePath)
+
+            let aTotal = aBase + aBoost
+            let bTotal = bBase + bBoost
+
+            if (aTotal !== bTotal) return bTotal - aTotal
             return a.name.localeCompare(b.name)
         })
 
@@ -212,7 +223,7 @@ Item {
             type: "app",
             title: app.name,
             description: app.genericName || app.comment || "",
-            icon: IconService.getIcon(app.icon),
+            icon: Services.IconService.getIcon(app.icon),
             data: app,
             action: function() {
                 launchApp(app)

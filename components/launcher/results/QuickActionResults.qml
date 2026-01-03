@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell.Services.Mpris
-import "../../../services"
+import "../../../services" as Services
 import ".."
 
 QtObject {
@@ -196,7 +196,7 @@ QtObject {
         })
 
         // VPN (only if configured)
-        if (ConfigService.quickToggleVpnName) {
+        if (Services.ConfigService.quickToggleVpnName) {
             let vpnOn = QuickActionState.vpnConnected
             actions.push({
                 type: "quickaction",
@@ -299,6 +299,10 @@ QtObject {
             }
 
             if (score > 0) {
+                // Add usage boost to score
+                let itemId = "quickaction:" + (action.category || "unknown") + ":" + action.title
+                let boost = Services.UsageStatsService.getBoostScore(itemId)
+
                 // Store action with score for sorting
                 results.push({
                     type: action.type,
@@ -308,7 +312,7 @@ QtObject {
                     icon: action.icon,
                     keywords: action.keywords,
                     action: action.action,
-                    _score: score
+                    _score: score + boost
                 })
             }
         }

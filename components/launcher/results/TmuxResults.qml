@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Io
 import "../../../theme"
+import "../../../services" as Services
 
 QtObject {
     id: tmuxResults
@@ -115,6 +116,15 @@ QtObject {
                 }
             })
         }
+
+        // Sort existing windows by usage boost (before adding "create new")
+        results.sort((a, b) => {
+            let aId = "tmux:" + a.data.sessionName + ":" + a.data.windowIndex
+            let bId = "tmux:" + b.data.sessionName + ":" + b.data.windowIndex
+            let aBoost = Services.UsageStatsService.getBoostScore(aId)
+            let bBoost = Services.UsageStatsService.getBoostScore(bId)
+            return bBoost - aBoost
+        })
 
         // Add "Create new session" option if query is valid and no exact session match
         if (lowerQuery && !hasExactSessionMatch && isValidSessionName(query.trim())) {

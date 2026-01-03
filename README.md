@@ -253,6 +253,23 @@ Real-time calculations displayed on the right side of the input as you type:
 - Icons indicate active windows and attached sessions
 - Can be disabled in Settings → Search Features → Tmux Sessions
 
+**Quick Actions** (no prefix needed):
+Quick actions appear in unified search alongside apps, providing fast access to:
+- **Panel Shortcuts** - Settings, Display Settings, Theme Settings, Wallpaper, Overview
+- **Bar Mode Switching** - Normal, Focus, Hidden modes
+- **Media Controls** - Play/Pause, Next, Previous, Stop (only when media player active)
+- **System Toggles** - WiFi, Bluetooth, Mic Mute, Night Light, VPN, Caffeine, Do Not Disturb
+  - Toggles show current state (e.g., "WiFi: On" vs "WiFi: Off")
+  - Icons update to reflect current state
+
+**Usage Tracking & Smart Sorting**:
+The launcher learns from your usage patterns:
+- Items you select are tracked with frequency and recency
+- Frequently and recently used items appear higher in results
+- Uses logarithmic frequency scaling (prevents overused items from dominating)
+- Recency decays over ~1 week half-life
+- Stats stored in `~/.local/share/faiyt-qs/usage-stats.json`
+
 ### Screen Capture
 Screenshot and screen recording functionality with area selection:
 
@@ -436,6 +453,7 @@ faiyt-qs/
 │   │   ├── ResultItem.qml       # Search result item
 │   │   ├── WindowResultItem.qml # Window result with live preview
 │   │   ├── Evaluator.qml        # Evaluator manager
+│   │   ├── QuickActionState.qml # Quick action toggle states
 │   │   ├── EmojiGridView.qml    # Emoji grid display
 │   │   ├── StickerGridView.qml  # Sticker grid with preview panel
 │   │   ├── StickerPackBar.qml   # Sticker pack selection bar
@@ -445,10 +463,11 @@ faiyt-qs/
 │   │   │   ├── CommandResults.qml
 │   │   │   ├── SystemResults.qml
 │   │   │   ├── WindowResults.qml
-│   │   │   ├── EmojiResults.qml   # Emoji search provider
-│   │   │   ├── StickerResults.qml # Signal sticker search
-│   │   │   ├── GifResults.qml     # Tenor GIF search
-│   │   │   └── TmuxResults.qml    # Tmux session search
+│   │   │   ├── EmojiResults.qml     # Emoji search provider
+│   │   │   ├── StickerResults.qml   # Signal sticker search
+│   │   │   ├── GifResults.qml       # Tenor GIF search
+│   │   │   ├── TmuxResults.qml      # Tmux session search
+│   │   │   └── QuickActionResults.qml # Quick actions (panels, toggles, media)
 │   │   └── evaluators/          # Instant evaluators
 │   │       ├── MathEvaluator.qml
 │   │       ├── PercentageEvaluator.qml
@@ -498,6 +517,7 @@ faiyt-qs/
 │       ├── MonitorItem.qml       # Draggable monitor representation
 │       └── MonitorSettings.qml   # Resolution/scale/transform settings
 ├── services/
+│   ├── BatteryService.qml       # Battery monitoring and notifications
 │   ├── BluetoothService.qml     # Bluetooth device management singleton
 │   ├── CavaService.qml          # Audio visualization (cava) singleton
 │   ├── ClaudeService.qml        # Claude AI API integration
@@ -505,7 +525,8 @@ faiyt-qs/
 │   ├── ConversationManager.qml  # AI conversation storage (~/.local/share)
 │   ├── IconService.qml          # Centralized NerdFont icon mappings
 │   ├── StickerService.qml       # Signal sticker pack management
-│   └── ThemeService.qml         # Theme switching and custom theme management
+│   ├── ThemeService.qml         # Theme switching and custom theme management
+│   └── UsageStatsService.qml    # Launcher usage tracking for smart sorting
 ├── scripts/
 │   ├── screen-capture.sh        # Screenshot and recording script
 │   ├── sticker-decrypt.sh       # Signal sticker decryption (HKDF + AES)
