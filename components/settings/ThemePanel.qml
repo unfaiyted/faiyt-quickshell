@@ -234,6 +234,18 @@ Rectangle {
     border.width: 1
     border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
 
+    focus: true
+    Keys.onEscapePressed: {
+        if (dropdownVisible) {
+            closeDropdown()
+        } else if (pickerVisible) {
+            closePicker()
+        } else {
+            ThemePanelState.close()
+            SettingsState.open()
+        }
+    }
+
     // Shadow layer
     Rectangle {
         anchors.fill: parent

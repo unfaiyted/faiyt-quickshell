@@ -1836,4 +1836,20 @@ Rectangle {
 
     // Keyboard handler
     Keys.onEscapePressed: SettingsState.close()
+
+    // Focus search bar when panel opens
+    Connections {
+        target: SettingsState
+        function onSettingsOpenChanged() {
+            if (SettingsState.settingsOpen) {
+                searchInput.forceActiveFocus()
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        if (SettingsState.settingsOpen) {
+            searchInput.forceActiveFocus()
+        }
+    }
 }

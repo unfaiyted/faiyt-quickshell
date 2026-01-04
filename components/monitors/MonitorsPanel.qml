@@ -13,6 +13,9 @@ Rectangle {
     border.width: 1
     border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
 
+    focus: true
+    Keys.onEscapePressed: MonitorsState.close()
+
     // Prevent click-through
     MouseArea {
         anchors.fill: parent
