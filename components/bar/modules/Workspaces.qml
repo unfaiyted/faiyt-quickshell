@@ -136,6 +136,46 @@ Rectangle {
                             // Mouse entered tooltip, keep it open
                         }
                     }
+
+                    // Hint overlay for workspace popup windows
+                    PopupWindow {
+                        id: hintPopup
+                        anchor.window: wsTooltip
+                        anchor.rect: Qt.rect(0, 0, tooltipContent.width, tooltipContent.height)
+                        anchor.edges: Edges.Top | Edges.Left
+
+                        visible: wsTooltip.visible && HintNavigationService.active
+                        color: "transparent"
+
+                        implicitWidth: tooltipContent.width
+                        implicitHeight: tooltipContent.height
+
+                        HintOverlay {
+                            anchors.fill: parent
+                            scope: "workspace-popup"
+                            mapRoot: tooltipContent
+                        }
+                    }
+
+                    // Keyboard handling for hints in popup
+                    FocusScope {
+                        id: popupKeyHandler
+                        anchors.fill: parent
+                        focus: wsTooltip.visible && HintNavigationService.active
+
+                        Keys.onPressed: function(event) {
+                            if (HintNavigationService.active) {
+                                let key = ""
+                                if (event.key === Qt.Key_Escape) key = "Escape"
+                                else if (event.key === Qt.Key_Backspace) key = "Backspace"
+                                else if (event.text && event.text.length === 1) key = event.text
+
+                                if (key && HintNavigationService.handleKey(key, "workspace-popup", event.modifiers)) {
+                                    event.accepted = true
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

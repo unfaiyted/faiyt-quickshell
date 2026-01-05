@@ -7,6 +7,7 @@ import Quickshell.Hyprland
 import "../../../theme"
 import "../../../services"
 import "../../overview"
+import "../../common"
 
 Rectangle {
     id: tooltip
@@ -337,6 +338,26 @@ Rectangle {
                                 Hyprland.dispatch("focuswindow address:" + windowItem.winData.address)
                             } else if (mouse.button === Qt.MiddleButton) {
                                 // Close the window
+                                Hyprland.dispatch("closewindow address:" + windowItem.winData.address)
+                            }
+                        }
+                    }
+
+                    // Hint navigation for window
+                    HintTarget {
+                        targetElement: windowFrame
+                        scope: "workspace-popup"
+                        enabled: tooltip.isVisible
+                        action: () => {
+                            // Focus the window (left-click)
+                            if (windowItem.winData) {
+                                tooltip.requestClose()
+                                Hyprland.dispatch("focuswindow address:" + windowItem.winData.address)
+                            }
+                        }
+                        secondaryAction: () => {
+                            // Close the window (middle-click)
+                            if (windowItem.winData) {
                                 Hyprland.dispatch("closewindow address:" + windowItem.winData.address)
                             }
                         }
