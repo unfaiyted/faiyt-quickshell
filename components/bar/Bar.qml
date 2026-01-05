@@ -27,8 +27,29 @@ PanelWindow {
                                           OverviewState.overviewOpen ||
                                           ThemePanelState.panelOpen
 
-    // Bar hints only active when no other window is open
-    readonly property bool barHintsActive: HintNavigationService.active && !anyWindowOpen
+    // Bar hints only active when no other window is open and no popup scope is active
+    property bool barHintsActive: false
+
+    function updateBarHintsActive() {
+        const popupScope = HintNavigationService.activePopupScope
+        const shouldBeActive = HintNavigationService.active && !anyWindowOpen &&
+                               (popupScope === "" || popupScope === "bar")
+        if (barHintsActive !== shouldBeActive) {
+            barHintsActive = shouldBeActive
+        }
+    }
+
+    Connections {
+        target: HintNavigationService
+        function onActiveChanged() {
+            bar.updateBarHintsActive()
+        }
+        function onActivePopupScopeChanged() {
+            bar.updateBarHintsActive()
+        }
+    }
+
+    onAnyWindowOpenChanged: updateBarHintsActive()
 
     // Position at top, span full width
     anchors {
@@ -46,8 +67,8 @@ PanelWindow {
     // Background color
     color: Colors.background
 
-    // Keyboard focus - Exclusive when bar hints active for reliable key capture
-    WlrLayershell.keyboardFocus: barHintsActive ?
+    // Keyboard focus - Exclusive when hints active (bar handles routing to popup scopes)
+    WlrLayershell.keyboardFocus: (HintNavigationService.active && !anyWindowOpen) ?
         WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // Main layout container
@@ -168,36 +189,49 @@ PanelWindow {
             }
         }
 
-        // Keyboard handler for hint navigation
+        // Keyboard handler for hint navigation (routes to bar or active popup scope)
         FocusScope {
             id: keyboardHandler
             anchors.fill: parent
-            focus: bar.barHintsActive
+            focus: HintNavigationService.active && !bar.anyWindowOpen
 
-            // Force focus when bar hints become active
+            // Force focus when hints become active
             Connections {
-                target: bar
-                function onBarHintsActiveChanged() {
-                    if (bar.barHintsActive) {
+                target: HintNavigationService
+                function onActiveChanged() {
+                    if (HintNavigationService.active && !bar.anyWindowOpen) {
                         keyboardHandler.forceActiveFocus()
                     }
                 }
             }
 
             Keys.onPressed: function(event) {
-                if (bar.barHintsActive) {
-                    let key = ""
-                    if (event.key === Qt.Key_Escape) {
-                        key = "Escape"
-                    } else if (event.key === Qt.Key_Backspace) {
-                        key = "Backspace"
-                    } else if (event.text && event.text.length === 1) {
-                        key = event.text
-                    }
+                if (!HintNavigationService.active) return
 
-                    if (key && HintNavigationService.handleKey(key, "bar", event.modifiers)) {
-                        event.accepted = true
+                // Determine which scope to route keys to
+                const scope = HintNavigationService.activePopupScope || "bar"
+
+                // Handle Escape specially - close popup or deactivate hints
+                if (event.key === Qt.Key_Escape) {
+                    if (HintNavigationService.activePopupScope !== "") {
+                        // Close popup via signal (components listen for popupScopeCleared)
+                        HintNavigationService.clearPopupScope()
+                    } else {
+                        HintNavigationService.deactivate()
                     }
+                    event.accepted = true
+                    return
+                }
+
+                let key = ""
+                if (event.key === Qt.Key_Backspace) {
+                    key = "Backspace"
+                } else if (event.text && event.text.length === 1) {
+                    key = event.text
+                }
+
+                if (key && HintNavigationService.handleKey(key, scope, event.modifiers)) {
+                    event.accepted = true
                 }
             }
         }

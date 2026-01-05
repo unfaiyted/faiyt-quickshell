@@ -10,6 +10,16 @@ Item {
     width: 20
     height: 20
 
+    // Listen for popup scope cleared signal to close menu
+    Connections {
+        target: HintNavigationService
+        function onPopupScopeCleared(scope) {
+            if (scope === "screenshot-menu") {
+                modeMenu.visible = false
+            }
+        }
+    }
+
     // Icon
     Text {
         id: iconText
@@ -59,6 +69,7 @@ Item {
         secondaryAction: () => {
             // Shift+key opens the screenshot mode menu
             contextMenu.visible = true
+            HintNavigationService.setPopupScope("screenshot-menu")
         }
     }
 
@@ -205,11 +216,12 @@ Item {
 
                     HintTarget {
                         targetElement: menuItem1
-                        scope: "bar"
+                        scope: "screenshot-menu"
                         enabled: contextMenu.visible
                         action: () => {
                             ScreenshotState.annotateEnabled = false
                             contextMenu.visible = false
+                            HintNavigationService.clearPopupScope()
                             ScreenshotState.capture()
                         }
                     }
@@ -268,13 +280,68 @@ Item {
 
                     HintTarget {
                         targetElement: menuItem2
-                        scope: "bar"
+                        scope: "screenshot-menu"
                         enabled: contextMenu.visible
                         action: () => {
                             ScreenshotState.annotateEnabled = true
                             contextMenu.visible = false
+                            HintNavigationService.clearPopupScope()
                             ScreenshotState.capture()
                         }
+                    }
+                }
+            }
+        }
+
+        // Clear popup scope when menu closes
+        onVisibleChanged: {
+            if (!visible && HintNavigationService.activePopupScope === "screenshot-menu") {
+                HintNavigationService.clearPopupScope()
+            }
+        }
+
+        // Hint overlay for screenshot menu
+        PopupWindow {
+            id: hintPopup
+            anchor.window: contextMenu
+            anchor.rect: Qt.rect(0, 0, menuContent.width, menuContent.height)
+            anchor.edges: Edges.Top | Edges.Left
+
+            visible: contextMenu.visible && HintNavigationService.active
+            color: "transparent"
+
+            implicitWidth: menuContent.width
+            implicitHeight: menuContent.height
+
+            HintOverlay {
+                anchors.fill: parent
+                scope: "screenshot-menu"
+                mapRoot: menuContent
+            }
+        }
+
+        // Keyboard handling for hints in menu
+        FocusScope {
+            id: menuKeyHandler
+            anchors.fill: parent
+            focus: contextMenu.visible && HintNavigationService.active
+
+            Keys.onPressed: function(event) {
+                // Escape closes the menu
+                if (event.key === Qt.Key_Escape) {
+                    contextMenu.visible = false
+                    HintNavigationService.clearPopupScope()
+                    event.accepted = true
+                    return
+                }
+
+                if (HintNavigationService.active) {
+                    let key = ""
+                    if (event.key === Qt.Key_Backspace) key = "Backspace"
+                    else if (event.text && event.text.length === 1) key = event.text
+
+                    if (key && HintNavigationService.handleKey(key, "screenshot-menu", event.modifiers)) {
+                        event.accepted = true
                     }
                 }
             }

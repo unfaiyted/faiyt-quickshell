@@ -12,6 +12,45 @@ Singleton {
     property var targets: []  // [{id, element, hint, action, scope}]
     property int _nextId: 0  // Counter for unique IDs
 
+    // Active popup scope - when set, only hints from this scope are shown
+    // This suppresses parent scope hints (e.g., bar) while popup is open
+    property string activePopupScope: ""
+
+    // Signal emitted when popup scope is cleared (for popup cleanup)
+    signal popupScopeCleared(string scope)
+
+    // Timer to delay hint reassignment after popup opens
+    Timer {
+        id: popupHintTimer
+        interval: 50
+        repeat: false
+        onTriggered: hintService.reassignHints()
+    }
+
+    // Set the active popup scope (called when opening a popup via hints)
+    function setPopupScope(scope: string): void {
+        activePopupScope = scope
+        inputBuffer = ""  // Reset input buffer for new scope
+        reassignHints()
+        // Also reassign after a short delay to catch dynamically registered targets
+        popupHintTimer.restart()
+    }
+
+    // Clear the popup scope (called when popup closes)
+    function clearPopupScope(): void {
+        const previousScope = activePopupScope
+        activePopupScope = ""
+        reassignHints()
+        if (previousScope !== "") {
+            popupScopeCleared(previousScope)
+        }
+    }
+
+    // Check if a popup scope is currently active
+    function hasActivePopup(): bool {
+        return activePopupScope !== ""
+    }
+
     // Home-row priority hint characters
     readonly property var hintChars: [
         "a","s","d","f","g","h","j","k","l",  // Home row first
@@ -163,13 +202,23 @@ Singleton {
             // (This prevents "a" from activating when "aa", "ab" etc. exist)
             if (exact && !hasLongerMatches) {
                 const isShiftPressed = (modifiers & Qt.ShiftModifier)
+                const previousPopupScope = activePopupScope
+
                 // Shift+key triggers secondary action (right-click behavior)
                 if (isShiftPressed && typeof exact.secondaryAction === 'function') {
                     exact.secondaryAction()
                 } else if (typeof exact.action === 'function') {
                     exact.action()
                 }
-                deactivate()
+
+                // If action opened a popup (set activePopupScope), stay active
+                // Otherwise, deactivate hints
+                if (activePopupScope === previousPopupScope) {
+                    deactivate()
+                } else {
+                    // Popup was opened, just reset input buffer
+                    inputBuffer = ""
+                }
                 return true
             }
 
@@ -191,6 +240,7 @@ Singleton {
     function deactivate(): void {
         active = false
         inputBuffer = ""
+        activePopupScope = ""
     }
 
     function toggle(): void {

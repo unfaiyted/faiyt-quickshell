@@ -21,8 +21,12 @@ Item {
     anchors.fill: parent
     z: 1000
 
-    // Only visible when hint mode is active
-    visible: HintNavigationService.active
+    // Direct visibility binding - simpler and more reactive
+    visible: {
+        const popupScope = HintNavigationService.activePopupScope
+        const isActive = HintNavigationService.active
+        return isActive && (popupScope === "" || popupScope === hintOverlay.scope)
+    }
 
     // Fade in/out animation
     opacity: HintNavigationService.active ? 1 : 0
@@ -83,8 +87,9 @@ Item {
             height: 18
             radius: 4
 
-            // Theme-matched colors
-            color: Colors.rose
+            // Theme-matched colors - foam for hints with secondary action, rose for primary-only
+            property bool hasSecondaryAction: target && typeof target.secondaryAction === 'function'
+            color: hasSecondaryAction ? Colors.foam : Colors.rose
             border.width: 1
             border.color: Qt.darker(color, 1.15)
 

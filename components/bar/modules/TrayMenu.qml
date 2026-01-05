@@ -3,6 +3,7 @@ import Quickshell
 import "../../../theme"
 import "../../../services"
 import ".."
+import "../../common"
 
 PopupWindow {
     id: menuPopup
@@ -14,9 +15,22 @@ PopupWindow {
 
     signal menuClosed()
 
-    // Notify when menu is hidden
+    // Listen for popup scope cleared signal to close menu
+    Connections {
+        target: HintNavigationService
+        function onPopupScopeCleared(scope) {
+            if (scope === "tray-menu") {
+                menuPopup.visible = false
+            }
+        }
+    }
+
+    // Notify when menu is hidden and clear popup scope
     onVisibleChanged: {
         if (!visible) {
+            if (HintNavigationService.activePopupScope === "tray-menu") {
+                HintNavigationService.clearPopupScope()
+            }
             menuClosed()
         }
     }
@@ -180,7 +194,67 @@ PopupWindow {
                     }
                 }
             }
+
+            HintTarget {
+                targetElement: itemRect
+                scope: "tray-menu"
+                enabled: menuPopup.visible && (entry?.enabled ?? false) && !(entry?.hasChildren ?? false)
+                action: () => {
+                    if (menuPopup.focusAppFunction && menuPopup.appId) {
+                        menuPopup.focusAppFunction(menuPopup.appId)
+                    }
+                    entry?.triggered()
+                    menuPopup.visible = false
+                    HintNavigationService.clearPopupScope()
+                }
+            }
         }
     }
 
+    // Hint overlay for tray menu
+    PopupWindow {
+        id: hintPopup
+        anchor.window: menuPopup
+        anchor.rect: Qt.rect(0, 0, menuContent.width, menuContent.height)
+        anchor.edges: Edges.Top | Edges.Left
+
+        visible: menuPopup.visible && HintNavigationService.active
+        color: "transparent"
+
+        implicitWidth: menuContent.width
+        implicitHeight: menuContent.height
+
+        HintOverlay {
+            anchors.fill: parent
+            scope: "tray-menu"
+            mapRoot: menuContent
+        }
+    }
+
+    // Keyboard handling for hints in menu
+    FocusScope {
+        id: menuKeyHandler
+        anchors.fill: parent
+        focus: menuPopup.visible && HintNavigationService.active
+
+        Keys.onPressed: function(event) {
+            // Escape closes the menu
+            if (event.key === Qt.Key_Escape) {
+                menuPopup.visible = false
+                HintNavigationService.clearPopupScope()
+                event.accepted = true
+                return
+            }
+
+            if (HintNavigationService.active) {
+                let key = ""
+                if (event.key === Qt.Key_Backspace) key = "Backspace"
+                else if (event.text && event.text.length === 1) key = event.text
+
+                if (key && HintNavigationService.handleKey(key, "tray-menu", event.modifiers)) {
+                    event.accepted = true
+                }
+            }
+        }
+    }
 }

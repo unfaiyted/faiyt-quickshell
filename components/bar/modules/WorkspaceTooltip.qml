@@ -68,6 +68,8 @@ Rectangle {
             HyprlandData.updateWindowList()
             captureReady = false
             captureDelayTimer.start()
+            // Force hint reassignment after tooltip opens (HintTargets may register async)
+            hintRefreshTimer.start()
         } else {
             captureReady = false
             captureDelayTimer.stop()
@@ -75,6 +77,18 @@ Rectangle {
             exitCheckTimer.stop()
             hoveredWindowCount = 0
             mouseInside = false
+        }
+    }
+
+    // Timer to refresh hints after tooltip opens
+    Timer {
+        id: hintRefreshTimer
+        interval: 100
+        repeat: false
+        onTriggered: {
+            if (tooltip.isVisible && HintNavigationService.active) {
+                HintNavigationService.reassignHints()
+            }
         }
     }
 
@@ -349,15 +363,17 @@ Rectangle {
                         scope: "workspace-popup"
                         enabled: tooltip.isVisible
                         action: () => {
-                            // Focus the window (left-click)
+                            // Focus the window (left-click) and deactivate hints
                             if (windowItem.winData) {
+                                HintNavigationService.deactivate()
                                 tooltip.requestClose()
                                 Hyprland.dispatch("focuswindow address:" + windowItem.winData.address)
                             }
                         }
                         secondaryAction: () => {
-                            // Close the window (middle-click)
+                            // Close the window (middle-click) and deactivate hints
                             if (windowItem.winData) {
+                                HintNavigationService.deactivate()
                                 Hyprland.dispatch("closewindow address:" + windowItem.winData.address)
                             }
                         }

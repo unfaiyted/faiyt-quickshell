@@ -10,6 +10,16 @@ Item {
     width: 20
     height: 20
 
+    // Listen for popup scope cleared signal to close menu
+    Connections {
+        target: HintNavigationService
+        function onPopupScopeCleared(scope) {
+            if (scope === "recording-menu") {
+                modeMenu.visible = false
+            }
+        }
+    }
+
     // Icon text element
     Text {
         id: iconText
@@ -93,6 +103,7 @@ Item {
         secondaryAction: () => {
             // Shift+key opens the recording mode menu
             modeMenu.visible = true
+            HintNavigationService.setPopupScope("recording-menu")
         }
     }
 
@@ -239,11 +250,12 @@ Item {
 
                     HintTarget {
                         targetElement: menuItem1
-                        scope: "bar"
+                        scope: "recording-menu"
                         enabled: modeMenu.visible
                         action: () => {
                             RecordingState.recordingMode = "record"
                             modeMenu.visible = false
+                            HintNavigationService.clearPopupScope()
                             RecordingState.start("selection")
                         }
                     }
@@ -302,11 +314,12 @@ Item {
 
                     HintTarget {
                         targetElement: menuItem2
-                        scope: "bar"
+                        scope: "recording-menu"
                         enabled: modeMenu.visible
                         action: () => {
                             RecordingState.recordingMode = "record-hq"
                             modeMenu.visible = false
+                            HintNavigationService.clearPopupScope()
                             RecordingState.start("selection")
                         }
                     }
@@ -365,13 +378,68 @@ Item {
 
                     HintTarget {
                         targetElement: menuItem3
-                        scope: "bar"
+                        scope: "recording-menu"
                         enabled: modeMenu.visible
                         action: () => {
                             RecordingState.recordingMode = "record-gif"
                             modeMenu.visible = false
+                            HintNavigationService.clearPopupScope()
                             RecordingState.start("selection")
                         }
+                    }
+                }
+            }
+        }
+
+        // Clear popup scope when menu closes
+        onVisibleChanged: {
+            if (!visible && HintNavigationService.activePopupScope === "recording-menu") {
+                HintNavigationService.clearPopupScope()
+            }
+        }
+
+        // Hint overlay for recording menu
+        PopupWindow {
+            id: hintPopup
+            anchor.window: modeMenu
+            anchor.rect: Qt.rect(0, 0, menuContent.width, menuContent.height)
+            anchor.edges: Edges.Top | Edges.Left
+
+            visible: modeMenu.visible && HintNavigationService.active
+            color: "transparent"
+
+            implicitWidth: menuContent.width
+            implicitHeight: menuContent.height
+
+            HintOverlay {
+                anchors.fill: parent
+                scope: "recording-menu"
+                mapRoot: menuContent
+            }
+        }
+
+        // Keyboard handling for hints in menu
+        FocusScope {
+            id: menuKeyHandler
+            anchors.fill: parent
+            focus: modeMenu.visible && HintNavigationService.active
+
+            Keys.onPressed: function(event) {
+                // Escape closes the menu
+                if (event.key === Qt.Key_Escape) {
+                    modeMenu.visible = false
+                    HintNavigationService.clearPopupScope()
+                    event.accepted = true
+                    return
+                }
+
+                if (HintNavigationService.active) {
+                    let key = ""
+                    if (event.key === Qt.Key_Backspace) key = "Backspace"
+                    else if (event.text && event.text.length === 1) key = event.text
+
+                    if (key && HintNavigationService.handleKey(key, "recording-menu", event.modifiers)) {
+                        event.accepted = true
                     }
                 }
             }

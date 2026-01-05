@@ -17,6 +17,16 @@ Rectangle {
     // Track which workspace tooltip is open (-1 = none)
     property int openTooltipId: -1
 
+    // Listen for popup scope cleared signal to close tooltip
+    Connections {
+        target: HintNavigationService
+        function onPopupScopeCleared(scope) {
+            if (scope === "workspace-popup") {
+                workspacesContainer.openTooltipId = -1
+            }
+        }
+    }
+
     // Paged workspaces configuration
     property int perPage: ConfigService.workspacesPerPage
     property int currentPage: {
@@ -102,6 +112,7 @@ Rectangle {
                         // Shift+key opens the workspace tooltip/popup
                         if (wsIndicator.isOccupied) {
                             workspacesContainer.openTooltipId = wsIndicator.wsId
+                            HintNavigationService.setPopupScope("workspace-popup")
                         }
                     }
                 }
@@ -130,6 +141,7 @@ Rectangle {
 
                         onRequestClose: {
                             workspacesContainer.openTooltipId = -1
+                            HintNavigationService.clearPopupScope()
                         }
 
                         onCancelClose: {
@@ -137,24 +149,12 @@ Rectangle {
                         }
                     }
 
-                    // Hint overlay for workspace popup windows
-                    PopupWindow {
-                        id: hintPopup
-                        anchor.window: wsTooltip
-                        anchor.rect: Qt.rect(0, 0, tooltipContent.width, tooltipContent.height)
-                        anchor.edges: Edges.Top | Edges.Left
-
-                        visible: wsTooltip.visible && HintNavigationService.active
-                        color: "transparent"
-
-                        implicitWidth: tooltipContent.width
-                        implicitHeight: tooltipContent.height
-
-                        HintOverlay {
-                            anchors.fill: parent
-                            scope: "workspace-popup"
-                            mapRoot: tooltipContent
-                        }
+                    // Hint overlay directly in tooltip (no nested PopupWindow)
+                    HintOverlay {
+                        id: wsHintOverlay
+                        anchors.fill: tooltipContent
+                        scope: "workspace-popup"
+                        z: 1000
                     }
 
                     // Keyboard handling for hints in popup
@@ -164,10 +164,17 @@ Rectangle {
                         focus: wsTooltip.visible && HintNavigationService.active
 
                         Keys.onPressed: function(event) {
+                            // Escape closes the popup
+                            if (event.key === Qt.Key_Escape) {
+                                workspacesContainer.openTooltipId = -1
+                                HintNavigationService.clearPopupScope()
+                                event.accepted = true
+                                return
+                            }
+
                             if (HintNavigationService.active) {
                                 let key = ""
-                                if (event.key === Qt.Key_Escape) key = "Escape"
-                                else if (event.key === Qt.Key_Backspace) key = "Backspace"
+                                if (event.key === Qt.Key_Backspace) key = "Backspace"
                                 else if (event.text && event.text.length === 1) key = event.text
 
                                 if (key && HintNavigationService.handleKey(key, "workspace-popup", event.modifiers)) {
