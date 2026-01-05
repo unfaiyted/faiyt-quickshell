@@ -195,7 +195,7 @@ PanelWindow {
                         key = event.text
                     }
 
-                    if (key && HintNavigationService.handleKey(key, "bar")) {
+                    if (key && HintNavigationService.handleKey(key, "bar", event.modifiers)) {
                         event.accepted = true
                     }
                 }

@@ -64,10 +64,17 @@ Singleton {
     }
 
     // Register a clickable target
-    function register(element: Item, action: var, scope: string): int {
+    function register(element: Item, action: var, scope: string, secondaryAction: var): int {
         const id = _nextId++
         const newTargets = targets.slice()
-        newTargets.push({id: id, element: element, action: action, scope: scope, hint: ""})
+        newTargets.push({
+            id: id,
+            element: element,
+            action: action,
+            secondaryAction: secondaryAction || null,
+            scope: scope,
+            hint: ""
+        })
         targets = newTargets
         reassignHints()
         return id
@@ -123,8 +130,10 @@ Singleton {
 
     // Handle key input - returns true if key was handled
     // Optional scope parameter to only match hints from that scope
-    function handleKey(key, scope): bool {
+    // Optional modifiers parameter to detect Shift for secondary action
+    function handleKey(key, scope, modifiers): bool {
         scope = scope || ""
+        modifiers = modifiers || 0
         if (key === "Escape") {
             deactivate()
             return true
@@ -153,7 +162,11 @@ Singleton {
             // Only activate if exact match AND no longer hints exist
             // (This prevents "a" from activating when "aa", "ab" etc. exist)
             if (exact && !hasLongerMatches) {
-                if (typeof exact.action === 'function') {
+                const isShiftPressed = (modifiers & Qt.ShiftModifier)
+                // Shift+key triggers secondary action (right-click behavior)
+                if (isShiftPressed && typeof exact.secondaryAction === 'function') {
+                    exact.secondaryAction()
+                } else if (typeof exact.action === 'function') {
                     exact.action()
                 }
                 deactivate()

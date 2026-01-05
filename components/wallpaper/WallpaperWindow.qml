@@ -499,7 +499,7 @@ PanelWindow {
                         key = event.text
                     }
 
-                    if (key && HintNavigationService.handleKey(key, "wallpaper")) {
+                    if (key && HintNavigationService.handleKey(key, "wallpaper", event.modifiers)) {
                         event.accepted = true
                         return
                     }

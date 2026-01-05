@@ -98,6 +98,12 @@ Rectangle {
                     targetElement: wsIndicator
                     scope: "bar"
                     action: () => Hyprland.dispatch("workspace " + wsIndicator.wsId)
+                    secondaryAction: () => {
+                        // Shift+key opens the workspace tooltip/popup
+                        if (wsIndicator.isOccupied) {
+                            workspacesContainer.openTooltipId = wsIndicator.wsId
+                        }
+                    }
                 }
 
                 // Tooltip for each workspace indicator

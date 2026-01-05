@@ -90,6 +90,10 @@ Item {
         targetElement: recordBtn
         scope: "bar"
         action: () => RecordingState.toggle()
+        secondaryAction: () => {
+            // Shift+key opens the recording mode menu
+            modeMenu.visible = true
+        }
     }
 
     Timer {

@@ -110,7 +110,7 @@ Scope {
                         else if (event.key === Qt.Key_Backspace) key = "Backspace"
                         else if (event.text && event.text.length === 1) key = event.text
 
-                        if (key && HintNavigationService.handleKey(key, "monitors")) {
+                        if (key && HintNavigationService.handleKey(key, "monitors", event.modifiers)) {
                             event.accepted = true
                             return
                         }

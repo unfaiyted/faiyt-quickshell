@@ -7,8 +7,11 @@ Item {
     // The element to place the hint badge on
     property Item targetElement: parent
 
-    // Function to call when this hint is selected
+    // Function to call when this hint is selected (left-click behavior)
     property var action: null
+
+    // Function to call when Shift+hint is pressed (right-click behavior)
+    property var secondaryAction: null
 
     // Which overlay scope this belongs to (e.g., "sidebar-right")
     property string scope: ""
@@ -27,7 +30,7 @@ Item {
     Component.onCompleted: {
         if (enabled && action && targetElement) {
             _registrationId = HintNavigationService.register(
-                targetElement, action, scope
+                targetElement, action, scope, secondaryAction
             )
         }
     }
@@ -41,7 +44,7 @@ Item {
     onEnabledChanged: {
         if (enabled && action && targetElement && _registrationId < 0) {
             _registrationId = HintNavigationService.register(
-                targetElement, action, scope
+                targetElement, action, scope, secondaryAction
             )
         } else if (!enabled && _registrationId >= 0) {
             HintNavigationService.unregister(_registrationId)
@@ -57,7 +60,7 @@ Item {
         }
         if (enabled && action && targetElement) {
             _registrationId = HintNavigationService.register(
-                targetElement, action, scope
+                targetElement, action, scope, secondaryAction
             )
         }
     }

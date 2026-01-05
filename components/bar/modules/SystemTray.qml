@@ -323,6 +323,12 @@ BarGroup {
                             }
                         }
                     }
+                    secondaryAction: () => {
+                        // Right-click behavior: open context menu
+                        if (trayData.hasMenu) {
+                            tray.openMenu(trayMenu)
+                        }
+                    }
                 }
 
                 // Tooltip popup (only show when menu is not visible)

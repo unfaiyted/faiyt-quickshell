@@ -56,6 +56,10 @@ Item {
         targetElement: screenshotBtn
         scope: "bar"
         action: () => ScreenshotState.capture()
+        secondaryAction: () => {
+            // Shift+key opens the screenshot mode menu
+            contextMenu.visible = true
+        }
     }
 
     Timer {

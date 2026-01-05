@@ -226,7 +226,7 @@ PanelWindow {
                     key = event.text
                 }
 
-                if (key && HintNavigationService.handleKey(key, "sidebar-right")) {
+                if (key && HintNavigationService.handleKey(key, "sidebar-right", event.modifiers)) {
                     event.accepted = true
                     return
                 }
