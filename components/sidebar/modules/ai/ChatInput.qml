@@ -13,6 +13,16 @@ Item {
 
     height: 72
 
+    // Find ChatMessages sibling for keyboard scrolling
+    function findChatMessages() {
+        for (let i = 0; i < chatInput.parent.children.length; i++) {
+            if (chatInput.parent.children[i].objectName === "chatMessages") {
+                return chatInput.parent.children[i]
+            }
+        }
+        return null
+    }
+
     Rectangle {
         id: inputContainer
         anchors.fill: parent
@@ -60,6 +70,26 @@ Item {
                         }
                     }
 
+                    // Auto-focus input when conversation is selected
+                    Connections {
+                        target: ConversationManager
+                        function onConversationChanged(id) {
+                            if (chatInput.enabled && !AIState.isProcessing) {
+                                inputArea.forceActiveFocus()
+                            }
+                        }
+                    }
+
+                    // Auto-focus input when sidebar opens on a chat tab
+                    Connections {
+                        target: SidebarState
+                        function onLeftOpenChanged() {
+                            if (SidebarState.leftOpen && chatInput.enabled && !AIState.isProcessing && AIState.activeProviderTab < 4) {
+                                inputArea.forceActiveFocus()
+                            }
+                        }
+                    }
+
                     Keys.onReturnPressed: function(event) {
                         if (!(event.modifiers & Qt.ShiftModifier)) {
                             if (text.trim().length > 0) {
@@ -68,6 +98,23 @@ Item {
                             }
                             event.accepted = true
                         }
+                    }
+
+                    Keys.onUpPressed: function(event) {
+                        const chatMessages = findChatMessages()
+                        if (chatMessages) chatMessages.scrollUp()
+                        event.accepted = true
+                    }
+
+                    Keys.onDownPressed: function(event) {
+                        const chatMessages = findChatMessages()
+                        if (chatMessages) chatMessages.scrollDown()
+                        event.accepted = true
+                    }
+
+                    Keys.onEscapePressed: function(event) {
+                        SidebarState.leftOpen = false
+                        event.accepted = true
                     }
                 }
             }

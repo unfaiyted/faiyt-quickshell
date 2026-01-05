@@ -6,8 +6,20 @@ import "../.."
 
 Item {
     id: chatMessages
+    objectName: "chatMessages"
 
     property string provider: "claude"
+
+    // Scroll functions for keyboard navigation from ChatInput
+    function scrollUp() {
+        scrollAnim.to = Math.max(0, flickable.contentY - 80)
+        scrollAnim.restart()
+    }
+
+    function scrollDown() {
+        scrollAnim.to = Math.min(flickable.contentHeight - flickable.height, flickable.contentY + 80)
+        scrollAnim.restart()
+    }
     property var messages: AIState.activeConversation ? AIState.activeConversation.messages : []
     property bool loading: AIState.isProcessing
 
@@ -60,6 +72,15 @@ Item {
         ScrollBar.vertical: ScrollBar {
             active: true
             policy: ScrollBar.AsNeeded
+        }
+
+        // Smooth scroll animation for keyboard navigation
+        NumberAnimation {
+            id: scrollAnim
+            target: flickable
+            property: "contentY"
+            duration: 150
+            easing.type: Easing.OutCubic
         }
 
         Column {
