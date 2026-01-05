@@ -3,6 +3,8 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import "../../../../theme"
+import "../../../../services"
+import "../../../common"
 import "SyntaxHighlighter.js" as SyntaxHighlighter
 
 Rectangle {
@@ -78,6 +80,16 @@ Rectangle {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        copyProcess.running = true
+                        copyButton.copySuccess = true
+                        copyResetTimer.restart()
+                    }
+                }
+
+                HintTarget {
+                    targetElement: copyButton
+                    scope: "sidebar-left"
+                    action: () => {
                         copyProcess.running = true
                         copyButton.copySuccess = true
                         copyResetTimer.restart()

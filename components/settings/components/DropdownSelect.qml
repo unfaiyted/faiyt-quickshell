@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../theme"
+import "../../common"
 
 Item {
     id: dropdown
@@ -11,6 +12,7 @@ Item {
     property bool popupOpen: false
     property bool enableSearch: false  // Optional search feature
     property string previewText: "Aa Bb Cc"  // For font previews
+    property string hintScope: "settings"
     signal selected(int index, var value)
 
     // Find any DropdownOverlay in parent hierarchy
@@ -110,21 +112,29 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (dropdown.dropdownOverlay) {
-                    if (dropdown.popupOpen) {
-                        if (dropdown.dropdownOverlay.isThemePanel) {
-                            dropdown.dropdownOverlay.panel.closeDropdown()
-                        } else {
-                            dropdown.dropdownOverlay.close()
-                        }
-                    } else {
-                        if (dropdown.dropdownOverlay.isThemePanel) {
-                            dropdown.dropdownOverlay.panel.openDropdown(dropdown, dropdown.model, dropdown.currentIndex, dropdown.previewText, dropdown.enableSearch)
-                        } else {
-                            dropdown.dropdownOverlay.open(dropdown, dropdown.model, dropdown.currentIndex, dropdown.enableSearch, dropdown.previewText)
-                        }
-                    }
+            onClicked: dropdown.toggleDropdown()
+        }
+
+        HintTarget {
+            targetElement: button
+            scope: dropdown.hintScope
+            action: () => dropdown.toggleDropdown()
+        }
+    }
+
+    function toggleDropdown() {
+        if (dropdown.dropdownOverlay) {
+            if (dropdown.popupOpen) {
+                if (dropdown.dropdownOverlay.isThemePanel) {
+                    dropdown.dropdownOverlay.panel.closeDropdown()
+                } else {
+                    dropdown.dropdownOverlay.close()
+                }
+            } else {
+                if (dropdown.dropdownOverlay.isThemePanel) {
+                    dropdown.dropdownOverlay.panel.openDropdown(dropdown, dropdown.model, dropdown.currentIndex, dropdown.previewText, dropdown.enableSearch)
+                } else {
+                    dropdown.dropdownOverlay.open(dropdown, dropdown.model, dropdown.currentIndex, dropdown.enableSearch, dropdown.previewText)
                 }
             }
         }

@@ -4,6 +4,7 @@ import Quickshell.Io
 import "../../../theme"
 import "../../../services"
 import ".."
+import "../../common"
 
 BarGroup {
     id: weather
@@ -289,6 +290,14 @@ BarGroup {
         }
     }
 
+    HintTarget {
+        targetElement: weather
+        scope: "bar"
+        action: () => {
+            weather.popupOpen = true
+        }
+    }
+
     // Weather popup
     PopupWindow {
         id: tooltip
@@ -367,6 +376,7 @@ BarGroup {
 
                 // Temperature (clickable to copy)
                 Rectangle {
+                    id: tempRowRect
                     width: tempRow.width + 20
                     height: 50
                     radius: 8
@@ -410,6 +420,13 @@ BarGroup {
                             closeTimer.start()
                         }
                         onClicked: weather.copyWeatherSummary()
+                    }
+
+                    HintTarget {
+                        targetElement: tempRowRect
+                        scope: "bar"
+                        enabled: tooltip.visible
+                        action: () => weather.copyWeatherSummary()
                     }
                 }
 

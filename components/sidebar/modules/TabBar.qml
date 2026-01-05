@@ -1,5 +1,7 @@
 import QtQuick
 import "../../../theme"
+import "../../../services"
+import "../../common"
 
 Item {
     id: tabBar
@@ -115,6 +117,13 @@ Item {
                             onClicked: tabBar.currentIndex = index
                             onEntered: tabButton.isHovered = true
                             onExited: tabButton.isHovered = false
+                        }
+
+                        // Hint navigation target
+                        HintTarget {
+                            targetElement: tabButton
+                            scope: "sidebar-right"
+                            action: () => { tabBar.currentIndex = index }
                         }
                     }
                 }

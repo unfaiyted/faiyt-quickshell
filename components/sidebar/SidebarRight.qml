@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../../theme"
 import "../../services"
+import "../common"
 import "modules"
 
 PanelWindow {
@@ -22,8 +23,9 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus for Escape key
-    WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // Keyboard focus for Escape key and hint navigation
+    WlrLayershell.keyboardFocus: (expanded || HintNavigationService.active) ?
+        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // Hide window when not expanded (after animation completes) or disabled in config
     visible: ConfigService.windowSidebarRightEnabled && (expanded || slideAnimation.running || bgFadeAnim.running)
@@ -183,15 +185,54 @@ PanelWindow {
                 border.width: 1
                 border.color: Colors.border
             }
+
         }
     }
 
-    // Keyboard handler for Escape (at window level for reliable focus)
+    // Hint navigation overlay in a popup to avoid clipping issues
+    PopupWindow {
+        id: hintPopup
+        anchor.window: rightSidebar
+        anchor.rect: Qt.rect(8, 8, rightSidebar.width - 16, rightSidebar.height - 16)
+        anchor.edges: Edges.Top | Edges.Left
+
+        visible: rightSidebar.expanded && HintNavigationService.active
+        color: "transparent"
+
+        implicitWidth: rightSidebar.width - 16
+        implicitHeight: rightSidebar.height - 16
+
+        HintOverlay {
+            anchors.fill: parent
+            scope: "sidebar-right"
+            mapRoot: contentPanel
+        }
+    }
+
+    // Keyboard handler for Escape and hint navigation (at window level for reliable focus)
     FocusScope {
         anchors.fill: parent
-        focus: rightSidebar.expanded
+        focus: rightSidebar.expanded || HintNavigationService.active
 
         Keys.onPressed: function(event) {
+            // Handle hint navigation first when active
+            if (HintNavigationService.active) {
+                let key = ""
+                if (event.key === Qt.Key_Escape) {
+                    key = "Escape"
+                } else if (event.key === Qt.Key_Backspace) {
+                    key = "Backspace"
+                } else if (event.text && event.text.length === 1) {
+                    key = event.text
+                }
+
+                if (key && HintNavigationService.handleKey(key, "sidebar-right")) {
+                    event.accepted = true
+                    return
+                }
+            }
+
+            // Standard escape to close sidebar
             if (event.key === Qt.Key_Escape) {
                 SidebarState.rightOpen = false
                 event.accepted = true

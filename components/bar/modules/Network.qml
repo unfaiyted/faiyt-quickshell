@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import "../../../theme"
 import ".."
+import "../../common"
 
 BarGroup {
     id: network
@@ -135,6 +136,14 @@ BarGroup {
         }
     }
 
+    HintTarget {
+        targetElement: network
+        scope: "bar"
+        action: () => {
+            network.popupOpen = true
+        }
+    }
+
     // Custom tooltip popup
     PopupWindow {
         id: tooltip
@@ -213,6 +222,7 @@ BarGroup {
 
                 // IP Address row - clickable to copy
                 Rectangle {
+                    id: ipRowRect
                     visible: network.ipAddress.length > 0
                     width: ipRow.width + 16
                     height: 24
@@ -255,10 +265,21 @@ BarGroup {
                             network.copyToClipboard(ip)
                         }
                     }
+
+                    HintTarget {
+                        targetElement: ipRowRect
+                        scope: "bar"
+                        enabled: tooltip.visible && network.ipAddress.length > 0
+                        action: () => {
+                            var ip = network.ipAddress.split("/")[0]
+                            network.copyToClipboard(ip)
+                        }
+                    }
                 }
 
                 // Gateway row - clickable to copy or open in browser
                 Rectangle {
+                    id: gatewayRowRect
                     visible: network.gateway.length > 0
                     width: gatewayRow.width + 16
                     height: 24
@@ -272,6 +293,7 @@ BarGroup {
                         spacing: 8
 
                         Text {
+                            id: gatewayText
                             text: "󰛳 " + network.gateway
                             color: gatewayMouseArea.containsMouse ? Colors.foreground : Colors.muted
                             font.pixelSize: 10
@@ -287,6 +309,13 @@ BarGroup {
                                 onExited: closeTimer.start()
                                 onClicked: network.copyToClipboard(network.gateway)
                             }
+
+                            HintTarget {
+                                targetElement: gatewayText
+                                scope: "bar"
+                                enabled: tooltip.visible && network.gateway.length > 0
+                                action: () => network.copyToClipboard(network.gateway)
+                            }
                         }
 
                         Text {
@@ -299,6 +328,7 @@ BarGroup {
 
                         // Open in browser button - always visible with larger hit area
                         Rectangle {
+                            id: gatewayLinkBtn
                             width: 20
                             height: 20
                             radius: 4
@@ -322,6 +352,16 @@ BarGroup {
                                 onEntered: closeTimer.stop()
                                 onExited: closeTimer.start()
                                 onClicked: {
+                                    network.openGateway()
+                                    network.popupOpen = false
+                                }
+                            }
+
+                            HintTarget {
+                                targetElement: gatewayLinkBtn
+                                scope: "bar"
+                                enabled: tooltip.visible && network.gateway.length > 0
+                                action: () => {
                                     network.openGateway()
                                     network.popupOpen = false
                                 }

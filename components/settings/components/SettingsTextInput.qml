@@ -1,11 +1,13 @@
 import QtQuick
 import "../../../theme"
+import "../../common"
 
 Rectangle {
     id: settingsTextInput
 
     property alias text: inputField.text
     property string placeholder: ""
+    property string hintScope: "settings"
     signal textEdited(string value)
 
     width: 150
@@ -52,5 +54,11 @@ Rectangle {
             color: Colors.foregroundMuted
             visible: inputField.text.length === 0 && !inputField.activeFocus
         }
+    }
+
+    HintTarget {
+        targetElement: settingsTextInput
+        scope: settingsTextInput.hintScope
+        action: () => inputField.forceActiveFocus()
     }
 }

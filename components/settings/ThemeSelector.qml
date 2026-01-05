@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../theme"
 import "../../services"
+import "../common"
 
 Column {
     id: themeSelector
@@ -70,6 +71,16 @@ Column {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
+                    SettingsState.close()
+                    ThemePanelState.open()
+                }
+            }
+
+            HintTarget {
+                targetElement: parent
+                scope: "settings"
+                action: () => {
+                    HintNavigationService.deactivate()
                     SettingsState.close()
                     ThemePanelState.open()
                 }
@@ -197,6 +208,7 @@ Column {
                 }
 
                 MouseArea {
+                    id: themeOptionArea
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
@@ -205,6 +217,12 @@ Column {
                     onClicked: {
                         ThemeService.setTheme(modelData.name)
                     }
+                }
+
+                HintTarget {
+                    targetElement: themeOption
+                    scope: "settings"
+                    action: () => ThemeService.setTheme(modelData.name)
                 }
             }
         }
@@ -244,15 +262,33 @@ Column {
                 color: Colors.primary
             }
 
-            Text {
-                text: "Open Theme Manager"
-                font.pixelSize: 13
-                color: Colors.primary
+            Rectangle {
+                id: openThemeManagerBtn
+                width: openThemeManagerText.width
+                height: openThemeManagerText.height
+                color: "transparent"
+
+                Text {
+                    id: openThemeManagerText
+                    text: "Open Theme Manager"
+                    font.pixelSize: 13
+                    color: Colors.primary
+                }
 
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        SettingsState.close()
+                        ThemePanelState.open()
+                    }
+                }
+
+                HintTarget {
+                    targetElement: openThemeManagerBtn
+                    scope: "settings"
+                    action: () => {
+                        HintNavigationService.deactivate()
                         SettingsState.close()
                         ThemePanelState.open()
                     }

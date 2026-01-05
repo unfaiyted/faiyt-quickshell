@@ -320,6 +320,30 @@ Full-screen workspace overview with live window previews:
   - Drag window - Move to different workspace
 - **Click outside** to close
 
+### Keyboard Hint Navigation
+Flash.nvim-style keyboard navigation for all clickable UI elements:
+
+**Activation:**
+- Press `Ctrl+Space` to activate hint mode in any panel
+- Letter badges appear on all clickable elements
+- Type the letter(s) to click the element
+- Press `Escape` to cancel
+
+**Supported Panels:**
+- **Sidebars** - All tabs, toggles, buttons, and controls
+- **Settings Panel** - All toggles, dropdowns, number inputs, and action buttons
+- **Theme Manager** - Theme cards, color swatches, tab buttons, and font pickers
+- **Monitor Configuration** - Monitor items, resolution/scale buttons, and action buttons
+- **Wallpaper Picker** - Wallpaper items and navigation
+- **Top Bar** - All interactive bar modules
+
+**Features:**
+- Scope-aware hints (only shows elements relevant to current panel)
+- Single-letter hints (A-Z) for common elements
+- Two-letter hints (AA-ZZ) when more elements are present
+- Visual feedback with colored badges
+- Automatic deactivation after action or panel close
+
 ### Notification Popups
 Toast notifications that appear when notifications arrive:
 - Stack from top-right corner (up to 5)
@@ -509,13 +533,16 @@ faiyt-qs/
 │   │       ├── ThemeEditorView.qml   # Color editor layout
 │   │       ├── ColorSection.qml      # Collapsible color group
 │   │       └── ColorRow.qml          # Color swatch + hex input
-│   └── monitors/
-│       ├── MonitorsWindow.qml    # Full-screen overlay
-│       ├── MonitorsPanel.qml     # Main panel with canvas + settings
-│       ├── MonitorsState.qml     # Singleton state + IPC
-│       ├── MonitorCanvas.qml     # Monitor arrangement canvas
-│       ├── MonitorItem.qml       # Draggable monitor representation
-│       └── MonitorSettings.qml   # Resolution/scale/transform settings
+│   ├── monitors/
+│   │   ├── MonitorsWindow.qml    # Full-screen overlay
+│   │   ├── MonitorsPanel.qml     # Main panel with canvas + settings
+│   │   ├── MonitorsState.qml     # Singleton state + IPC
+│   │   ├── MonitorCanvas.qml     # Monitor arrangement canvas
+│   │   ├── MonitorItem.qml       # Draggable monitor representation
+│   │   └── MonitorSettings.qml   # Resolution/scale/transform settings
+│   └── common/
+│       ├── HintTarget.qml        # Registers clickable element for hint navigation
+│       └── HintOverlay.qml       # Renders hint badges over UI elements
 ├── services/
 │   ├── BatteryService.qml       # Battery monitoring and notifications
 │   ├── BluetoothService.qml     # Bluetooth device management singleton
@@ -523,6 +550,8 @@ faiyt-qs/
 │   ├── ClaudeService.qml        # Claude AI API integration
 │   ├── ConfigService.qml        # Settings persistence (JSON config)
 │   ├── ConversationManager.qml  # AI conversation storage (~/.local/share)
+│   ├── FontService.qml          # System font discovery and configuration
+│   ├── HintNavigationService.qml # Flash.nvim-style keyboard hint navigation
 │   ├── IconService.qml          # Centralized NerdFont icon mappings
 │   ├── StickerService.qml       # Signal sticker pack management
 │   ├── ThemeService.qml         # Theme switching and custom theme management

@@ -5,6 +5,7 @@ import "../../theme"
 import "../../services"
 import "modules"
 import "modules/ai"
+import "../common"
 
 PanelWindow {
     id: leftSidebar
@@ -23,8 +24,9 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus for Escape key
-    WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // Keyboard focus - Exclusive when hints active for reliable key capture
+    WlrLayershell.keyboardFocus: (expanded || HintNavigationService.active) ?
+        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // Hide window when not expanded (after animation completes) or disabled in config
     visible: ConfigService.windowSidebarLeftEnabled && (expanded || slideAnimation.running || bgFadeAnim.running)
@@ -182,12 +184,60 @@ PanelWindow {
         }
     }
 
-    // Keyboard handler for Escape (at window level for reliable focus)
+    // Hint navigation overlay in a popup to avoid clipping
+    PopupWindow {
+        id: hintPopup
+        anchor.window: leftSidebar
+        anchor.rect: Qt.rect(8, 8, leftSidebar.width - 16, leftSidebar.height - 16)
+        anchor.edges: Edges.Top | Edges.Left
+
+        visible: leftSidebar.expanded && HintNavigationService.active
+        color: "transparent"
+
+        implicitWidth: leftSidebar.width - 16
+        implicitHeight: leftSidebar.height - 16
+
+        HintOverlay {
+            anchors.fill: parent
+            scope: "sidebar-left"
+            mapRoot: contentPanel
+        }
+    }
+
+    // Keyboard handler (at window level for reliable focus)
     FocusScope {
+        id: keyboardHandler
         anchors.fill: parent
-        focus: leftSidebar.expanded
+        focus: leftSidebar.expanded || HintNavigationService.active
+
+        // Force focus to this handler when hints become active
+        Connections {
+            target: HintNavigationService
+            function onActiveChanged() {
+                if (HintNavigationService.active && leftSidebar.expanded) {
+                    keyboardHandler.forceActiveFocus()
+                }
+            }
+        }
 
         Keys.onPressed: function(event) {
+            // Handle hint navigation first when active
+            if (HintNavigationService.active) {
+                let key = ""
+                if (event.key === Qt.Key_Escape) {
+                    key = "Escape"
+                } else if (event.key === Qt.Key_Backspace) {
+                    key = "Backspace"
+                } else if (event.text && event.text.length === 1) {
+                    key = event.text
+                }
+
+                if (key && HintNavigationService.handleKey(key, "sidebar-left")) {
+                    event.accepted = true
+                    return
+                }
+            }
+
             if (event.key === Qt.Key_Escape) {
                 SidebarState.leftOpen = false
                 event.accepted = true

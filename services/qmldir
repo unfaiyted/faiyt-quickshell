@@ -11,3 +11,4 @@ singleton StickerService 1.0 StickerService.qml
 singleton ThemeService 1.0 ThemeService.qml
 singleton BatteryService 1.0 BatteryService.qml
 singleton UsageStatsService 1.0 UsageStatsService.qml
+singleton HintNavigationService 1.0 HintNavigationService.qml

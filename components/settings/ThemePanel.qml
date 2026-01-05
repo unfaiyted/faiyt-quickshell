@@ -5,6 +5,7 @@ import Quickshell
 import "../../theme"
 import "../../services"
 import "components"
+import "../common"
 
 Rectangle {
     id: themePanel
@@ -306,6 +307,13 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: themePanel.editingTheme = null
                     }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "theme"
+                        enabled: themePanel.isEditMode
+                        action: () => themePanel.editingTheme = null
+                    }
                 }
 
                 // Theme icon
@@ -373,6 +381,13 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: themePanel.activeTab = "themes"
                         }
+
+                        HintTarget {
+                            targetElement: parent
+                            scope: "theme"
+                            enabled: !themePanel.isEditMode
+                            action: () => themePanel.activeTab = "themes"
+                        }
                     }
 
                     Rectangle {
@@ -415,6 +430,13 @@ Rectangle {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: themePanel.activeTab = "fonts"
+                        }
+
+                        HintTarget {
+                            targetElement: parent
+                            scope: "theme"
+                            enabled: !themePanel.isEditMode
+                            action: () => themePanel.activeTab = "fonts"
                         }
                     }
                 }
@@ -466,6 +488,18 @@ Rectangle {
                             }
                         }
                     }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "theme"
+                        enabled: !themePanel.isEditMode && themePanel.activeTab === "themes"
+                        action: () => {
+                            let newTheme = ThemeService.createNewTheme()
+                            if (newTheme) {
+                                themePanel.editingTheme = newTheme
+                            }
+                        }
+                    }
                 }
 
                 // Close button
@@ -490,6 +524,16 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            ThemePanelState.close()
+                            SettingsState.open()
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "theme"
+                        action: () => {
+                            HintNavigationService.deactivate()
                             ThemePanelState.close()
                             SettingsState.open()
                         }
@@ -707,6 +751,13 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: themePanel.closePicker()
+                    }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "theme"
+                        enabled: themePanel.pickerVisible
+                        action: () => themePanel.closePicker()
                     }
                 }
             }
@@ -1117,6 +1168,13 @@ Rectangle {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: themePanel.selectDropdownItem(index, modelData.value)
+                        }
+
+                        HintTarget {
+                            targetElement: dropdownItem
+                            scope: "theme"
+                            enabled: themePanel.dropdownVisible
+                            action: () => themePanel.selectDropdownItem(index, modelData.value)
                         }
                     }
                 }

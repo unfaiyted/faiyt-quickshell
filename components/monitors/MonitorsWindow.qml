@@ -2,7 +2,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "."
+import "../common"
 
 Scope {
     id: monitorsScope
@@ -61,12 +63,64 @@ Scope {
                 }
             }
 
+            // Hint navigation overlay
+            PopupWindow {
+                id: hintPopup
+                anchor.window: monitorsWindow
+                anchor.rect: Qt.rect(
+                    (monitorsWindow.width - panel.width) / 2,
+                    (monitorsWindow.height - panel.height) / 2,
+                    panel.width,
+                    panel.height
+                )
+                anchor.edges: Edges.Top | Edges.Left
+
+                visible: MonitorsState.monitorsOpen && HintNavigationService.active
+                color: "transparent"
+
+                implicitWidth: panel.width
+                implicitHeight: panel.height
+
+                HintOverlay {
+                    anchors.fill: parent
+                    scope: "monitors"
+                    mapRoot: panel
+                }
+            }
+
             // Keyboard handling
-            Item {
+            FocusScope {
+                id: keyboardHandler
                 anchors.fill: parent
                 focus: MonitorsState.monitorsOpen
 
-                Keys.onEscapePressed: MonitorsState.close()
+                Connections {
+                    target: HintNavigationService
+                    function onActiveChanged() {
+                        if (HintNavigationService.active && MonitorsState.monitorsOpen) {
+                            keyboardHandler.forceActiveFocus()
+                        }
+                    }
+                }
+
+                Keys.onPressed: function(event) {
+                    if (HintNavigationService.active) {
+                        let key = ""
+                        if (event.key === Qt.Key_Escape) key = "Escape"
+                        else if (event.key === Qt.Key_Backspace) key = "Backspace"
+                        else if (event.text && event.text.length === 1) key = event.text
+
+                        if (key && HintNavigationService.handleKey(key, "monitors")) {
+                            event.accepted = true
+                            return
+                        }
+                    }
+
+                    if (event.key === Qt.Key_Escape) {
+                        MonitorsState.close()
+                        event.accepted = true
+                    }
+                }
             }
 
             onVisibleChanged: {

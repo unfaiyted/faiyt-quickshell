@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import "../../../theme"
 import "../../../services"
 import ".."
+import "../../common"
 
 Rectangle {
     id: workspacesContainer
@@ -91,6 +92,12 @@ Rectangle {
                             tooltipContent.startCloseTimer()
                         }
                     }
+                }
+
+                HintTarget {
+                    targetElement: wsIndicator
+                    scope: "bar"
+                    action: () => Hyprland.dispatch("workspace " + wsIndicator.wsId)
                 }
 
                 // Tooltip for each workspace indicator

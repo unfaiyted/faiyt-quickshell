@@ -4,6 +4,7 @@ import Quickshell.Io
 import "../../../theme"
 import "../../../services"
 import ".."
+import "../../common"
 
 BarGroup {
     id: clockContainer
@@ -178,6 +179,15 @@ BarGroup {
         }
     }
 
+    HintTarget {
+        targetElement: clockContainer
+        scope: "bar"
+        action: () => {
+            clockContainer.popupOpen = true
+            clockContainer.updateTimezoneTimes()
+        }
+    }
+
     // Custom tooltip popup window
     PopupWindow {
         id: tooltip
@@ -221,6 +231,7 @@ BarGroup {
 
                 // Date row - clickable to copy
                 Rectangle {
+                    id: dateRowRect
                     width: dateRow.width + 16
                     height: 28
                     radius: 4
@@ -259,6 +270,13 @@ BarGroup {
                         onExited: closeTimer.start()
                         onClicked: clockContainer.copyToClipboard(clockContainer.fullDate)
                     }
+
+                    HintTarget {
+                        targetElement: dateRowRect
+                        scope: "bar"
+                        enabled: tooltip.visible
+                        action: () => clockContainer.copyToClipboard(clockContainer.fullDate)
+                    }
                 }
 
                 Rectangle {
@@ -270,6 +288,7 @@ BarGroup {
 
                 // Local time row
                 Rectangle {
+                    id: localTimeRect
                     width: localTimeRow.width + 16
                     height: 28
                     radius: 4
@@ -323,6 +342,13 @@ BarGroup {
                         onExited: closeTimer.start()
                         onClicked: clockContainer.copyToClipboard(clockContainer.fullTime)
                     }
+
+                    HintTarget {
+                        targetElement: localTimeRect
+                        scope: "bar"
+                        enabled: tooltip.visible
+                        action: () => clockContainer.copyToClipboard(clockContainer.fullTime)
+                    }
                 }
 
                 // Timezone rows
@@ -330,6 +356,7 @@ BarGroup {
                     model: ConfigService.timezones
 
                     Rectangle {
+                        id: tzRect
                         required property var modelData
                         required property int index
 
@@ -401,6 +428,13 @@ BarGroup {
                             }
                             onClicked: clockContainer.copyToClipboard(clockContainer.getTimeInTimezone(modelData.id))
                         }
+
+                        HintTarget {
+                            targetElement: tzRect
+                            scope: "bar"
+                            enabled: tooltip.visible
+                            action: () => clockContainer.copyToClipboard(clockContainer.getTimeInTimezone(tzRect.modelData.id))
+                        }
                     }
                 }
 
@@ -414,6 +448,7 @@ BarGroup {
 
                 // Unix timestamp row
                 Rectangle {
+                    id: timestampRect
                     width: timestampRow.width + 16
                     height: 24
                     radius: 4
@@ -450,6 +485,13 @@ BarGroup {
                         onEntered: closeTimer.stop()
                         onExited: closeTimer.start()
                         onClicked: clockContainer.copyToClipboard(clockContainer.timestamp)
+                    }
+
+                    HintTarget {
+                        targetElement: timestampRect
+                        scope: "bar"
+                        enabled: tooltip.visible
+                        action: () => clockContainer.copyToClipboard(clockContainer.timestamp)
                     }
                 }
             }

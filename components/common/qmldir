@@ -1,0 +1,3 @@
+module components.common
+HintOverlay 1.0 HintOverlay.qml
+HintTarget 1.0 HintTarget.qml

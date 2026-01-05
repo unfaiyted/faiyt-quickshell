@@ -2,7 +2,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "."
+import "../common"
 
 Scope {
     id: themePanelScope
@@ -78,12 +80,64 @@ Scope {
                 }
             }
 
+            // Hint navigation overlay
+            PopupWindow {
+                id: hintPopup
+                anchor.window: themePanelWindow
+                anchor.rect: Qt.rect(
+                    (themePanelWindow.width - panel.width) / 2,
+                    (themePanelWindow.height - panel.height) / 2,
+                    panel.width,
+                    panel.height
+                )
+                anchor.edges: Edges.Top | Edges.Left
+
+                visible: ThemePanelState.panelOpen && HintNavigationService.active
+                color: "transparent"
+
+                implicitWidth: panel.width
+                implicitHeight: panel.height
+
+                HintOverlay {
+                    anchors.fill: parent
+                    scope: "theme"
+                    mapRoot: panel
+                }
+            }
+
             // Keyboard handling
-            Item {
+            FocusScope {
+                id: keyboardHandler
                 anchors.fill: parent
                 focus: ThemePanelState.panelOpen
 
-                Keys.onEscapePressed: ThemePanelState.close()
+                Connections {
+                    target: HintNavigationService
+                    function onActiveChanged() {
+                        if (HintNavigationService.active && ThemePanelState.panelOpen) {
+                            keyboardHandler.forceActiveFocus()
+                        }
+                    }
+                }
+
+                Keys.onPressed: function(event) {
+                    if (HintNavigationService.active) {
+                        let key = ""
+                        if (event.key === Qt.Key_Escape) key = "Escape"
+                        else if (event.key === Qt.Key_Backspace) key = "Backspace"
+                        else if (event.text && event.text.length === 1) key = event.text
+
+                        if (key && HintNavigationService.handleKey(key, "theme")) {
+                            event.accepted = true
+                            return
+                        }
+                    }
+
+                    if (event.key === Qt.Key_Escape) {
+                        ThemePanelState.close()
+                        event.accepted = true
+                    }
+                }
             }
 
             onVisibleChanged: {

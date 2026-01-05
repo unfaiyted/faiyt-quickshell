@@ -3,6 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import "../../../theme"
 import "../../../services"
+import "../../common"
 
 Item {
     id: bluetoothPanel
@@ -40,6 +41,7 @@ Item {
 
             // Adapter selector button
             Rectangle {
+                id: adapterSelectorBtn
                 width: 70
                 height: 24
                 radius: 6
@@ -72,6 +74,13 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: bluetoothPanel.showAdapterDropdown = !bluetoothPanel.showAdapterDropdown
                 }
+
+                HintTarget {
+                    targetElement: adapterSelectorBtn
+                    scope: "sidebar-right"
+                    action: () => bluetoothPanel.showAdapterDropdown = !bluetoothPanel.showAdapterDropdown
+                    enabled: bluetoothPanel.adapters.length > 1
+                }
             }
         }
 
@@ -95,6 +104,7 @@ Item {
                     model: bluetoothPanel.adapters
 
                     Rectangle {
+                        id: adapterDropdownItem
                         width: adaptersList.width
                         height: 36
                         radius: 6
@@ -146,6 +156,16 @@ Item {
                                 BluetoothService.selectAdapter(adapterIdx)
                                 bluetoothPanel.showAdapterDropdown = false
                             }
+                        }
+
+                        HintTarget {
+                            targetElement: adapterDropdownItem
+                            scope: "sidebar-right"
+                            action: () => {
+                                BluetoothService.selectAdapter(adapterIdx)
+                                bluetoothPanel.showAdapterDropdown = false
+                            }
+                            enabled: bluetoothPanel.showAdapterDropdown
                         }
                     }
                 }
@@ -206,6 +226,7 @@ Item {
 
                 // Power switch
                 Rectangle {
+                    id: btPowerSwitch
                     width: 44
                     height: 24
                     radius: 12
@@ -233,6 +254,12 @@ Item {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: BluetoothService.togglePower()
+                    }
+
+                    HintTarget {
+                        targetElement: btPowerSwitch
+                        scope: "sidebar-right"
+                        action: () => BluetoothService.togglePower()
                     }
                 }
             }
@@ -274,6 +301,7 @@ Item {
 
                     // Scan button
                     Rectangle {
+                        id: btScanBtn
                         width: 32
                         height: 32
                         radius: 8
@@ -303,6 +331,13 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: BluetoothService.toggleScanning()
                         }
+
+                        HintTarget {
+                            targetElement: btScanBtn
+                            scope: "sidebar-right"
+                            action: () => BluetoothService.toggleScanning()
+                            enabled: bluetoothPanel.powered
+                        }
                     }
                 }
 
@@ -325,6 +360,7 @@ Item {
                     model: bluetoothPanel.devices
 
                     Rectangle {
+                        id: btDeviceItem
                         width: deviceColumn.width
                         height: 56
                         radius: 10
@@ -451,6 +487,19 @@ Item {
                                 }
                             }
                         }
+
+                        HintTarget {
+                            targetElement: btDeviceItem
+                            scope: "sidebar-right"
+                            action: () => {
+                                if (device.connected) {
+                                    BluetoothService.disconnectDevice(device.mac)
+                                } else {
+                                    BluetoothService.connectDevice(device.mac)
+                                }
+                            }
+                            enabled: bluetoothPanel.powered
+                        }
                     }
                 }
 
@@ -504,6 +553,7 @@ Item {
                     model: bluetoothPanel.scanning ? bluetoothPanel.discoveredDevices : []
 
                     Rectangle {
+                        id: btDiscoveredItem
                         width: deviceColumn.width
                         height: 56
                         radius: 10
@@ -607,6 +657,13 @@ Item {
                             onClicked: {
                                 BluetoothService.connectDevice(device.mac)
                             }
+                        }
+
+                        HintTarget {
+                            targetElement: btDiscoveredItem
+                            scope: "sidebar-right"
+                            action: () => BluetoothService.connectDevice(device.mac)
+                            enabled: bluetoothPanel.scanning
                         }
                     }
                 }

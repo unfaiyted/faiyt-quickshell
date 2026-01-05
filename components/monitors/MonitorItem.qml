@@ -1,6 +1,7 @@
 import QtQuick
 import "../../theme"
 import "."
+import "../common"
 
 Rectangle {
     id: monitorItem
@@ -160,5 +161,11 @@ Rectangle {
         onReleased: {
             isDragging = false
         }
+    }
+
+    HintTarget {
+        targetElement: monitorItem
+        scope: "monitors"
+        action: () => MonitorsState.selectedMonitor = monitor.name
     }
 }

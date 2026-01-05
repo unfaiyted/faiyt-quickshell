@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell.Io
 import "../../../theme"
+import "../../../services"
+import "../../common"
 
 Item {
     id: toolsModule
@@ -49,6 +51,7 @@ Item {
 
         // Search bar
         Rectangle {
+            id: searchBar
             width: parent.width
             height: 40
             radius: 10
@@ -75,6 +78,16 @@ Item {
                     color: Colors.foreground
                     clip: true
 
+                    // Remove focus when hint navigation becomes active
+                    Connections {
+                        target: HintNavigationService
+                        function onActiveChanged() {
+                            if (HintNavigationService.active && searchInput.activeFocus) {
+                                searchInput.focus = false
+                            }
+                        }
+                    }
+
                     Text {
                         anchors.fill: parent
                         text: "Search tools..."
@@ -85,6 +98,12 @@ Item {
 
                     onTextChanged: toolsModule.searchQuery = text
                 }
+            }
+
+            HintTarget {
+                targetElement: searchBar
+                scope: "sidebar-left"
+                action: () => searchInput.forceActiveFocus()
             }
         }
 
@@ -97,6 +116,7 @@ Item {
                 model: categories
 
                 Rectangle {
+                    id: categoryTab
                     width: (parent.width - 24) / 5
                     height: 32
                     radius: 8
@@ -125,6 +145,12 @@ Item {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: toolsModule.selectedCategory = modelData.id
+                    }
+
+                    HintTarget {
+                        targetElement: categoryTab
+                        scope: "sidebar-left"
+                        action: () => toolsModule.selectedCategory = modelData.id
                     }
                 }
             }

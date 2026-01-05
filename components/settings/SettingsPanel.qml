@@ -7,6 +7,7 @@ import "../../theme"
 import "../../services"
 import "../../components/monitors"
 import "components"
+import "../common"
 
 Rectangle {
     id: settingsPanel
@@ -103,6 +104,15 @@ Rectangle {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: SettingsState.close()
+                        }
+
+                        HintTarget {
+                            targetElement: parent
+                            scope: "settings"
+                            action: () => {
+                                HintNavigationService.deactivate()
+                                SettingsState.close()
+                            }
                         }
                     }
                 }
@@ -245,6 +255,17 @@ Rectangle {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
+                                    SettingsState.close()
+                                    MonitorsState.openedFromSettings = true
+                                    MonitorsState.open()
+                                }
+                            }
+
+                            HintTarget {
+                                targetElement: parent
+                                scope: "settings"
+                                action: () => {
+                                    HintNavigationService.deactivate()
                                     SettingsState.close()
                                     MonitorsState.openedFromSettings = true
                                     MonitorsState.open()
@@ -843,6 +864,16 @@ Rectangle {
                                                         ConfigService.saveConfig()
                                                     }
                                                 }
+
+                                                HintTarget {
+                                                    targetElement: parent
+                                                    scope: "settings"
+                                                    action: () => {
+                                                        let tzs = ConfigService.timezones.filter((_, i) => i !== index)
+                                                        ConfigService.setValue("time.timezones", tzs)
+                                                        ConfigService.saveConfig()
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -930,6 +961,21 @@ Rectangle {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
+                                                if (newTimezoneId.text && newTimezoneLabel.text) {
+                                                    let tzs = ConfigService.timezones.slice()
+                                                    tzs.push({id: newTimezoneId.text, label: newTimezoneLabel.text})
+                                                    ConfigService.setValue("time.timezones", tzs)
+                                                    ConfigService.saveConfig()
+                                                    newTimezoneId.text = ""
+                                                    newTimezoneLabel.text = ""
+                                                }
+                                            }
+                                        }
+
+                                        HintTarget {
+                                            targetElement: parent
+                                            scope: "settings"
+                                            action: () => {
                                                 if (newTimezoneId.text && newTimezoneLabel.text) {
                                                     let tzs = ConfigService.timezones.slice()
                                                     tzs.push({id: newTimezoneId.text, label: newTimezoneLabel.text})
@@ -1403,6 +1449,12 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: Qt.openUrlExternally("https://developers.google.com/tenor/guides/quickstart")
                                     }
+
+                                    HintTarget {
+                                        targetElement: parent
+                                        scope: "settings"
+                                        action: () => Qt.openUrlExternally("https://developers.google.com/tenor/guides/quickstart")
+                                    }
                                 }
                             }
                         }
@@ -1609,6 +1661,12 @@ Rectangle {
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: stickerPacksColumn.addPack()
                                     }
+
+                                    HintTarget {
+                                        targetElement: parent
+                                        scope: "settings"
+                                        action: () => stickerPacksColumn.addPack()
+                                    }
                                 }
                             }
 
@@ -1718,6 +1776,12 @@ Rectangle {
                                                     cursorShape: Qt.PointingHandCursor
                                                     onClicked: StickerService.removePack(modelData.id)
                                                 }
+
+                                                HintTarget {
+                                                    targetElement: parent
+                                                    scope: "settings"
+                                                    action: () => StickerService.removePack(modelData.id)
+                                                }
                                             }
                                         }
                                     }
@@ -1815,12 +1879,19 @@ Rectangle {
                             }
 
                             MouseArea {
+                                id: restartArea
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 hoverEnabled: true
                                 onClicked: {
                                     restartProcess.running = true
                                 }
+                            }
+
+                            HintTarget {
+                                targetElement: parent
+                                scope: "settings"
+                                action: () => restartProcess.running = true
                             }
 
                             Process {

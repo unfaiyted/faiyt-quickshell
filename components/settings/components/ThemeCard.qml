@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../theme"
 import "../../../services"
+import "../../common"
 
 Rectangle {
     id: themeCard
@@ -169,6 +170,12 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: themeCard.duplicate()
                 }
+
+                HintTarget {
+                    targetElement: parent
+                    scope: "theme"
+                    action: () => themeCard.duplicate()
+                }
             }
 
             // Edit button (only for custom themes)
@@ -208,6 +215,13 @@ Rectangle {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: themeCard.edit()
+                }
+
+                HintTarget {
+                    targetElement: parent
+                    scope: "theme"
+                    enabled: !themeCard.isBuiltin
+                    action: () => themeCard.edit()
                 }
             }
 
@@ -249,12 +263,20 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: themeCard.deleteTheme()
                 }
+
+                HintTarget {
+                    targetElement: parent
+                    scope: "theme"
+                    enabled: !themeCard.isBuiltin
+                    action: () => themeCard.deleteTheme()
+                }
             }
         }
     }
 
     // Main click area for selecting theme
     MouseArea {
+        id: cardArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
@@ -262,5 +284,11 @@ Rectangle {
         onEntered: themeCard.hovered = true
         onExited: themeCard.hovered = false
         onClicked: themeCard.selected()
+    }
+
+    HintTarget {
+        targetElement: themeCard
+        scope: "theme"
+        action: () => themeCard.selected()
     }
 }

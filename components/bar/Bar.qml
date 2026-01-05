@@ -1,13 +1,34 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import "../../theme"
 import "../../services"
 import "modules"
+import "../common"
+import "../sidebar"
+import "../launcher"
+import "../wallpaper"
+import "../settings"
+import "../monitors"
+import "../overview"
 
 PanelWindow {
     id: bar
 
     visible: ConfigService.windowBarEnabled
+
+    // Check if any overlay window is open (disables bar hints)
+    readonly property bool anyWindowOpen: SidebarState.leftOpen ||
+                                          SidebarState.rightOpen ||
+                                          LauncherState.visible ||
+                                          WallpaperState.visible ||
+                                          SettingsState.settingsOpen ||
+                                          MonitorsState.monitorsOpen ||
+                                          OverviewState.overviewOpen ||
+                                          ThemePanelState.panelOpen
+
+    // Bar hints only active when no other window is open
+    readonly property bool barHintsActive: HintNavigationService.active && !anyWindowOpen
 
     // Position at top, span full width
     anchors {
@@ -25,8 +46,13 @@ PanelWindow {
     // Background color
     color: Colors.background
 
+    // Keyboard focus - Exclusive when bar hints active for reliable key capture
+    WlrLayershell.keyboardFocus: barHintsActive ?
+        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
     // Main layout container
     Item {
+        id: barContent
         anchors.fill: parent
 
         // Distro icon (leftmost element)
@@ -118,6 +144,62 @@ PanelWindow {
             anchors.right: parent.right
             height: 0
             color: Colors.border
+        }
+
+        // Hint navigation overlay in a popup so hints can extend below bar
+        PopupWindow {
+            id: hintPopup
+            anchor.window: bar
+            anchor.rect: Qt.rect(0, 0, bar.width, bar.height)
+            anchor.edges: Edges.Top | Edges.Left
+
+            visible: bar.barHintsActive
+            color: "transparent"
+
+            // Extend height to allow hints to render below bar elements
+            implicitWidth: bar.width
+            implicitHeight: bar.height + 30
+
+            HintOverlay {
+                anchors.fill: parent
+                scope: "bar"
+                anchorPosition: "bottomCenter"
+                mapRoot: barContent
+            }
+        }
+
+        // Keyboard handler for hint navigation
+        FocusScope {
+            id: keyboardHandler
+            anchors.fill: parent
+            focus: bar.barHintsActive
+
+            // Force focus when bar hints become active
+            Connections {
+                target: bar
+                function onBarHintsActiveChanged() {
+                    if (bar.barHintsActive) {
+                        keyboardHandler.forceActiveFocus()
+                    }
+                }
+            }
+
+            Keys.onPressed: function(event) {
+                if (bar.barHintsActive) {
+                    let key = ""
+                    if (event.key === Qt.Key_Escape) {
+                        key = "Escape"
+                    } else if (event.key === Qt.Key_Backspace) {
+                        key = "Backspace"
+                    } else if (event.text && event.text.length === 1) {
+                        key = event.text
+                    }
+
+                    if (key && HintNavigationService.handleKey(key, "bar")) {
+                        event.accepted = true
+                    }
+                }
+            }
         }
     }
 }

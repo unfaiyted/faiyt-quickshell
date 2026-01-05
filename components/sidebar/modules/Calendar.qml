@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../theme"
+import "../../common"
 
 Item {
     id: calendar
@@ -92,6 +93,7 @@ Item {
 
             // Previous month button
             Rectangle {
+                id: prevMonthBtn
                 width: 32
                 height: 32
                 radius: 8
@@ -111,6 +113,12 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: previousMonth()
+                }
+
+                HintTarget {
+                    targetElement: prevMonthBtn
+                    scope: "sidebar-right"
+                    action: () => previousMonth()
                 }
             }
 
@@ -141,6 +149,7 @@ Item {
 
             // Next month button
             Rectangle {
+                id: nextMonthBtn
                 width: 32
                 height: 32
                 radius: 8
@@ -161,10 +170,17 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: nextMonth()
                 }
+
+                HintTarget {
+                    targetElement: nextMonthBtn
+                    scope: "sidebar-right"
+                    action: () => nextMonth()
+                }
             }
 
             // Today button
             Rectangle {
+                id: todayBtn
                 width: 32
                 height: 32
                 radius: 8
@@ -184,6 +200,12 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: goToToday()
+                }
+
+                HintTarget {
+                    targetElement: todayBtn
+                    scope: "sidebar-right"
+                    action: () => goToToday()
                 }
             }
         }

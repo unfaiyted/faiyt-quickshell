@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Io
 import "../../theme"
+import "../common"
 
 Rectangle {
     id: wallpaperItem
@@ -164,6 +165,15 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
 
         onClicked: {
+            WallpaperState.selectedIndex = itemIndex
+            WallpaperState.setWallpaper(wallpaperPath)
+        }
+    }
+
+    HintTarget {
+        targetElement: wallpaperItem
+        scope: "wallpaper"
+        action: () => {
             WallpaperState.selectedIndex = itemIndex
             WallpaperState.setWallpaper(wallpaperPath)
         }

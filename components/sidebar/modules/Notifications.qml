@@ -3,6 +3,7 @@ import QtQuick.Controls
 import "../../../theme"
 import "../../notifications"
 import ".."
+import "../../common"
 
 Item {
     id: notifications
@@ -88,6 +89,7 @@ Item {
 
             // Do Not Disturb toggle
             Rectangle {
+                id: dndBtn
                 width: 32
                 height: 32
                 radius: 8
@@ -109,10 +111,17 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: NotificationState.doNotDisturb = !NotificationState.doNotDisturb
                 }
+
+                HintTarget {
+                    targetElement: dndBtn
+                    scope: "sidebar-right"
+                    action: () => NotificationState.doNotDisturb = !NotificationState.doNotDisturb
+                }
             }
 
             // Clear all button
             Rectangle {
+                id: clearAllBtn
                 width: 32
                 height: 32
                 radius: 8
@@ -134,6 +143,13 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: clearAll()
+                }
+
+                HintTarget {
+                    targetElement: clearAllBtn
+                    scope: "sidebar-right"
+                    action: () => clearAll()
+                    enabled: notificationCount() > 0
                 }
             }
         }
@@ -288,6 +304,7 @@ Item {
 
                                 // Dismiss button
                                 Rectangle {
+                                    id: dismissBtn
                                     width: 28
                                     height: 28
                                     radius: 6
@@ -310,6 +327,12 @@ Item {
                                         onClicked: {
                                             dismissNotification(notification)
                                         }
+                                    }
+
+                                    HintTarget {
+                                        targetElement: dismissBtn
+                                        scope: "sidebar-right"
+                                        action: () => dismissNotification(notification)
                                     }
                                 }
                             }

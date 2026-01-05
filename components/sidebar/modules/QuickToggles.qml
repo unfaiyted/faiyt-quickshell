@@ -3,6 +3,7 @@ import Quickshell.Io
 import "../../../services"
 import "../../../theme"
 import "../../notifications" as Notifications
+import "../../common"
 
 Item {
     id: quickToggles
@@ -397,10 +398,19 @@ Item {
         property string label: ""
         property string tooltip: ""
         property color activeColor: Colors.primary
+        property string hintScope: "sidebar-right"
         signal clicked()
 
         spacing: 4
         opacity: enabled ? 1.0 : 0.5
+
+        // Hint navigation target
+        HintTarget {
+            targetElement: btnRect
+            scope: toggleBtn.hintScope
+            action: () => { if (toggleBtn.enabled) toggleBtn.clicked() }
+            enabled: toggleBtn.enabled && toggleBtn.visible
+        }
 
         // Main toggle button
         Rectangle {

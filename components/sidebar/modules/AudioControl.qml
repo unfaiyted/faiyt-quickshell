@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Services.Pipewire
 import "../../../theme"
 import "../../../services"
+import "../../common"
 
 Item {
     id: audioControl
@@ -136,6 +137,7 @@ Item {
 
             // Device selector button
             Rectangle {
+                id: outputDeviceSelectorBtn
                 width: 70
                 height: 24
                 radius: 6
@@ -168,6 +170,13 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: audioControl.showOutputDevices = !audioControl.showOutputDevices
                 }
+
+                HintTarget {
+                    targetElement: outputDeviceSelectorBtn
+                    scope: "sidebar-right"
+                    action: () => audioControl.showOutputDevices = !audioControl.showOutputDevices
+                    enabled: getOutputDevices().length > 1
+                }
             }
         }
 
@@ -191,6 +200,7 @@ Item {
                     model: getOutputDevices()
 
                     Rectangle {
+                        id: outputDeviceItem
                         width: outputDevicesList.width
                         height: 32
                         radius: 6
@@ -233,6 +243,16 @@ Item {
                                 audioControl.showOutputDevices = false
                             }
                         }
+
+                        HintTarget {
+                            targetElement: outputDeviceItem
+                            scope: "sidebar-right"
+                            action: () => {
+                                Pipewire.preferredDefaultAudioSink = device
+                                audioControl.showOutputDevices = false
+                            }
+                            enabled: audioControl.showOutputDevices
+                        }
                     }
                 }
             }
@@ -257,6 +277,7 @@ Item {
 
                     // Volume icon (clickable to mute)
                     Rectangle {
+                        id: outputMuteBtn
                         width: 36
                         height: 36
                         radius: 8
@@ -279,6 +300,17 @@ Item {
                                     Pipewire.defaultAudioSink.audio.muted = !Pipewire.defaultAudioSink.audio.muted
                                 }
                             }
+                        }
+
+                        HintTarget {
+                            targetElement: outputMuteBtn
+                            scope: "sidebar-right"
+                            action: () => {
+                                if (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio) {
+                                    Pipewire.defaultAudioSink.audio.muted = !Pipewire.defaultAudioSink.audio.muted
+                                }
+                            }
+                            enabled: Pipewire.defaultAudioSink !== null
                         }
                     }
 
@@ -378,6 +410,7 @@ Item {
 
             // Device selector button
             Rectangle {
+                id: inputDeviceSelectorBtn
                 width: 70
                 height: 24
                 radius: 6
@@ -410,6 +443,13 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: audioControl.showInputDevices = !audioControl.showInputDevices
                 }
+
+                HintTarget {
+                    targetElement: inputDeviceSelectorBtn
+                    scope: "sidebar-right"
+                    action: () => audioControl.showInputDevices = !audioControl.showInputDevices
+                    enabled: getInputDevices().length > 1
+                }
             }
         }
 
@@ -433,6 +473,7 @@ Item {
                     model: getInputDevices()
 
                     Rectangle {
+                        id: inputDeviceItem
                         width: inputDevicesList.width
                         height: 32
                         radius: 6
@@ -475,6 +516,16 @@ Item {
                                 audioControl.showInputDevices = false
                             }
                         }
+
+                        HintTarget {
+                            targetElement: inputDeviceItem
+                            scope: "sidebar-right"
+                            action: () => {
+                                Pipewire.preferredDefaultAudioSource = device
+                                audioControl.showInputDevices = false
+                            }
+                            enabled: audioControl.showInputDevices
+                        }
                     }
                 }
             }
@@ -499,6 +550,7 @@ Item {
 
                     // Mic icon (clickable to mute)
                     Rectangle {
+                        id: inputMuteBtn
                         width: 36
                         height: 36
                         radius: 8
@@ -522,6 +574,17 @@ Item {
                                     Pipewire.defaultAudioSource.audio.muted = !Pipewire.defaultAudioSource.audio.muted
                                 }
                             }
+                        }
+
+                        HintTarget {
+                            targetElement: inputMuteBtn
+                            scope: "sidebar-right"
+                            action: () => {
+                                if (Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio) {
+                                    Pipewire.defaultAudioSource.audio.muted = !Pipewire.defaultAudioSource.audio.muted
+                                }
+                            }
+                            enabled: Pipewire.defaultAudioSource !== null
                         }
                     }
 
@@ -686,6 +749,7 @@ Item {
 
                                     // App icon
                                     Rectangle {
+                                        id: appMuteBtn
                                         width: 28
                                         height: 28
                                         radius: 6
@@ -703,6 +767,16 @@ Item {
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
+                                                if (stream && stream.audio) {
+                                                    stream.audio.muted = !stream.audio.muted
+                                                }
+                                            }
+                                        }
+
+                                        HintTarget {
+                                            targetElement: appMuteBtn
+                                            scope: "sidebar-right"
+                                            action: () => {
                                                 if (stream && stream.audio) {
                                                     stream.audio.muted = !stream.audio.muted
                                                 }

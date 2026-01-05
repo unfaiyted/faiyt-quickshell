@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
 import "../../../theme"
+import "../../../services"
+import "../../common"
 
 Item {
     id: screenshotBtn
@@ -48,6 +50,12 @@ Item {
                 tooltipPopup.visible = false
             }
         }
+    }
+
+    HintTarget {
+        targetElement: screenshotBtn
+        scope: "bar"
+        action: () => ScreenshotState.capture()
     }
 
     Timer {
@@ -142,6 +150,7 @@ Item {
 
                 // Screenshot (regular)
                 Rectangle {
+                    id: menuItem1
                     width: Math.max(itemRow1.width + 24, 180)
                     height: 28
                     radius: 4
@@ -189,10 +198,22 @@ Item {
                             ScreenshotState.capture()
                         }
                     }
+
+                    HintTarget {
+                        targetElement: menuItem1
+                        scope: "bar"
+                        enabled: contextMenu.visible
+                        action: () => {
+                            ScreenshotState.annotateEnabled = false
+                            contextMenu.visible = false
+                            ScreenshotState.capture()
+                        }
+                    }
                 }
 
                 // Screenshot + Annotate
                 Rectangle {
+                    id: menuItem2
                     width: Math.max(itemRow2.width + 24, 180)
                     height: 28
                     radius: 4
@@ -235,6 +256,17 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            ScreenshotState.annotateEnabled = true
+                            contextMenu.visible = false
+                            ScreenshotState.capture()
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: menuItem2
+                        scope: "bar"
+                        enabled: contextMenu.visible
+                        action: () => {
                             ScreenshotState.annotateEnabled = true
                             contextMenu.visible = false
                             ScreenshotState.capture()

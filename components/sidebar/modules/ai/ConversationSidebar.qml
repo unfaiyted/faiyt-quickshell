@@ -3,6 +3,7 @@ import QtQuick.Controls
 import "../../../../theme"
 import "../../../../services"
 import "../.."
+import "../../../common"
 
 Item {
     id: conversationSidebar
@@ -53,6 +54,7 @@ Item {
 
             // New conversation button
             Rectangle {
+                id: newConvBtn
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
@@ -75,6 +77,12 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: AIState.createConversation()
+                }
+
+                HintTarget {
+                    targetElement: newConvBtn
+                    scope: "sidebar-left"
+                    action: () => AIState.createConversation()
                 }
             }
         }
@@ -152,6 +160,17 @@ Item {
                                     color: Colors.foreground
                                     visible: convItem.isEditing
                                     selectByMouse: true
+
+                                    // Remove focus when hint navigation becomes active
+                                    Connections {
+                                        target: HintNavigationService
+                                        function onActiveChanged() {
+                                            if (HintNavigationService.active && renameInput.activeFocus) {
+                                                renameInput.focus = false
+                                                conversationSidebar.finishRename()
+                                            }
+                                        }
+                                    }
 
                                     onAccepted: {
                                         AIState.renameConversation(modelData.id, text)
@@ -239,6 +258,15 @@ Item {
                             }
                         }
 
+                        HintTarget {
+                            targetElement: convItem
+                            scope: "sidebar-left"
+                            enabled: !convItem.isEditing
+                            action: () => {
+                                AIState.switchConversation(modelData.id)
+                                AIState.conversationSidebarOpen = false
+                            }
+                        }
                     }
                 }
 

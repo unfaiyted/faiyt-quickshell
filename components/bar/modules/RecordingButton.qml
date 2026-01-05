@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
 import "../../../theme"
+import "../../../services"
+import "../../common"
 
 Item {
     id: recordBtn
@@ -82,6 +84,12 @@ Item {
                 tooltipPopup.visible = false
             }
         }
+    }
+
+    HintTarget {
+        targetElement: recordBtn
+        scope: "bar"
+        action: () => RecordingState.toggle()
     }
 
     Timer {
@@ -176,6 +184,7 @@ Item {
 
                 // Standard Recording
                 Rectangle {
+                    id: menuItem1
                     width: Math.max(itemRow1.width + 24, 160)
                     height: 28
                     radius: 4
@@ -223,10 +232,22 @@ Item {
                             RecordingState.start("selection")
                         }
                     }
+
+                    HintTarget {
+                        targetElement: menuItem1
+                        scope: "bar"
+                        enabled: modeMenu.visible
+                        action: () => {
+                            RecordingState.recordingMode = "record"
+                            modeMenu.visible = false
+                            RecordingState.start("selection")
+                        }
+                    }
                 }
 
                 // High Quality Recording
                 Rectangle {
+                    id: menuItem2
                     width: Math.max(itemRow2.width + 24, 160)
                     height: 28
                     radius: 4
@@ -274,10 +295,22 @@ Item {
                             RecordingState.start("selection")
                         }
                     }
+
+                    HintTarget {
+                        targetElement: menuItem2
+                        scope: "bar"
+                        enabled: modeMenu.visible
+                        action: () => {
+                            RecordingState.recordingMode = "record-hq"
+                            modeMenu.visible = false
+                            RecordingState.start("selection")
+                        }
+                    }
                 }
 
                 // GIF Recording
                 Rectangle {
+                    id: menuItem3
                     width: Math.max(itemRow3.width + 24, 160)
                     height: 28
                     radius: 4
@@ -320,6 +353,17 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            RecordingState.recordingMode = "record-gif"
+                            modeMenu.visible = false
+                            RecordingState.start("selection")
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: menuItem3
+                        scope: "bar"
+                        enabled: modeMenu.visible
+                        action: () => {
                             RecordingState.recordingMode = "record-gif"
                             modeMenu.visible = false
                             RecordingState.start("selection")

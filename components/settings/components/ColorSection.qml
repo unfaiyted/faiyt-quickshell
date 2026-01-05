@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../theme"
+import "../../common"
 
 Rectangle {
     id: colorSection
@@ -86,6 +87,12 @@ Rectangle {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: colorSection.collapsed = !colorSection.collapsed
+                }
+
+                HintTarget {
+                    targetElement: parent
+                    scope: "theme"
+                    action: () => colorSection.collapsed = !colorSection.collapsed
                 }
             }
         }

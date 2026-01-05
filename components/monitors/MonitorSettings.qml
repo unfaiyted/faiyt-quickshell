@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../theme"
 import "."
+import "../common"
 
 Rectangle {
     id: settingsContainer
@@ -76,6 +77,13 @@ Rectangle {
                         expanded = !expanded
                     }
                 }
+            }
+
+            HintTarget {
+                targetElement: headerRow
+                scope: "monitors"
+                enabled: selectedMonitor !== null && selectedMonitor !== undefined
+                action: () => expanded = !expanded
             }
         }
 
@@ -157,6 +165,13 @@ Rectangle {
                                         MonitorsState.setTempSetting(selectedMonitor.name, "mode", mode)
                                     }
                                 }
+
+                                HintTarget {
+                                    targetElement: parent
+                                    scope: "monitors"
+                                    enabled: settingsContainer.expanded && settingsContainer.selectedMonitor
+                                    action: () => MonitorsState.setTempSetting(selectedMonitor.name, "mode", mode)
+                                }
                             }
                         }
                     }
@@ -217,6 +232,13 @@ Rectangle {
                                     onClicked: {
                                         MonitorsState.setTempSetting(selectedMonitor.name, "scale", scaleValue)
                                     }
+                                }
+
+                                HintTarget {
+                                    targetElement: parent
+                                    scope: "monitors"
+                                    enabled: settingsContainer.expanded && settingsContainer.selectedMonitor
+                                    action: () => MonitorsState.setTempSetting(selectedMonitor.name, "scale", scaleValue)
                                 }
                             }
                         }
@@ -289,6 +311,13 @@ Rectangle {
                                     onClicked: {
                                         MonitorsState.setTempSetting(selectedMonitor.name, "transform", transformValue)
                                     }
+                                }
+
+                                HintTarget {
+                                    targetElement: parent
+                                    scope: "monitors"
+                                    enabled: settingsContainer.expanded && settingsContainer.selectedMonitor
+                                    action: () => MonitorsState.setTempSetting(selectedMonitor.name, "transform", transformValue)
                                 }
                             }
                         }

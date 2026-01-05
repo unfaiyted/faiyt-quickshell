@@ -8,6 +8,7 @@ import "../../../theme"
 import "../../../services"
 import "../../overview"
 import ".."
+import "../../common"
 
 BarGroup {
     id: tray
@@ -303,6 +304,22 @@ BarGroup {
                                 } else {
                                     tray.openMenu(trayMenu)
                                 }
+                            }
+                        }
+                    }
+                }
+
+                HintTarget {
+                    targetElement: trayItemContainer
+                    scope: "bar"
+                    action: () => {
+                        // Left-click behavior: focus/activate or open menu
+                        if (trayData.onlyMenu && trayData.hasMenu) {
+                            tray.openMenu(trayMenu)
+                        } else {
+                            tray.closeAllMenus()
+                            if (!tray.focusAppWindow(trayItemContainer.trayId)) {
+                                trayData.activate()
                             }
                         }
                     }

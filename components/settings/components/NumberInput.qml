@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import "../../../theme"
+import "../../common"
 
 Rectangle {
     id: numberInput
@@ -9,6 +10,7 @@ Rectangle {
     property int min: 0
     property int max: 100
     property int step: 1
+    property string hintScope: "settings"
     signal valueModified(int value)
 
     width: 100
@@ -46,12 +48,13 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (numberInput.value > numberInput.min) {
-                        numberInput.value = Math.max(numberInput.min, numberInput.value - numberInput.step)
-                        numberInput.valueModified(numberInput.value)
-                    }
-                }
+                onClicked: numberInput.decrease()
+            }
+
+            HintTarget {
+                targetElement: parent
+                scope: numberInput.hintScope
+                action: () => numberInput.decrease()
             }
         }
 
@@ -96,13 +99,28 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (numberInput.value < numberInput.max) {
-                        numberInput.value = Math.min(numberInput.max, numberInput.value + numberInput.step)
-                        numberInput.valueModified(numberInput.value)
-                    }
-                }
+                onClicked: numberInput.increase()
             }
+
+            HintTarget {
+                targetElement: parent
+                scope: numberInput.hintScope
+                action: () => numberInput.increase()
+            }
+        }
+    }
+
+    function decrease() {
+        if (numberInput.value > numberInput.min) {
+            numberInput.value = Math.max(numberInput.min, numberInput.value - numberInput.step)
+            numberInput.valueModified(numberInput.value)
+        }
+    }
+
+    function increase() {
+        if (numberInput.value < numberInput.max) {
+            numberInput.value = Math.min(numberInput.max, numberInput.value + numberInput.step)
+            numberInput.valueModified(numberInput.value)
         }
     }
 }

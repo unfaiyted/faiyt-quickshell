@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell.Io
 import "../../../theme"
+import "../../../services"
+import "../../common"
 
 Rectangle {
     id: toolItem
@@ -204,6 +206,7 @@ Rectangle {
 
                 // Copy button
                 Rectangle {
+                    id: copyButton
                     anchors.top: parent.top
                     anchors.right: parent.right
                     anchors.margins: 4
@@ -232,6 +235,13 @@ Rectangle {
                         }
                     }
 
+                    HintTarget {
+                        targetElement: copyButton
+                        scope: "sidebar-left"
+                        enabled: !loading && result
+                        action: () => copyProcess.running = true
+                    }
+
                     Process {
                         id: copyProcess
                         command: ["bash", "-c", "echo -n '" + result.replace(/'/g, "'\\''") + "' | wl-copy"]
@@ -247,5 +257,11 @@ Rectangle {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: execute()
+    }
+
+    HintTarget {
+        targetElement: toolItem
+        scope: "sidebar-left"
+        action: () => execute()
     }
 }

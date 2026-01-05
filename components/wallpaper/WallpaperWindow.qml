@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../../theme"
 import "../../services"
+import "../common"
 
 PanelWindow {
     id: wallpaperWindow
@@ -31,8 +32,9 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus mode
-    WlrLayershell.keyboardFocus: expanded ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // Keyboard focus mode - Exclusive when hints active for reliable key capture
+    WlrLayershell.keyboardFocus: (expanded || HintNavigationService.active) ?
+        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     visible: ConfigService.windowWallpaperEnabled && (expanded || animating)
 
@@ -103,6 +105,12 @@ PanelWindow {
             onClicked: {} // Absorb clicks
         }
 
+        // Hint navigation overlay
+        HintOverlay {
+            anchors.fill: parent
+            scope: "wallpaper"
+        }
+
         Column {
             anchors.fill: parent
             anchors.leftMargin: 16
@@ -139,6 +147,7 @@ PanelWindow {
 
                 // Close button
                 Rectangle {
+                    id: closeButton
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     width: 28
@@ -160,6 +169,12 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: WallpaperState.hide()
+                    }
+
+                    HintTarget {
+                        targetElement: closeButton
+                        scope: "wallpaper"
+                        action: () => WallpaperState.hide()
                     }
                 }
             }
@@ -194,6 +209,13 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: WallpaperState.prevPage()
+                    }
+
+                    HintTarget {
+                        targetElement: prevButton
+                        scope: "wallpaper"
+                        action: () => WallpaperState.prevPage()
+                        enabled: WallpaperState.wallpapers.length > WallpaperState.itemsPerPage
                     }
                 }
 
@@ -309,6 +331,13 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: WallpaperState.nextPage()
+                    }
+
+                    HintTarget {
+                        targetElement: nextButton
+                        scope: "wallpaper"
+                        action: () => WallpaperState.nextPage()
+                        enabled: WallpaperState.wallpapers.length > WallpaperState.itemsPerPage
                     }
                 }
             }
@@ -456,9 +485,26 @@ PanelWindow {
         FocusScope {
             id: keyboardHandler
             anchors.fill: parent
-            focus: wallpaperWindow.expanded
+            focus: wallpaperWindow.expanded || HintNavigationService.active
 
             Keys.onPressed: function(event) {
+                // Handle hint navigation first when active
+                if (HintNavigationService.active) {
+                    let key = ""
+                    if (event.key === Qt.Key_Escape) {
+                        key = "Escape"
+                    } else if (event.key === Qt.Key_Backspace) {
+                        key = "Backspace"
+                    } else if (event.text && event.text.length === 1) {
+                        key = event.text
+                    }
+
+                    if (key && HintNavigationService.handleKey(key, "wallpaper")) {
+                        event.accepted = true
+                        return
+                    }
+                }
+
                 switch (event.key) {
                     case Qt.Key_Escape:
                         WallpaperState.hide()

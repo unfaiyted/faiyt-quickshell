@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../../../theme"
+import "../../common"
 
 Item {
     id: collapsibleSection
@@ -8,6 +9,7 @@ Item {
     property string title: ""
     property string icon: ""
     property bool expanded: false
+    property string hintScope: "settings"
     default property alias content: contentColumn.children
 
     width: parent.width
@@ -79,6 +81,12 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: collapsibleSection.expanded = !collapsibleSection.expanded
         }
+
+        HintTarget {
+            targetElement: headerRow
+            scope: collapsibleSection.hintScope
+            action: () => collapsibleSection.expanded = !collapsibleSection.expanded
+        }
     }
 
     // Content container
@@ -88,10 +96,15 @@ Item {
         anchors.topMargin: 8
         width: parent.width
         height: contentColumn.height
+        // Keep visible during animation, hide when fully collapsed
+        visible: collapsibleSection.expanded || opacityAnim.running
         opacity: collapsibleSection.expanded ? 1 : 0
 
         Behavior on opacity {
-            NumberAnimation { duration: 150 }
+            NumberAnimation {
+                id: opacityAnim
+                duration: 150
+            }
         }
 
         Column {

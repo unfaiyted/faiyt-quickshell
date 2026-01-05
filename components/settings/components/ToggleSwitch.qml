@@ -1,10 +1,12 @@
 import QtQuick
 import "../../../theme"
+import "../../common"
 
 Rectangle {
     id: toggle
 
     property bool checked: false
+    property string hintScope: "settings"
     signal toggled(bool value)
 
     width: 44
@@ -39,6 +41,15 @@ Rectangle {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
         onClicked: {
+            toggle.checked = !toggle.checked
+            toggle.toggled(toggle.checked)
+        }
+    }
+
+    HintTarget {
+        targetElement: toggle
+        scope: toggle.hintScope
+        action: () => {
             toggle.checked = !toggle.checked
             toggle.toggled(toggle.checked)
         }

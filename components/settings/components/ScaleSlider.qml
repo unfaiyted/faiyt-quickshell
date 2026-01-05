@@ -1,5 +1,6 @@
 import QtQuick
 import "../../../theme"
+import "../../common"
 
 Item {
     id: scaleSlider
@@ -160,6 +161,15 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            scaleSlider.scaleValue = modelData.value
+                            scaleSlider.scaleUpdated(modelData.value)
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "theme"
+                        action: () => {
                             scaleSlider.scaleValue = modelData.value
                             scaleSlider.scaleUpdated(modelData.value)
                         }

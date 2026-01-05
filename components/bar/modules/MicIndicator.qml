@@ -4,6 +4,7 @@ import Quickshell.Io
 import "../../../theme"
 import "../../../services"
 import ".."
+import "../../common"
 
 BarGroup {
     id: micIndicator
@@ -70,6 +71,15 @@ BarGroup {
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             micIndicator.micMuted = false  // Optimistic update
+            micToggleProcess.running = true
+        }
+    }
+
+    HintTarget {
+        targetElement: micIndicator
+        scope: "bar"
+        action: () => {
+            micIndicator.micMuted = false
             micToggleProcess.running = true
         }
     }

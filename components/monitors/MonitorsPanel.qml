@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../theme"
 import "."
+import "../common"
 
 Rectangle {
     id: monitorsPanel
@@ -94,6 +95,15 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: MonitorsState.close()
                     }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "monitors"
+                        action: () => {
+                            HintNavigationService.deactivate()
+                            MonitorsState.close()
+                        }
+                    }
                 }
             }
         }
@@ -166,6 +176,13 @@ Rectangle {
                             }
                         }
                     }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "monitors"
+                        enabled: MonitorsState.hasChanges
+                        action: () => MonitorsState.applyChanges()
+                    }
                 }
 
                 // Reset button
@@ -202,6 +219,13 @@ Rectangle {
                             }
                         }
                     }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "monitors"
+                        enabled: MonitorsState.hasChanges
+                        action: () => MonitorsState.resetChanges()
+                    }
                 }
 
                 // Auto-align button
@@ -232,6 +256,12 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: MonitorsState.autoAlign()
+                    }
+
+                    HintTarget {
+                        targetElement: parent
+                        scope: "monitors"
+                        action: () => MonitorsState.autoAlign()
                     }
                 }
             }

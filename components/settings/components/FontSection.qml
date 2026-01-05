@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../theme"
 import "../../../services"
+import "../../common"
 
 Item {
     id: fontSection
@@ -376,6 +377,12 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: ThemeService.resetFonts()
+                }
+
+                HintTarget {
+                    targetElement: parent
+                    scope: "theme"
+                    action: () => ThemeService.resetFonts()
                 }
             }
 

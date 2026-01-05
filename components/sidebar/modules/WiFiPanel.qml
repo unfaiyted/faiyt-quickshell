@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell.Io
 import "../../../theme"
+import "../../common"
 
 Item {
     id: wifiPanel
@@ -295,6 +296,7 @@ Item {
 
                 // Power switch
                 Rectangle {
+                    id: wifiPowerSwitch
                     width: 44
                     height: 24
                     radius: 12
@@ -323,6 +325,12 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: toggleProcess.running = true
                     }
+
+                    HintTarget {
+                        targetElement: wifiPowerSwitch
+                        scope: "sidebar-right"
+                        action: () => toggleProcess.running = true
+                    }
                 }
             }
         }
@@ -344,6 +352,7 @@ Item {
 
             // Refresh button
             Rectangle {
+                id: wifiRefreshBtn
                 width: 32
                 height: 32
                 radius: 8
@@ -372,6 +381,13 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: refreshNetworks()
+                }
+
+                HintTarget {
+                    targetElement: wifiRefreshBtn
+                    scope: "sidebar-right"
+                    action: () => refreshNetworks()
+                    enabled: wifiPanel.enabled
                 }
             }
         }
@@ -559,6 +575,7 @@ Item {
                     model: wifiPanel.networks
 
                     Rectangle {
+                        id: wifiNetworkItem
                         width: networkColumn.width
                         height: 48
                         radius: 10
@@ -688,6 +705,19 @@ Item {
                                     connectToNetwork(network.ssid, network.secured)
                                 }
                             }
+                        }
+
+                        HintTarget {
+                            targetElement: wifiNetworkItem
+                            scope: "sidebar-right"
+                            action: () => {
+                                if (isConnected) {
+                                    disconnectProcess.running = true
+                                } else {
+                                    connectToNetwork(network.ssid, network.secured)
+                                }
+                            }
+                            enabled: wifiPanel.enabled
                         }
                     }
                 }

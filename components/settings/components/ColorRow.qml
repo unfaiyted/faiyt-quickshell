@@ -1,6 +1,7 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import "../../../theme"
+import "../../common"
 
 Item {
     id: colorRow
@@ -110,12 +111,19 @@ Item {
             }
 
             MouseArea {
+                id: swatchArea
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 hoverEnabled: true
                 onClicked: {
                     colorRow.requestPicker(colorRow)
                 }
+            }
+
+            HintTarget {
+                targetElement: swatchContainer
+                scope: "theme"
+                action: () => colorRow.requestPicker(colorRow)
             }
         }
 

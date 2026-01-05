@@ -2,7 +2,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
 import "."
+import "../common"
 
 Scope {
     id: settingsScope
@@ -78,12 +80,64 @@ Scope {
                 }
             }
 
+            // Hint navigation overlay
+            PopupWindow {
+                id: hintPopup
+                anchor.window: settingsWindow
+                anchor.rect: Qt.rect(
+                    (settingsWindow.width - panel.width) / 2,
+                    (settingsWindow.height - panel.height) / 2,
+                    panel.width,
+                    panel.height
+                )
+                anchor.edges: Edges.Top | Edges.Left
+
+                visible: SettingsState.settingsOpen && HintNavigationService.active
+                color: "transparent"
+
+                implicitWidth: panel.width
+                implicitHeight: panel.height
+
+                HintOverlay {
+                    anchors.fill: parent
+                    scope: "settings"
+                    mapRoot: panel
+                }
+            }
+
             // Keyboard handling
-            Item {
+            FocusScope {
+                id: keyboardHandler
                 anchors.fill: parent
                 focus: SettingsState.settingsOpen
 
-                Keys.onEscapePressed: SettingsState.close()
+                Connections {
+                    target: HintNavigationService
+                    function onActiveChanged() {
+                        if (HintNavigationService.active && SettingsState.settingsOpen) {
+                            keyboardHandler.forceActiveFocus()
+                        }
+                    }
+                }
+
+                Keys.onPressed: function(event) {
+                    if (HintNavigationService.active) {
+                        let key = ""
+                        if (event.key === Qt.Key_Escape) key = "Escape"
+                        else if (event.key === Qt.Key_Backspace) key = "Backspace"
+                        else if (event.text && event.text.length === 1) key = event.text
+
+                        if (key && HintNavigationService.handleKey(key, "settings")) {
+                            event.accepted = true
+                            return
+                        }
+                    }
+
+                    if (event.key === Qt.Key_Escape) {
+                        SettingsState.close()
+                        event.accepted = true
+                    }
+                }
             }
 
             onVisibleChanged: {

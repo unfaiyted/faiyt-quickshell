@@ -3,6 +3,7 @@ import Qt5Compat.GraphicalEffects
 import Quickshell.Io
 import "../../../theme"
 import "../../../components/settings"
+import "../../common"
 
 Item {
     id: header
@@ -213,6 +214,7 @@ Item {
 
             // Settings button
             Rectangle {
+                id: settingsBtn
                 width: 36
                 height: 36
                 radius: 8
@@ -233,10 +235,17 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: SettingsState.toggle()
                 }
+
+                HintTarget {
+                    targetElement: settingsBtn
+                    scope: "sidebar-right"
+                    action: () => SettingsState.toggle()
+                }
             }
 
             // Power button
             Rectangle {
+                id: powerBtn
                 width: 36
                 height: 36
                 radius: 8
@@ -261,6 +270,12 @@ Item {
                 Process {
                     id: powerProcess
                     command: ["systemctl", "poweroff"]
+                }
+
+                HintTarget {
+                    targetElement: powerBtn
+                    scope: "sidebar-right"
+                    action: () => powerProcess.running = true
                 }
             }
         }

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import "../../../../theme"
 import "../../../../services"
 import "../.."
+import "../../../common"
 
 Item {
     id: chatInput
@@ -13,6 +14,7 @@ Item {
     height: 72
 
     Rectangle {
+        id: inputContainer
         anchors.fill: parent
         anchors.margins: 8
         radius: 12
@@ -48,6 +50,16 @@ Item {
                     enabled: chatInput.enabled && !AIState.isProcessing
                     selectByMouse: true
 
+                    // Remove focus when hint navigation becomes active
+                    Connections {
+                        target: HintNavigationService
+                        function onActiveChanged() {
+                            if (HintNavigationService.active && inputArea.activeFocus) {
+                                inputArea.focus = false
+                            }
+                        }
+                    }
+
                     Keys.onReturnPressed: function(event) {
                         if (!(event.modifiers & Qt.ShiftModifier)) {
                             if (text.trim().length > 0) {
@@ -62,6 +74,7 @@ Item {
 
             // Send/Cancel button
             Rectangle {
+                id: sendButton
                 width: 36
                 height: 36
                 radius: 8
@@ -111,7 +124,28 @@ Item {
                         }
                     }
                 }
+
+                HintTarget {
+                    targetElement: sendButton
+                    scope: "sidebar-left"
+                    enabled: chatInput.enabled
+                    action: () => {
+                        if (AIState.isProcessing) {
+                            AIState.cancelRequest()
+                        } else if (inputArea.text.trim().length > 0) {
+                            AIState.sendMessage(inputArea.text)
+                            inputArea.text = ""
+                        }
+                    }
+                }
             }
+        }
+
+        HintTarget {
+            targetElement: inputContainer
+            scope: "sidebar-left"
+            enabled: chatInput.enabled && !AIState.isProcessing
+            action: () => inputArea.forceActiveFocus()
         }
     }
 }

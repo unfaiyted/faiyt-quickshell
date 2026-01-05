@@ -4,6 +4,7 @@ import Quickshell.Services.Mpris
 import "../../../theme"
 import "../../../services"
 import ".."
+import "../../common"
 
 BarGroup {
     id: musicModule
@@ -202,6 +203,19 @@ BarGroup {
         onExited: {
             musicModule.hoverModule = false
             tooltip.scheduleClose()
+        }
+    }
+
+    HintTarget {
+        targetElement: musicModule
+        scope: "bar"
+        action: () => {
+            if (musicModule.player && musicModule.player.canTogglePlaying) {
+                musicModule.player.togglePlaying()
+            }
+            if (musicModule.trackTitle.length > 0) {
+                tooltip.show()
+            }
         }
     }
 
@@ -465,6 +479,7 @@ BarGroup {
 
                     // Previous button
                     Rectangle {
+                        id: prevBtn
                         width: 32
                         height: 32
                         radius: 16
@@ -490,10 +505,22 @@ BarGroup {
                                 }
                             }
                         }
+
+                        HintTarget {
+                            targetElement: prevBtn
+                            scope: "bar"
+                            enabled: tooltip.visible && musicModule.canPrevious
+                            action: () => {
+                                if (musicModule.canPrevious && musicModule.player) {
+                                    musicModule.player.previous()
+                                }
+                            }
+                        }
                     }
 
                     // Play/Pause button
                     Rectangle {
+                        id: playBtn
                         width: 40
                         height: 40
                         radius: 20
@@ -518,10 +545,22 @@ BarGroup {
                                 }
                             }
                         }
+
+                        HintTarget {
+                            targetElement: playBtn
+                            scope: "bar"
+                            enabled: tooltip.visible
+                            action: () => {
+                                if (musicModule.player && musicModule.player.canTogglePlaying) {
+                                    musicModule.player.togglePlaying()
+                                }
+                            }
+                        }
                     }
 
                     // Next button
                     Rectangle {
+                        id: nextBtn
                         width: 32
                         height: 32
                         radius: 16
@@ -542,6 +581,17 @@ BarGroup {
                             hoverEnabled: true
                             cursorShape: musicModule.canNext ? Qt.PointingHandCursor : Qt.ArrowCursor
                             onClicked: {
+                                if (musicModule.canNext && musicModule.player) {
+                                    musicModule.player.next()
+                                }
+                            }
+                        }
+
+                        HintTarget {
+                            targetElement: nextBtn
+                            scope: "bar"
+                            enabled: tooltip.visible && musicModule.canNext
+                            action: () => {
                                 if (musicModule.canNext && musicModule.player) {
                                     musicModule.player.next()
                                 }

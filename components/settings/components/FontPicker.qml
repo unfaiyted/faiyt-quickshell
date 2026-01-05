@@ -1,6 +1,7 @@
 import QtQuick
 import "../../../theme"
 import "../../../services"
+import "../../common"
 
 Item {
     id: fontPicker
@@ -127,22 +128,30 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (fontPicker.dropdownOverlay) {
-                    if (fontPicker.popupOpen) {
-                        if (fontPicker.dropdownOverlay.isThemePanel) {
-                            fontPicker.dropdownOverlay.panel.closeDropdown()
-                        } else {
-                            fontPicker.dropdownOverlay.close()
-                        }
-                    } else {
-                        // Font pickers always enable search
-                        if (fontPicker.dropdownOverlay.isThemePanel) {
-                            fontPicker.dropdownOverlay.panel.openDropdown(fontPicker, fontPicker.model, fontPicker.currentIndex, fontPicker.previewText, true)
-                        } else {
-                            fontPicker.dropdownOverlay.open(fontPicker, fontPicker.model, fontPicker.currentIndex, true, fontPicker.previewText)
-                        }
-                    }
+            onClicked: fontPicker.toggleDropdown()
+        }
+
+        HintTarget {
+            targetElement: button
+            scope: "theme"
+            action: () => fontPicker.toggleDropdown()
+        }
+    }
+
+    function toggleDropdown() {
+        if (fontPicker.dropdownOverlay) {
+            if (fontPicker.popupOpen) {
+                if (fontPicker.dropdownOverlay.isThemePanel) {
+                    fontPicker.dropdownOverlay.panel.closeDropdown()
+                } else {
+                    fontPicker.dropdownOverlay.close()
+                }
+            } else {
+                // Font pickers always enable search
+                if (fontPicker.dropdownOverlay.isThemePanel) {
+                    fontPicker.dropdownOverlay.panel.openDropdown(fontPicker, fontPicker.model, fontPicker.currentIndex, fontPicker.previewText, true)
+                } else {
+                    fontPicker.dropdownOverlay.open(fontPicker, fontPicker.model, fontPicker.currentIndex, true, fontPicker.previewText)
                 }
             }
         }

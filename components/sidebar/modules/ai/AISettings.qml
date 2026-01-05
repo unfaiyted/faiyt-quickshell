@@ -3,6 +3,7 @@ import QtQuick.Controls
 import "../../../../theme"
 import "../../../../services"
 import "../.."
+import "../../../common"
 
 Item {
     id: aiSettings
@@ -151,10 +152,18 @@ Item {
                         }
 
                         Rectangle {
+                            id: modelDropdownBtn
                             width: parent.width
                             height: 36
                             radius: 6
                             color: Colors.backgroundAlt
+
+                            HintTarget {
+                                targetElement: modelDropdownBtn
+                                scope: "sidebar-left"
+                                enabled: !modelCombo.popup.visible
+                                action: () => modelCombo.popup.open()
+                            }
 
                             ComboBox {
                                 id: modelCombo
@@ -204,16 +213,20 @@ Item {
                                 }
 
                                 delegate: Rectangle {
+                                    id: modelDelegate
                                     width: modelCombo.width - 8
                                     height: 32
                                     radius: 4
                                     color: modelDelegateArea.containsMouse ? Colors.overlay : "transparent"
 
+                                    required property int index
+                                    required property var modelData
+
                                     Text {
                                         anchors.left: parent.left
                                         anchors.leftMargin: 8
                                         anchors.verticalCenter: parent.verticalCenter
-                                        text: formatModelName(modelData)
+                                        text: formatModelName(modelDelegate.modelData)
                                         font.pixelSize: 11
                                         color: Colors.foreground
                                     }
@@ -224,11 +237,24 @@ Item {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
-                                            modelCombo.currentIndex = index
+                                            modelCombo.currentIndex = modelDelegate.index
                                             modelCombo.popup.close()
-                                            ConfigService.setValue("ai.defaultModel", modelData)
+                                            ConfigService.setValue("ai.defaultModel", modelDelegate.modelData)
                                             ConfigService.saveConfig()
-                                            ClaudeService.currentModel = modelData
+                                            ClaudeService.currentModel = modelDelegate.modelData
+                                        }
+                                    }
+
+                                    HintTarget {
+                                        targetElement: modelDelegate
+                                        scope: "sidebar-left"
+                                        enabled: modelCombo.popup.visible
+                                        action: () => {
+                                            modelCombo.currentIndex = modelDelegate.index
+                                            modelCombo.popup.close()
+                                            ConfigService.setValue("ai.defaultModel", modelDelegate.modelData)
+                                            ConfigService.saveConfig()
+                                            ClaudeService.currentModel = modelDelegate.modelData
                                         }
                                     }
                                 }
@@ -410,14 +436,22 @@ Item {
                                         }
 
                                         MouseArea {
+                                            id: toggleArea
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: MCPClient.toggleServer(modelData.id)
+                                        }
+
+                                        HintTarget {
+                                            targetElement: parent
+                                            scope: "sidebar-left"
+                                            action: () => MCPClient.toggleServer(modelData.id)
                                         }
                                     }
 
                                     // Remove button
                                     Rectangle {
+                                        id: removeBtn
                                         width: 20
                                         height: 20
                                         radius: 4
@@ -439,6 +473,12 @@ Item {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: MCPClient.removeServer(modelData.id)
                                         }
+
+                                        HintTarget {
+                                            targetElement: removeBtn
+                                            scope: "sidebar-left"
+                                            action: () => MCPClient.removeServer(modelData.id)
+                                        }
                                     }
                                 }
                             }
@@ -455,6 +495,7 @@ Item {
 
                     // Add server button
                     Rectangle {
+                        id: addServerBtn
                         width: parent.width
                         height: 36
                         radius: 6
@@ -484,6 +525,12 @@ Item {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: addServerDialog.open()
+                        }
+
+                        HintTarget {
+                            targetElement: addServerBtn
+                            scope: "sidebar-left"
+                            action: () => addServerDialog.open()
                         }
                     }
                 }
@@ -533,6 +580,16 @@ Item {
                                 color: Colors.foreground
                                 wrapMode: TextEdit.Wrap
                                 background: null
+
+                                // Remove focus when hint navigation becomes active
+                                Connections {
+                                    target: HintNavigationService
+                                    function onActiveChanged() {
+                                        if (HintNavigationService.active && systemPromptInput.activeFocus) {
+                                            systemPromptInput.focus = false
+                                        }
+                                    }
+                                }
 
                                 onTextChanged: {
                                     ConfigService.setValue("ai.systemPrompt", text)
@@ -597,6 +654,16 @@ Item {
                         color: Colors.foreground
                         clip: true
                         selectByMouse: true
+
+                        // Remove focus when hint navigation becomes active
+                        Connections {
+                            target: HintNavigationService
+                            function onActiveChanged() {
+                                if (HintNavigationService.active && serverNameInput.activeFocus) {
+                                    serverNameInput.focus = false
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -626,6 +693,16 @@ Item {
                         color: Colors.foreground
                         clip: true
                         selectByMouse: true
+
+                        // Remove focus when hint navigation becomes active
+                        Connections {
+                            target: HintNavigationService
+                            function onActiveChanged() {
+                                if (HintNavigationService.active && serverCommandInput.activeFocus) {
+                                    serverCommandInput.focus = false
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -635,6 +712,7 @@ Item {
                 spacing: 8
 
                 Rectangle {
+                    id: cancelBtn
                     width: 70
                     height: 32
                     radius: 6
@@ -654,9 +732,17 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: addServerDialog.close()
                     }
+
+                    HintTarget {
+                        targetElement: cancelBtn
+                        scope: "sidebar-left"
+                        enabled: addServerDialog.visible
+                        action: () => addServerDialog.close()
+                    }
                 }
 
                 Rectangle {
+                    id: addBtn
                     width: 70
                     height: 32
                     radius: 6
@@ -675,6 +761,21 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            if (serverNameInput.text && serverCommandInput.text) {
+                                const command = serverCommandInput.text.split(" ")
+                                MCPClient.addServer(serverNameInput.text, command, {})
+                                serverNameInput.text = ""
+                                serverCommandInput.text = ""
+                                addServerDialog.close()
+                            }
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: addBtn
+                        scope: "sidebar-left"
+                        enabled: addServerDialog.visible
+                        action: () => {
                             if (serverNameInput.text && serverCommandInput.text) {
                                 const command = serverCommandInput.text.split(" ")
                                 MCPClient.addServer(serverNameInput.text, command, {})

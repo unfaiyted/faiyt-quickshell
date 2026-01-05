@@ -3,6 +3,7 @@ import QtQuick.Controls
 import "../../../../theme"
 import "../../../../services"
 import "../.."
+import "../../../common"
 
 Item {
     id: chatHeader
@@ -22,6 +23,7 @@ Item {
 
         // Conversation sidebar toggle
         Rectangle {
+            id: sidebarToggleBtn
             width: 32
             height: 32
             radius: 8
@@ -43,10 +45,17 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: AIState.toggleConversationSidebar()
             }
+
+            HintTarget {
+                targetElement: sidebarToggleBtn
+                scope: "sidebar-left"
+                action: () => AIState.toggleConversationSidebar()
+            }
         }
 
         // Model selector
         Rectangle {
+            id: modelSelectorBtn
             width: modelRow.width + 16
             height: 32
             radius: 8
@@ -91,6 +100,13 @@ Item {
                 onClicked: modelPopup.open()
             }
 
+            HintTarget {
+                targetElement: modelSelectorBtn
+                scope: "sidebar-left"
+                enabled: !stubMode
+                action: () => modelPopup.open()
+            }
+
             Popup {
                 id: modelPopup
                 y: parent.height + 4
@@ -112,6 +128,7 @@ Item {
                         model: AIState.getModels()
 
                         Rectangle {
+                            id: modelItem
                             width: parent.width
                             height: 32
                             radius: 6
@@ -133,6 +150,16 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
+                                    AIState.setModel(modelData)
+                                    modelPopup.close()
+                                }
+                            }
+
+                            HintTarget {
+                                targetElement: modelItem
+                                scope: "sidebar-left"
+                                enabled: modelPopup.visible
+                                action: () => {
                                     AIState.setModel(modelData)
                                     modelPopup.close()
                                 }
@@ -172,6 +199,7 @@ Item {
 
         // Clear chat button
         Rectangle {
+            id: clearChatBtn
             width: 32
             height: 32
             radius: 8
@@ -194,10 +222,18 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: AIState.clearConversation()
             }
+
+            HintTarget {
+                targetElement: clearChatBtn
+                scope: "sidebar-left"
+                enabled: !stubMode
+                action: () => AIState.clearConversation()
+            }
         }
 
         // New chat button
         Rectangle {
+            id: newChatBtn
             width: 32
             height: 32
             radius: 8
@@ -219,6 +255,13 @@ Item {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: AIState.createConversation()
+            }
+
+            HintTarget {
+                targetElement: newChatBtn
+                scope: "sidebar-left"
+                enabled: !stubMode
+                action: () => AIState.createConversation()
             }
         }
     }

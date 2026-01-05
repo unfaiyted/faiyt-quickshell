@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import "../../../theme"
 import ".."
+import "../../common"
 
 Item {
     id: utilBtn
@@ -46,6 +47,18 @@ Item {
             } else {
                 tooltipTimer.stop()
                 tooltipPopup.visible = false
+            }
+        }
+    }
+
+    HintTarget {
+        targetElement: utilBtn
+        scope: "bar"
+        action: () => {
+            if (utilBtn.onActivate) {
+                utilBtn.onActivate()
+            } else if (utilBtn.command.length > 0) {
+                proc.running = true
             }
         }
     }
