@@ -133,6 +133,40 @@ Scope {
                         }
                     }
 
+                    // Arrow key scrolling
+                    if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
+                        panel.scrollUp()
+                        event.accepted = true
+                        return
+                    }
+                    if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
+                        panel.scrollDown()
+                        event.accepted = true
+                        return
+                    }
+                    // Page up/down
+                    if (event.key === Qt.Key_PageUp) {
+                        panel.scrollPageUp()
+                        event.accepted = true
+                        return
+                    }
+                    if (event.key === Qt.Key_PageDown) {
+                        panel.scrollPageDown()
+                        event.accepted = true
+                        return
+                    }
+                    // Home/End - go to top/bottom
+                    if (event.key === Qt.Key_Home) {
+                        panel.scrollToTop()
+                        event.accepted = true
+                        return
+                    }
+                    if (event.key === Qt.Key_End) {
+                        panel.scrollToBottom()
+                        event.accepted = true
+                        return
+                    }
+
                     if (event.key === Qt.Key_Escape) {
                         SettingsState.close()
                         event.accepted = true

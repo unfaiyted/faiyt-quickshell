@@ -14,6 +14,14 @@ Rectangle {
 
     property string searchQuery: ""
 
+    // Expose scroll functions for keyboard navigation
+    function scrollUp() { settingsFlickable.scrollUp() }
+    function scrollDown() { settingsFlickable.scrollDown() }
+    function scrollPageUp() { settingsFlickable.scrollPageUp() }
+    function scrollPageDown() { settingsFlickable.scrollPageDown() }
+    function scrollToTop() { settingsFlickable.scrollToTop() }
+    function scrollToBottom() { settingsFlickable.scrollToBottom() }
+
     // Expose dropdown overlay for child components to find
     property alias dropdownOverlayRef: dropdownOverlay
 
@@ -119,12 +127,19 @@ Rectangle {
 
                 // Search box
                 Rectangle {
+                    id: searchBox
                     width: parent.width
                     height: 40
                     radius: 12
                     color: Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
                     border.width: 1
                     border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.1)
+
+                    HintTarget {
+                        targetElement: searchBox
+                        scope: "settings"
+                        action: () => searchInput.forceActiveFocus()
+                    }
 
                     Row {
                         anchors.fill: parent
@@ -152,6 +167,38 @@ Rectangle {
 
                             onTextChanged: settingsPanel.searchQuery = text.toLowerCase()
 
+                            // Handle scrolling keys while keeping focus
+                            Keys.onPressed: function(event) {
+                                // Ctrl+Space activates hint navigation
+                                if (event.key === Qt.Key_Space && (event.modifiers & Qt.ControlModifier)) {
+                                    HintNavigationService.activate()
+                                    event.accepted = true
+                                    return
+                                }
+
+                                if (event.key === Qt.Key_Up) {
+                                    settingsFlickable.scrollUp()
+                                    event.accepted = true
+                                } else if (event.key === Qt.Key_Down) {
+                                    settingsFlickable.scrollDown()
+                                    event.accepted = true
+                                } else if (event.key === Qt.Key_PageUp) {
+                                    settingsFlickable.scrollPageUp()
+                                    event.accepted = true
+                                } else if (event.key === Qt.Key_PageDown) {
+                                    settingsFlickable.scrollPageDown()
+                                    event.accepted = true
+                                } else if (event.key === Qt.Key_Escape) {
+                                    if (searchInput.text.length > 0) {
+                                        searchInput.text = ""
+                                        event.accepted = true
+                                    } else {
+                                        SettingsState.close()
+                                        event.accepted = true
+                                    }
+                                }
+                            }
+
                             Text {
                                 anchors.fill: parent
                                 verticalAlignment: Text.AlignVCenter
@@ -168,11 +215,52 @@ Rectangle {
 
         // Scrollable content
         Flickable {
+            id: settingsFlickable
             width: parent.width
             height: parent.height - headerContent.height - 48
             contentHeight: contentColumn.height
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+
+            // Scroll functions for keyboard navigation
+            function scrollUp() {
+                scrollAnim.to = Math.max(0, contentY - 100)
+                scrollAnim.restart()
+            }
+            function scrollDown() {
+                scrollAnim.to = Math.min(contentHeight - height, contentY + 100)
+                scrollAnim.restart()
+            }
+            function scrollPageUp() {
+                scrollAnim.to = Math.max(0, contentY - height * 0.8)
+                scrollAnim.restart()
+            }
+            function scrollPageDown() {
+                scrollAnim.to = Math.min(contentHeight - height, contentY + height * 0.8)
+                scrollAnim.restart()
+            }
+            function scrollToTop() {
+                scrollAnim.to = 0
+                scrollAnim.restart()
+            }
+            function scrollToBottom() {
+                scrollAnim.to = contentHeight - height
+                scrollAnim.restart()
+            }
+
+            Behavior on contentY {
+                id: scrollBehavior
+                enabled: false
+                NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+            }
+
+            NumberAnimation {
+                id: scrollAnim
+                target: settingsFlickable
+                property: "contentY"
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
 
             ScrollBar.vertical: ScrollBar {
                 policy: ScrollBar.AsNeeded
