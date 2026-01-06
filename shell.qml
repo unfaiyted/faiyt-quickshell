@@ -11,6 +11,7 @@ import "components/launcher"
 import "components/overview"
 import "components/settings"
 import "components/monitors"
+import "components/requirements"
 import "services"
 
 ShellRoot {
@@ -22,6 +23,18 @@ ShellRoot {
         // Initialize battery monitoring service
         if (BatteryService.hasBattery) {
             console.log("Battery monitoring active")
+        }
+    }
+
+    // Show requirements panel on startup if there are missing required dependencies
+    Connections {
+        target: RequirementsService
+        function onCheckCompleteChanged() {
+            if (RequirementsService.checkComplete &&
+                RequirementsService.hasMissingRequired &&
+                !ConfigService.getValue("requirements.dontShowOnStartup", false)) {
+                RequirementsState.open()
+            }
         }
     }
 
@@ -43,4 +56,5 @@ ShellRoot {
     SettingsWindow {}
     ThemePanelWindow {}
     MonitorsWindow {}
+    RequirementsWindow {}
 }

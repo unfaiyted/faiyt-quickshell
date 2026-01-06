@@ -6,6 +6,7 @@ import Quickshell.Io
 import "../../theme"
 import "../../services"
 import "../../components/monitors"
+import "../../components/requirements"
 import "components"
 import "../common"
 
@@ -293,7 +294,9 @@ Rectangle {
                     visible: contentColumn.matchesSearch("general") ||
                              contentColumn.matchesSearch("theme") ||
                              contentColumn.matchesSearch("display") ||
-                             contentColumn.matchesSearch("animation")
+                             contentColumn.matchesSearch("animation") ||
+                             contentColumn.matchesSearch("requirements") ||
+                             contentColumn.matchesSearch("dependencies")
                     title: "General"
 
                     ThemeSelector {
@@ -357,6 +360,68 @@ Rectangle {
                                     SettingsState.close()
                                     MonitorsState.openedFromSettings = true
                                     MonitorsState.open()
+                                }
+                            }
+                        }
+                    }
+
+                    // System Requirements button
+                    SettingRow {
+                        visible: contentColumn.matchesSearch("requirements") || contentColumn.matchesSearch("dependencies")
+                        label: "System Requirements"
+                        description: "Check installed dependencies and tools"
+
+                        Rectangle {
+                            width: reqBtnText.width + 24
+                            height: 32
+                            radius: 8
+                            color: reqBtnArea.containsMouse
+                                ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.2)
+                                : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                            border.width: 1
+                            border.color: Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                Text {
+                                    text: ""
+                                    font.family: Fonts.icon
+                                    font.pixelSize: 14
+                                    color: RequirementsService.hasMissingRequired
+                                        ? Colors.error
+                                        : (RequirementsService.hasMissingOptional ? Colors.warning : Colors.foreground)
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Text {
+                                    id: reqBtnText
+                                    text: "View Requirements"
+                                    font.pixelSize: 12
+                                    color: Colors.foreground
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: reqBtnArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    SettingsState.close()
+                                    RequirementsState.open()
+                                }
+                            }
+
+                            HintTarget {
+                                targetElement: parent
+                                scope: "settings"
+                                action: () => {
+                                    HintNavigationService.deactivate()
+                                    SettingsState.close()
+                                    RequirementsState.open()
                                 }
                             }
                         }

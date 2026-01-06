@@ -1,0 +1,5 @@
+module requirements
+
+singleton RequirementsState 1.0 RequirementsState.qml
+RequirementsWindow 1.0 RequirementsWindow.qml
+RequirementsPanel 1.0 RequirementsPanel.qml

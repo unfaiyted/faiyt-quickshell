@@ -177,6 +177,11 @@ Singleton {
             settings: {
                 enabled: true
             }
+        },
+
+        // Requirements checking
+        requirements: {
+            dontShowOnStartup: false
         }
     })
 

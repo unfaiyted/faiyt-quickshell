@@ -119,7 +119,7 @@ Categories: All, Dev, System, Network, Monitor
 Full-featured settings overlay for customizing the shell:
 
 **Sections:**
-- **Appearance** - Theme selector with live preview, bar mode, workspaces per page, display settings
+- **Appearance** - Theme selector with live preview, bar mode, workspaces per page, display settings, system requirements
 - **Bar Modules** - Toggle individual bar modules (Window Title, Workspaces, Mic Indicator, System Resources, Utilities, Music, System Tray, Network, Battery, Clock, Weather)
 - **Quick Toggles** - Configure sidebar quick toggles:
   - Enable Focus Mode toggle (replaces Caffeine)
@@ -179,6 +179,40 @@ Visual monitor arrangement and configuration panel:
 **Access:**
 - Settings panel → Appearance → "Open Display Settings" button
 - IPC: `qs ipc call monitors toggle`
+
+### Requirements Panel
+System dependency checker that validates required and optional tools:
+
+**Features:**
+- Checks 45+ external tools across 13 categories
+- Checks environment variables (API keys)
+- Auto-popup on startup if required dependencies are missing
+- "Don't show on startup" checkbox (persists to config)
+- Color-coded status indicators (green=OK, yellow=optional missing, red=required missing)
+- Collapsible categories for easy navigation
+- Refresh button to re-check dependencies
+
+**Categories:**
+- Core (quickshell, hyprctl, bash)
+- Clipboard (wl-copy, wl-paste)
+- Audio (wpctl, cava)
+- Network (nmcli, curl)
+- Bluetooth (bluetoothctl, busctl)
+- Power (systemctl, systemd-inhibit)
+- Screen Capture (grim, slurp, wf-recorder, hyprpicker, napkin, montage)
+- Media (ffmpeg, ffprobe, convert)
+- Stickers (openssl, python3)
+- System Info (free, top, uptime, whoami, hostname, fc-list)
+- Quick Toggles (hyprsunset, powerprofilesctl)
+- Wallpaper (swww)
+- Terminals (kitty, tmux)
+- Notifications (notify-send)
+- Utilities (pgrep, pkill, xdg-open, grep, awk, sed)
+- Environment Variables (ANTHROPIC_API_KEY, TENOR_API_KEY, QS_NET_SPEED_MBPS)
+
+**Access:**
+- Settings panel → General → "View Requirements" button
+- IPC: `qs ipc call requirements toggle`
 
 ### Launcher
 Application launcher with instant evaluators and multiple search modes:
@@ -540,6 +574,10 @@ faiyt-qs/
 │   │   ├── MonitorCanvas.qml     # Monitor arrangement canvas
 │   │   ├── MonitorItem.qml       # Draggable monitor representation
 │   │   └── MonitorSettings.qml   # Resolution/scale/transform settings
+│   ├── requirements/
+│   │   ├── RequirementsWindow.qml  # Full-screen overlay
+│   │   ├── RequirementsPanel.qml   # Requirements list with categories
+│   │   └── RequirementsState.qml   # Singleton state + IPC
 │   └── common/
 │       ├── HintTarget.qml        # Registers clickable element for hint navigation
 │       └── HintOverlay.qml       # Renders hint badges over UI elements
@@ -553,6 +591,7 @@ faiyt-qs/
 │   ├── FontService.qml          # System font discovery and configuration
 │   ├── HintNavigationService.qml # Flash.nvim-style keyboard hint navigation
 │   ├── IconService.qml          # Centralized NerdFont icon mappings
+│   ├── RequirementsService.qml  # System dependency checking
 │   ├── StickerService.qml       # Signal sticker pack management
 │   ├── ThemeService.qml         # Theme switching and custom theme management
 │   └── UsageStatsService.qml    # Launcher usage tracking for smart sorting
@@ -647,6 +686,12 @@ qs ipc call settings close       # Close settings panel
 qs ipc call monitors toggle      # Toggle monitor configuration
 qs ipc call monitors open        # Open monitor configuration
 qs ipc call monitors close       # Close monitor configuration
+
+# Requirements Panel
+qs ipc call requirements toggle  # Toggle requirements panel
+qs ipc call requirements open    # Open requirements panel
+qs ipc call requirements close   # Close requirements panel
+qs ipc call requirements check   # Re-check all dependencies
 
 # System Resources
 qs ipc call sysresources setNetSpeed 930  # Set max network speed in Mbps
