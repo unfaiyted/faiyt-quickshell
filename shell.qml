@@ -12,6 +12,7 @@ import "components/overview"
 import "components/settings"
 import "components/monitors"
 import "components/requirements"
+import "components/indicators"
 import "services"
 
 ShellRoot {
@@ -50,6 +51,7 @@ ShellRoot {
     SidebarLeft {}
     SidebarRight {}
     NotificationPopups {}
+    IndicatorWindow {}
     WallpaperWindow {}
     LauncherWindow {}
     Overview {}

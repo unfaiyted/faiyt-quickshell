@@ -182,6 +182,22 @@ Singleton {
         // Requirements checking
         requirements: {
             dontShowOnStartup: false
+        },
+
+        // Indicators (OSD overlays)
+        indicators: {
+            enabled: true,
+            timeout: 3000,              // ms before fade out
+            showVolume: true,
+            showBrightness: true,
+            showKeyboardBacklight: true
+        },
+
+        // System state persistence (restored on startup)
+        systemState: {
+            lastVolume: null,           // 0-100, restored on startup
+            lastBrightness: null,       // 0-100, restored on startup
+            lastKbBrightness: null      // 0-100, restored on startup
         }
     })
 
@@ -380,6 +396,13 @@ Singleton {
     property string aiSystemPrompt: config.ai?.systemPrompt || ""
     property var aiMcpServers: config.ai?.mcpServers || []
 
+    // Indicator convenience properties
+    property bool indicatorsEnabled: config.indicators?.enabled !== false
+    property int indicatorTimeout: config.indicators?.timeout ?? 3000
+    property bool indicatorShowVolume: config.indicators?.showVolume !== false
+    property bool indicatorShowBrightness: config.indicators?.showBrightness !== false
+    property bool indicatorShowKeyboardBacklight: config.indicators?.showKeyboardBacklight !== false
+
     // Update convenience properties when config changes
     onConfigChanged: {
         theme = config.theme || "rose-pine"
@@ -457,5 +480,12 @@ Singleton {
 
         // Custom themes
         customThemes = config.customThemes || {}
+
+        // Indicators
+        indicatorsEnabled = config.indicators?.enabled !== false
+        indicatorTimeout = config.indicators?.timeout ?? 3000
+        indicatorShowVolume = config.indicators?.showVolume !== false
+        indicatorShowBrightness = config.indicators?.showBrightness !== false
+        indicatorShowKeyboardBacklight = config.indicators?.showKeyboardBacklight !== false
     }
 }

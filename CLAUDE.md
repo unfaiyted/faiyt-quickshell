@@ -37,6 +37,7 @@ qs ipc call overview toggle|open|close
 qs ipc call monitors toggle|open|close
 qs ipc call recording toggle|start|stop|setMode|getMode|status
 qs ipc call sysresources setNetSpeed|getNetSpeed
+qs ipc call indicators showIndicator "volume|brightness|keyboard"|hide|status
 ```
 
 ## Architecture
@@ -58,6 +59,7 @@ qs ipc call sysresources setNetSpeed|getNetSpeed
 │   ├── settings/             # Settings panel + components/
 │   ├── overview/             # Workspace overview grid
 │   ├── notifications/        # Notification daemon + popups
+│   ├── indicators/           # OSD overlays (volume, brightness, KB backlight)
 │   ├── monitors/             # Display configuration
 │   └── wallpaper/            # Wallpaper picker
 └── scripts/                  # Bash/Python utilities
@@ -78,6 +80,8 @@ All services are singletons registered in `services/qmldir`:
 | MCPClient | Model Context Protocol server integration |
 | CavaService | Audio visualization (cava) |
 | FontService | Font configuration |
+| BrightnessService | Screen brightness control via brightnessctl/sysfs |
+| KeyboardBacklightService | Keyboard backlight control via sysfs |
 
 ### State Singletons
 Component-specific state is managed by singletons within each component directory:
@@ -87,6 +91,7 @@ Component-specific state is managed by singletons within each component director
 - `OverviewState.qml` - Overview visibility + IPC
 - `RecordingState.qml` - Recording state + IPC
 - `AIState.qml` - AI chat state (messages, current conversation)
+- `IndicatorState.qml` - OSD indicator visibility, values, IPC handler
 
 ### IPC Pattern
 Components expose IPC handlers for external control:
@@ -177,6 +182,7 @@ Services.ConfigService.setValue("theme", "rose-pine-moon")
 **Core:** QuickShell, Hyprland, Symbols Nerd Font, wl-clipboard, Pipewire
 **Screen Capture:** grim, slurp, wf-recorder, hyprpicker, napkin (annotation)
 **Quick Toggles:** hyprsunset (night light), powerprofilesctl
+**Brightness:** brightnessctl (for screen and keyboard backlight control)
 **Music:** cava (visualization)
 **Stickers:** openssl, python3, curl, imagemagick/ffmpeg
 

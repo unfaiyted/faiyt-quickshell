@@ -1,0 +1,5 @@
+module components.indicators
+singleton IndicatorState 1.0 IndicatorState.qml
+IndicatorWindow 1.0 IndicatorWindow.qml
+IndicatorCard 1.0 IndicatorCard.qml
+ProgressBar 1.0 ProgressBar.qml
