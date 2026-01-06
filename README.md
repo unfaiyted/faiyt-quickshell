@@ -419,25 +419,77 @@ Toast notifications that appear when notifications arrive:
 
 ## Installation
 
+### Quick Install (Arch Linux / Fedora)
+
 ```bash
-git clone https://github.com/yourusername/faiyt-qs.git
-cd faiyt-qs
+git clone https://github.com/unfaiyted/faiyt-quickshell.git
+cd faiyt-quickshell
+./install.sh
 ```
 
-The shell will automatically create the following directories on startup if they don't exist:
-- `~/Pictures/Screenshots/` - Screenshot storage
-- `~/Videos/Recordings/` - Screen recording storage
+The installer will:
+- Detect your distribution (Arch or Fedora)
+- Install required and optional dependencies
+- Create a symlink to `~/.config/quickshell/faiyt-qs`
+- Optionally configure Hyprland autostart and keybindings
+
+### Arch Linux (AUR)
+
+```bash
+# Using an AUR helper
+yay -S faiyt-qs
+
+# Or manually
+git clone https://aur.archlinux.org/faiyt-qs.git
+cd faiyt-qs
+makepkg -si
+```
+
+### Fedora (COPR)
+
+```bash
+sudo dnf copr enable errornointernet/quickshell
+sudo dnf copr enable solopasha/hyprland
+sudo dnf install faiyt-qs
+```
+
+### Manual Installation
+
+```bash
+git clone https://github.com/unfaiyted/faiyt-quickshell.git
+ln -s /path/to/faiyt-quickshell ~/.config/quickshell/faiyt-qs
+```
+
+### Uninstall
+
+```bash
+./uninstall.sh
+```
 
 ## Running
 
 ```bash
-quickshell -p shell.qml
-```
+# If installed via install.sh or manual symlink
+quickshell -c faiyt-qs
 
-Or from anywhere:
-```bash
+# If installed via AUR/COPR package
+faiyt-qs
+
+# Or run directly from source
 quickshell -p /path/to/faiyt-qs/shell.qml
 ```
+
+### Hyprland Autostart
+
+Add to your `~/.config/hypr/hyprland.conf`:
+
+```conf
+exec-once = quickshell -c faiyt-qs
+```
+
+The shell will automatically create these directories on startup:
+- `~/Pictures/Screenshots/` - Screenshot storage
+- `~/Videos/Recordings/` - Screen recording storage
 
 ## Project Structure
 

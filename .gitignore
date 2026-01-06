@@ -16,3 +16,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Package build artifacts (makepkg/rpmbuild)
+pkg/
+src/
+*.pkg.tar.zst
+*.pkg.tar.xz
+*.rpm
+*.src.rpm
+faiyt-quickshell/
