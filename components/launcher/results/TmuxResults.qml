@@ -111,7 +111,7 @@ QtObject {
                 iconColor: iconColor,
                 data: { target: target, sessionName: sessionName, windowIndex: windowIndex, isNew: false },
                 action: function() {
-                    launchProcess.command = ["kitty", "-e", "tmux", "attach", "-t", capturedTarget]
+                    launchProcess.command = [Services.ConfigService.terminalCommand, Services.ConfigService.terminalExecFlag, "tmux", "attach", "-t", capturedTarget]
                     launchProcess.running = true
                 }
             })
@@ -139,7 +139,7 @@ QtObject {
                 iconColor: Colors.iris,
                 data: { sessionName: newSessionName, isNew: true },
                 action: function() {
-                    launchProcess.command = ["kitty", "-e", "tmux", "new", "-s", capturedName]
+                    launchProcess.command = [Services.ConfigService.terminalCommand, Services.ConfigService.terminalExecFlag, "tmux", "new", "-s", capturedName]
                     launchProcess.running = true
                 }
             })

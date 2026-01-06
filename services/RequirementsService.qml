@@ -75,7 +75,7 @@ Singleton {
         { name: "swww", category: "Wallpaper", required: false, description: "Animated wallpapers" },
 
         // Terminals (Optional)
-        { name: "kitty", category: "Terminals", required: false, description: "Terminal emulator" },
+        { name: "kitty", category: "Terminals", required: false, description: "Default terminal (configurable in Settings → External Programs)" },
         { name: "tmux", category: "Terminals", required: false, description: "Terminal multiplexer" },
 
         // Notifications (Optional)

@@ -112,7 +112,7 @@ PopupWindow {
         contextMenu.visible = false
         if (result.data?.desktop) {
             const path = result.data.desktop.replace(/\/[^\/]+$/, "")
-            commandProcess.command = ["xdg-open", path]
+            commandProcess.command = [ConfigService.fileManagerCommand, path]
             commandProcess.running = true
         }
         LauncherState.hide()

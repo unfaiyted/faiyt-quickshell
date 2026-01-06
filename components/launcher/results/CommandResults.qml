@@ -20,7 +20,7 @@ Item {
         property string cmd: ""
         property bool useTerminal: false
         command: useTerminal ?
-            ["kitty", "-e", "bash", "-c", cmd + "; echo ''; echo 'Press Enter to close...'; read"] :
+            [Services.ConfigService.terminalCommand, Services.ConfigService.terminalExecFlag, "bash", "-c", cmd + "; echo ''; echo 'Press Enter to close...'; read"] :
             ["bash", "-c", cmd]
     }
 

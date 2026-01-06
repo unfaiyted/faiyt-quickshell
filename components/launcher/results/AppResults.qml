@@ -293,7 +293,7 @@ Item {
 
         if (app.terminal) {
             // Launch in terminal (detached so we can launch more apps)
-            launchProcess.cmd = "setsid kitty -e " + cmd + " &"
+            launchProcess.cmd = "setsid " + Services.ConfigService.terminalCommand + " " + Services.ConfigService.terminalExecFlag + " " + cmd + " &"
         } else {
             // Launch detached so the Process is freed immediately for more launches
             launchProcess.cmd = "setsid " + cmd + " >/dev/null 2>&1 &"
