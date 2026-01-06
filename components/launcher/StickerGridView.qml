@@ -2,6 +2,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 import "../../theme"
 import "../../services"
+import "../common"
 
 Item {
     id: stickerGridView
@@ -604,6 +605,15 @@ Item {
                     }
                 }
 
+                HintTarget {
+                    targetElement: cellBackground
+                    scope: "launcher"
+                    enabled: LauncherState.visible && !stickerGridView.isInfoMode
+                    action: () => {
+                        HintNavigationService.deactivate()
+                        stickerGridView.stickerClicked(index)
+                    }
+                }
             }
         }
 

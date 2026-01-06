@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../../theme"
 import "../../services"
+import "../common"
 
 PanelWindow {
     id: launcherWindow
@@ -17,6 +18,31 @@ PanelWindow {
 
     property bool expanded: LauncherState.visible
     property int baseWidth: LauncherState.isStickerMode ? 640 : 600
+
+    // Hint navigation state
+    property bool launcherHintsActive: {
+        const popupScope = HintNavigationService.activePopupScope
+        return HintNavigationService.active && expanded &&
+               (popupScope === "" || popupScope === "launcher" || popupScope === "launcher-menu")
+    }
+
+    // Context menu state
+    property var contextMenuResult: null
+    property Item contextMenuAnchor: null
+
+    function showContextMenu(result, anchorItem) {
+        contextMenuResult = result
+        contextMenuAnchor = anchorItem
+        resultContextMenu.result = result
+        resultContextMenu.visible = true
+        HintNavigationService.setPopupScope("launcher-menu")
+    }
+
+    function hideContextMenu() {
+        resultContextMenu.visible = false
+        contextMenuResult = null
+        contextMenuAnchor = null
+    }
 
     implicitWidth: baseWidth
     implicitHeight: expanded ? Math.min(contentColumn.implicitHeight + 32, 650) : 0
@@ -315,6 +341,10 @@ PanelWindow {
                                         LauncherState.selectedIndex = index
                                         LauncherState.activateSelected()
                                     }
+
+                                    onContextMenu: (result) => {
+                                        launcherWindow.showContextMenu(result, this)
+                                    }
                                 }
                             }
 
@@ -328,6 +358,10 @@ PanelWindow {
                                     onClicked: {
                                         LauncherState.selectedIndex = index
                                         LauncherState.activateSelected()
+                                    }
+
+                                    onContextMenu: (result) => {
+                                        launcherWindow.showContextMenu(result, this)
                                     }
                                 }
                             }
@@ -447,6 +481,24 @@ PanelWindow {
                             color: Colors.foregroundAlt
                         }
                     }
+
+                    // Hints toggle
+                    Row {
+                        spacing: 6
+
+                        Text {
+                            text: "C-;"
+                            font.pixelSize: 10
+                            font.bold: true
+                            color: HintNavigationService.active ? Colors.iris : Colors.foregroundMuted
+                        }
+
+                        Text {
+                            text: "Hints"
+                            font.pixelSize: 11
+                            color: HintNavigationService.active ? Colors.iris : Colors.foregroundAlt
+                        }
+                    }
                 }
             }
         }  // Column
@@ -455,12 +507,129 @@ PanelWindow {
 
     }  // gradientWrapper Item
 
+    // Hint overlay popup - renders hints above launcher content
+    PopupWindow {
+        id: hintPopup
+        anchor.window: launcherWindow
+        anchor.onAnchoring: {
+            // Map contentPanel position to window coordinates for accurate hint placement
+            const pos = contentPanel.mapToItem(launcherWindow.contentItem, 0, 0)
+            anchor.rect = Qt.rect(pos.x, pos.y, contentPanel.width, contentPanel.height)
+        }
+        anchor.edges: Edges.Top | Edges.Left
+
+        visible: launcherWindow.expanded && HintNavigationService.active
+        color: "transparent"
+
+        implicitWidth: contentPanel.width
+        implicitHeight: contentPanel.height
+
+        HintOverlay {
+            anchors.fill: parent
+            scope: "launcher"
+            mapRoot: contentPanel
+        }
+    }
+
+    // Force reassign hints when launcher visibility or results change
+    Connections {
+        target: HintNavigationService
+        function onActiveChanged() {
+            if (HintNavigationService.active && launcherWindow.expanded) {
+                // Delay to ensure all delegates are ready
+                hintReassignTimer.restart()
+            }
+        }
+    }
+
+    Connections {
+        target: LauncherState
+        function onResultsChanged() {
+            if (HintNavigationService.active && launcherWindow.expanded) {
+                hintReassignTimer.restart()
+            }
+        }
+    }
+
+    Timer {
+        id: hintReassignTimer
+        interval: 100
+        onTriggered: HintNavigationService.reassignHints()
+    }
+
+    // Deactivate hints when launcher closes, reassign when opening
+    onExpandedChanged: {
+        if (!expanded && HintNavigationService.active) {
+            HintNavigationService.deactivate()
+        }
+        if (!expanded) {
+            hideContextMenu()
+        }
+        if (expanded && HintNavigationService.active) {
+            hintReassignTimer.restart()
+        }
+    }
+
+    // Result context menu
+    ResultContextMenu {
+        id: resultContextMenu
+        anchor.window: launcherWindow
+        anchor.rect: Qt.rect(
+            gradientWrapper.x + (gradientWrapper.width - 200) / 2,
+            gradientWrapper.anchors.topMargin + 100,
+            200,
+            1
+        )
+        anchor.edges: Edges.Top | Edges.Left
+
+        onMenuClosed: {
+            launcherWindow.contextMenuResult = null
+            launcherWindow.contextMenuAnchor = null
+        }
+    }
+
     // Keyboard handler at window level
     FocusScope {
+        id: windowFocusScope
         anchors.fill: parent
         focus: launcherWindow.expanded
 
+        // Take focus when hints are active
+        Connections {
+            target: HintNavigationService
+            function onActiveChanged() {
+                if (HintNavigationService.active && launcherWindow.expanded) {
+                    windowFocusScope.forceActiveFocus()
+                }
+            }
+        }
+
         Keys.onPressed: function(event) {
+            // Handle hint navigation toggle (Ctrl+;)
+            if (event.key === Qt.Key_Semicolon && (event.modifiers & Qt.ControlModifier)) {
+                HintNavigationService.toggle()
+                event.accepted = true
+                return
+            }
+
+            // When hints are active, handle Escape specially and pass other keys to hint service
+            if (HintNavigationService.active) {
+                // Escape deactivates hints but keeps launcher open
+                if (event.key === Qt.Key_Escape) {
+                    HintNavigationService.deactivate()
+                    event.accepted = true
+                    return
+                }
+
+                let key = event.text || ""
+                if (event.key === Qt.Key_Backspace) key = "Backspace"
+
+                if (key && HintNavigationService.handleKey(key, "launcher", event.modifiers)) {
+                    event.accepted = true
+                    return
+                }
+            }
+
             switch (event.key) {
                 case Qt.Key_Escape:
                     LauncherState.hide()

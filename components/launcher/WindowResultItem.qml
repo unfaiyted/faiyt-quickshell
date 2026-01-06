@@ -3,6 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Wayland
 import "../../theme"
+import "../../services"
+import "../common"
 
 Rectangle {
     id: windowResultItem
@@ -14,6 +16,7 @@ Rectangle {
     property bool captureReady: false
 
     signal clicked()
+    signal contextMenu(var result)
 
     // Delay capture to allow ScreencopyView to initialize
     Timer {
@@ -152,6 +155,26 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: windowResultItem.clicked()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: (mouse) => {
+            if (mouse.button === Qt.RightButton) {
+                windowResultItem.contextMenu(result)
+            } else {
+                windowResultItem.clicked()
+            }
+        }
+    }
+
+    HintTarget {
+        targetElement: windowResultItem
+        scope: "launcher"
+        enabled: LauncherState.visible
+        action: () => {
+            HintNavigationService.deactivate()
+            windowResultItem.clicked()
+        }
+        secondaryAction: () => {
+            windowResultItem.contextMenu(result)
+        }
     }
 }

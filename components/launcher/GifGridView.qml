@@ -3,6 +3,8 @@ import Quickshell
 import Quickshell.Io
 import Qt5Compat.GraphicalEffects
 import "../../theme"
+import "../../services"
+import "../common"
 import "results"
 
 Item {
@@ -535,6 +537,19 @@ Item {
                         }
                     }
                 }
+
+                HintTarget {
+                    targetElement: categoryCellBg
+                    scope: "launcher"
+                    enabled: LauncherState.visible && gifGridView.isCategoryMode
+                    action: () => {
+                        HintNavigationService.deactivate()
+                        gifGridView.selectedIndex = index
+                        if (modelData?.data?.searchTerm) {
+                            gifGridView.categorySelected(modelData.data.searchTerm)
+                        }
+                    }
+                }
             }
         }
 
@@ -889,6 +904,21 @@ Item {
 
                     onDoubleClicked: {
                         // Double click = copy URL (quick action)
+                        if (modelData?.data && !modelData.data.isLoading && !modelData.data.isError) {
+                            gifResultsHelper.copyUrl(modelData.data.fullUrl)
+                            LauncherState.hide()
+                        }
+                    }
+                }
+
+                HintTarget {
+                    targetElement: cellBackground
+                    scope: "launcher"
+                    enabled: LauncherState.visible && !gifGridView.isInfoMode && !gifGridView.isCategoryMode
+                    action: () => {
+                        HintNavigationService.deactivate()
+                        gifGridView.selectedIndex = index
+                        // Copy URL directly (same as double-click)
                         if (modelData?.data && !modelData.data.isLoading && !modelData.data.isError) {
                             gifResultsHelper.copyUrl(modelData.data.fullUrl)
                             LauncherState.hide()

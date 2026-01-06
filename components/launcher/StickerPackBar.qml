@@ -1,6 +1,7 @@
 import QtQuick
 import "../../theme"
 import "../../services"
+import "../common"
 
 Item {
     id: packBar
@@ -26,6 +27,7 @@ Item {
 
             // "All" button
             Rectangle {
+                id: allButton
                 property bool isKeyboardFocused: packBar.keyboardFocused && packBar.keyboardIndex === -1
 
                 width: 32
@@ -55,6 +57,17 @@ Item {
                         packBar.packSelected("")
                     }
                 }
+
+                HintTarget {
+                    targetElement: allButton
+                    scope: "launcher"
+                    enabled: LauncherState.visible && packBar.visible
+                    action: () => {
+                        HintNavigationService.deactivate()
+                        StickerService.selectedPackId = ""
+                        packBar.packSelected("")
+                    }
+                }
             }
 
             // Pack buttons
@@ -62,6 +75,7 @@ Item {
                 model: StickerService.stickerPacks
 
                 Rectangle {
+                    id: packButton
                     property bool isKeyboardFocused: packBar.keyboardFocused && packBar.keyboardIndex === index
 
                     width: 32
@@ -86,6 +100,17 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            StickerService.selectedPackId = modelData.id
+                            packBar.packSelected(modelData.id)
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: packButton
+                        scope: "launcher"
+                        enabled: LauncherState.visible && packBar.visible
+                        action: () => {
+                            HintNavigationService.deactivate()
                             StickerService.selectedPackId = modelData.id
                             packBar.packSelected(modelData.id)
                         }

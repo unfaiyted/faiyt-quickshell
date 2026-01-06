@@ -1,5 +1,7 @@
 import QtQuick
 import "../../theme"
+import "../../services"
+import "../common"
 
 Item {
     id: emojiGridView
@@ -69,6 +71,16 @@ Item {
 
                     onDoubleClicked: {
                         emojiGridView.emojiActivated(index)
+                    }
+                }
+
+                HintTarget {
+                    targetElement: cellBackground
+                    scope: "launcher"
+                    enabled: LauncherState.visible
+                    action: () => {
+                        HintNavigationService.deactivate()
+                        emojiGridView.emojiClicked(index)
                     }
                 }
 

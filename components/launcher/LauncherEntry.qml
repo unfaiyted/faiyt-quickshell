@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import "../../theme"
+import "../../services"
+import "../common"
 
 Rectangle {
     id: entryContainer
@@ -63,10 +65,22 @@ Rectangle {
                 Connections {
                     target: LauncherState
                     function onVisibleChanged() {
-                        if (LauncherState.visible) {
+                        if (LauncherState.visible && !HintNavigationService.active) {
                             searchField.forceActiveFocus()
                             // Delay selectAll to ensure text binding has updated
                             selectAllTimer.restart()
+                        }
+                    }
+                }
+
+                // Manage focus based on hint navigation state
+                // Note: Focus transfer is handled by LauncherWindow.windowFocusScope
+                Connections {
+                    target: HintNavigationService
+                    function onActiveChanged() {
+                        if (!HintNavigationService.active && LauncherState.visible) {
+                            // Refocus input when hints are deactivated
+                            searchField.forceActiveFocus()
                         }
                     }
                 }
@@ -88,23 +102,65 @@ Rectangle {
                     visible: searchField.text.length === 0
                 }
 
+                // Handle all key events - pass to hint system when active
+                Keys.onPressed: function(event) {
+                    // Handle hint toggle (Ctrl+;) from anywhere
+                    if (event.key === Qt.Key_Semicolon && (event.modifiers & Qt.ControlModifier)) {
+                        HintNavigationService.toggle()
+                        event.accepted = true
+                        return
+                    }
+
+                    // When hints are active, pass all keys to hint system
+                    if (HintNavigationService.active) {
+                        let key = event.text || ""
+                        if (event.key === Qt.Key_Escape) key = "Escape"
+                        else if (event.key === Qt.Key_Backspace) key = "Backspace"
+
+                        if (key === "Escape") {
+                            // Escape deactivates hints, keeps launcher open
+                            HintNavigationService.deactivate()
+                            event.accepted = true
+                            return
+                        }
+
+                        if (key && HintNavigationService.handleKey(key, "launcher", event.modifiers)) {
+                            event.accepted = true
+                            return
+                        }
+                        // Consume all letter keys when hints active to prevent typing
+                        if (event.text && event.text.length === 1) {
+                            event.accepted = true
+                            return
+                        }
+                    }
+                }
+
                 // Handle special keys
                 Keys.onEscapePressed: function(event) {
+                    // If hints are active, already handled above
+                    if (HintNavigationService.active) {
+                        event.accepted = true
+                        return
+                    }
                     LauncherState.hide()
                     event.accepted = true
                 }
 
                 Keys.onDownPressed: function(event) {
+                    if (HintNavigationService.active) return
                     LauncherState.selectNext()
                     event.accepted = true
                 }
 
                 Keys.onUpPressed: function(event) {
+                    if (HintNavigationService.active) return
                     LauncherState.selectPrevious()
                     event.accepted = true
                 }
 
                 Keys.onLeftPressed: function(event) {
+                    if (HintNavigationService.active) return
                     // If text is selected, deselect and move cursor to start
                     if (searchField.selectedText.length > 0) {
                         searchField.cursorPosition = searchField.selectionStart
@@ -120,6 +176,7 @@ Rectangle {
                 }
 
                 Keys.onRightPressed: function(event) {
+                    if (HintNavigationService.active) return
                     // If text is selected, deselect and move cursor to end
                     if (searchField.selectionStart !== searchField.selectionEnd) {
                         searchField.cursorPosition = searchField.selectionEnd
@@ -135,11 +192,13 @@ Rectangle {
                 }
 
                 Keys.onReturnPressed: function(event) {
+                    if (HintNavigationService.active) return
                     handleEnter()
                     event.accepted = true
                 }
 
                 Keys.onEnterPressed: function(event) {
+                    if (HintNavigationService.active) return
                     handleEnter()
                     event.accepted = true
                 }
@@ -212,6 +271,18 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            if (LauncherState.evalResult) {
+                                copyEvalAndShowFeedback()
+                            }
+                        }
+                    }
+
+                    HintTarget {
+                        targetElement: evalContainer
+                        scope: "launcher"
+                        enabled: LauncherState.visible && evalContainer.visible
+                        action: () => {
+                            HintNavigationService.deactivate()
                             if (LauncherState.evalResult) {
                                 copyEvalAndShowFeedback()
                             }

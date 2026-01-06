@@ -10,3 +10,4 @@ StickerGridView 1.0 StickerGridView.qml
 StickerPackBar 1.0 StickerPackBar.qml
 GifGridView 1.0 GifGridView.qml
 Evaluator 1.0 Evaluator.qml
+ResultContextMenu 1.0 ResultContextMenu.qml

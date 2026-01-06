@@ -1,5 +1,7 @@
 import QtQuick
 import "../../theme"
+import "../../services"
+import "../common"
 
 Rectangle {
     id: resultItem
@@ -8,6 +10,7 @@ Rectangle {
     property bool isSelected: false
 
     signal clicked()
+    signal contextMenu(var result)
 
     height: 52
     radius: 10
@@ -96,6 +99,26 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: resultItem.clicked()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: (mouse) => {
+            if (mouse.button === Qt.RightButton) {
+                resultItem.contextMenu(result)
+            } else {
+                resultItem.clicked()
+            }
+        }
+    }
+
+    HintTarget {
+        targetElement: resultItem
+        scope: "launcher"
+        enabled: LauncherState.visible
+        action: () => {
+            HintNavigationService.deactivate()
+            resultItem.clicked()
+        }
+        secondaryAction: () => {
+            resultItem.contextMenu(result)
+        }
     }
 }
