@@ -9,13 +9,13 @@ BarGroup {
     id: batteryModule
 
     implicitWidth: row.width + 16
-    implicitHeight: 24
+    implicitHeight: 30 
 
     // Only show if enabled in config AND there's a laptop battery
     visible: ConfigService.barModuleBattery && UPower.displayDevice && UPower.displayDevice.isLaptopBattery
 
     property int percentage: UPower.displayDevice
-        ? Math.round(UPower.displayDevice.percentage)
+        ? Math.round(UPower.displayDevice.percentage * 100)
         : 0
 
     property bool charging: UPower.displayDevice
@@ -65,10 +65,13 @@ BarGroup {
 
             Text {
                 anchors.centerIn: parent
-                text: batteryModule.percentage
-                font.pixelSize: 8
+                text: batteryModule.percentage.toString()
+                font.pixelSize: 7
                 font.bold: true
                 color: batteryModule.batteryColor
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideNone
             }
         }
 
