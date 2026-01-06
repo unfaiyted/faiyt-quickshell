@@ -3,6 +3,7 @@ import Quickshell
 import "../../../theme"
 import "../../../services"
 import "../../common"
+import "../../monitors"
 
 Item {
     id: recordBtn
@@ -388,12 +389,123 @@ Item {
                         }
                     }
                 }
+
+                // Separator for target selection
+                Rectangle {
+                    width: parent.width - 16
+                    height: 1
+                    color: Colors.overlay
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: MonitorsState.monitors.length > 0
+                }
+
+                // Target label
+                Text {
+                    text: "Record Target"
+                    color: Colors.muted
+                    font.pixelSize: 10
+                    leftPadding: 8
+                    visible: MonitorsState.monitors.length > 0
+                }
+
+                // Selection target (default)
+                Rectangle {
+                    id: menuItemSelection
+                    width: Math.max(selectionRow.width + 24, 160)
+                    height: 28
+                    radius: 4
+                    color: selectionMouse.containsMouse ? Colors.overlay : "transparent"
+                    visible: MonitorsState.monitors.length > 0
+
+                    Row {
+                        id: selectionRow
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 8
+
+                        Text {
+                            text: "󰩭"
+                            color: Colors.iris
+                            font.pixelSize: 12
+                            font.family: Fonts.icon
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Selection"
+                            color: Colors.foreground
+                            font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: selectionMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            modeMenu.visible = false
+                            RecordingState.start("selection")
+                        }
+                    }
+                }
+
+                // Dynamic monitor targets
+                Repeater {
+                    model: MonitorsState.monitors
+
+                    Rectangle {
+                        width: Math.max(monitorRow.width + 24, 160)
+                        height: 28
+                        radius: 4
+                        color: monitorMouse.containsMouse ? Colors.overlay : "transparent"
+
+                        Row {
+                            id: monitorRow
+                            anchors.left: parent.left
+                            anchors.leftMargin: 8
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 8
+
+                            Text {
+                                text: "󰍹"
+                                color: Colors.gold
+                                font.pixelSize: 12
+                                font.family: Fonts.icon
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: modelData.name
+                                color: Colors.foreground
+                                font.pixelSize: 11
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: monitorMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                modeMenu.visible = false
+                                RecordingState.start(modelData.name)
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        // Clear popup scope when menu closes
+        // Clear popup scope when menu closes, refresh monitors when opened
         onVisibleChanged: {
-            if (!visible && HintNavigationService.activePopupScope === "recording-menu") {
+            if (visible) {
+                // Refresh monitor list when menu opens
+                MonitorsState.refreshMonitors()
+            } else if (HintNavigationService.activePopupScope === "recording-menu") {
                 HintNavigationService.clearPopupScope()
             }
         }

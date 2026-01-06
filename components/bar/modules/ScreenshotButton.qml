@@ -3,6 +3,7 @@ import Quickshell
 import "../../../theme"
 import "../../../services"
 import "../../common"
+import "../../monitors"
 
 Item {
     id: screenshotBtn
@@ -290,12 +291,167 @@ Item {
                         }
                     }
                 }
+
+                // Separator for target selection
+                Rectangle {
+                    width: parent.width - 16
+                    height: 1
+                    color: Colors.overlay
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: MonitorsState.monitors.length > 0
+                }
+
+                // Target label
+                Text {
+                    text: "Screenshot Target"
+                    color: Colors.muted
+                    font.pixelSize: 10
+                    leftPadding: 8
+                    visible: MonitorsState.monitors.length > 0
+                }
+
+                // Selection target (default)
+                Rectangle {
+                    id: menuItemSelection
+                    width: Math.max(selectionRow.width + 24, 180)
+                    height: 28
+                    radius: 4
+                    color: selectionMouse.containsMouse ? Colors.overlay : "transparent"
+                    visible: MonitorsState.monitors.length > 0
+
+                    Row {
+                        id: selectionRow
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 8
+
+                        Text {
+                            text: "󰩭"
+                            color: Colors.iris
+                            font.pixelSize: 12
+                            font.family: Fonts.icon
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Selection"
+                            color: Colors.foreground
+                            font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: selectionMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            contextMenu.visible = false
+                            ScreenshotState.capture("selection")
+                        }
+                    }
+                }
+
+                // All monitors combined
+                Rectangle {
+                    id: menuItemAll
+                    width: Math.max(allRow.width + 24, 180)
+                    height: 28
+                    radius: 4
+                    color: allMouse.containsMouse ? Colors.overlay : "transparent"
+                    visible: MonitorsState.monitors.length > 1
+
+                    Row {
+                        id: allRow
+                        anchors.left: parent.left
+                        anchors.leftMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 8
+
+                        Text {
+                            text: "󰍺"
+                            color: Colors.foam
+                            font.pixelSize: 12
+                            font.family: Fonts.icon
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "All Monitors"
+                            color: Colors.foreground
+                            font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: allMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            contextMenu.visible = false
+                            ScreenshotState.capture("all")
+                        }
+                    }
+                }
+
+                // Dynamic monitor targets
+                Repeater {
+                    model: MonitorsState.monitors
+
+                    Rectangle {
+                        width: Math.max(monitorRow.width + 24, 180)
+                        height: 28
+                        radius: 4
+                        color: monitorMouse.containsMouse ? Colors.overlay : "transparent"
+
+                        Row {
+                            id: monitorRow
+                            anchors.left: parent.left
+                            anchors.leftMargin: 8
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 8
+
+                            Text {
+                                text: "󰍹"
+                                color: Colors.gold
+                                font.pixelSize: 12
+                                font.family: Fonts.icon
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: modelData.name
+                                color: Colors.foreground
+                                font.pixelSize: 11
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: monitorMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                contextMenu.visible = false
+                                ScreenshotState.capture(modelData.name)
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        // Clear popup scope when menu closes
+        // Clear popup scope when menu closes, refresh monitors when opened
         onVisibleChanged: {
-            if (!visible && HintNavigationService.activePopupScope === "screenshot-menu") {
+            if (visible) {
+                // Refresh monitor list when menu opens
+                MonitorsState.refreshMonitors()
+            } else if (HintNavigationService.activePopupScope === "screenshot-menu") {
                 HintNavigationService.clearPopupScope()
             }
         }

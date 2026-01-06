@@ -57,10 +57,12 @@ Singleton {
         // Utility defaults
         utilities: {
             recording: {
-                defaultMode: "record"  // "record", "record-hq", "record-gif"
+                defaultMode: "record",  // "record", "record-hq", "record-gif"
+                savePath: ""            // Empty = default ~/Videos/Recordings
             },
             screenshot: {
-                annotateEnabled: false
+                annotateEnabled: false,
+                savePath: ""            // Empty = default ~/Pictures/Screenshots
             }
         },
 
@@ -198,6 +200,19 @@ Singleton {
             lastVolume: null,           // 0-100, restored on startup
             lastBrightness: null,       // 0-100, restored on startup
             lastKbBrightness: null      // 0-100, restored on startup
+        },
+
+        // External programs configuration
+        externalPrograms: {
+            terminal: "kitty",          // Terminal emulator
+            terminalExecFlag: "-e",     // Flag to execute command
+            terminalCustom: "",         // Custom terminal if "custom" selected
+            fileManager: "xdg-open",    // File manager
+            fileManagerCustom: "",      // Custom file manager
+            browser: "xdg-open",        // Browser
+            browserCustom: "",          // Custom browser
+            annotator: "napkin",        // Screenshot annotator
+            annotatorCustom: ""         // Custom annotator
         }
     })
 
@@ -363,7 +378,9 @@ Singleton {
 
     // Utility defaults convenience properties
     property string recordingDefaultMode: config.utilities?.recording?.defaultMode || "record"
+    property string recordingSavePath: config.utilities?.recording?.savePath || ""
     property bool screenshotAnnotateEnabled: config.utilities?.screenshot?.annotateEnabled || false
+    property string screenshotSavePath: config.utilities?.screenshot?.savePath || ""
 
     // Window enable/disable convenience properties
     property bool windowBarEnabled: config.windows?.bar?.enabled !== false
@@ -402,6 +419,25 @@ Singleton {
     property bool indicatorShowVolume: config.indicators?.showVolume !== false
     property bool indicatorShowBrightness: config.indicators?.showBrightness !== false
     property bool indicatorShowKeyboardBacklight: config.indicators?.showKeyboardBacklight !== false
+
+    // External programs convenience properties
+    property string terminalCommand: {
+        let t = config.externalPrograms?.terminal || "kitty"
+        return t === "custom" ? (config.externalPrograms?.terminalCustom || "kitty") : t
+    }
+    property string terminalExecFlag: config.externalPrograms?.terminalExecFlag || "-e"
+    property string fileManagerCommand: {
+        let fm = config.externalPrograms?.fileManager || "xdg-open"
+        return fm === "custom" ? (config.externalPrograms?.fileManagerCustom || "xdg-open") : fm
+    }
+    property string browserCommand: {
+        let b = config.externalPrograms?.browser || "xdg-open"
+        return b === "custom" ? (config.externalPrograms?.browserCustom || "xdg-open") : b
+    }
+    property string annotatorCommand: {
+        let a = config.externalPrograms?.annotator || "napkin"
+        return a === "custom" ? (config.externalPrograms?.annotatorCustom || "napkin") : a
+    }
 
     // Update convenience properties when config changes
     onConfigChanged: {
@@ -448,7 +484,9 @@ Singleton {
 
         // Utility defaults
         recordingDefaultMode = config.utilities?.recording?.defaultMode || "record"
+        recordingSavePath = config.utilities?.recording?.savePath || ""
         screenshotAnnotateEnabled = config.utilities?.screenshot?.annotateEnabled || false
+        screenshotSavePath = config.utilities?.screenshot?.savePath || ""
 
         // AI config (API key from env var only)
         aiDefaultModel = config.ai?.defaultModel || "claude-sonnet-4-5-20250929"
@@ -487,5 +525,16 @@ Singleton {
         indicatorShowVolume = config.indicators?.showVolume !== false
         indicatorShowBrightness = config.indicators?.showBrightness !== false
         indicatorShowKeyboardBacklight = config.indicators?.showKeyboardBacklight !== false
+
+        // External programs - these use computed properties, force re-evaluation
+        let t = config.externalPrograms?.terminal || "kitty"
+        terminalCommand = t === "custom" ? (config.externalPrograms?.terminalCustom || "kitty") : t
+        terminalExecFlag = config.externalPrograms?.terminalExecFlag || "-e"
+        let fm = config.externalPrograms?.fileManager || "xdg-open"
+        fileManagerCommand = fm === "custom" ? (config.externalPrograms?.fileManagerCustom || "xdg-open") : fm
+        let b = config.externalPrograms?.browser || "xdg-open"
+        browserCommand = b === "custom" ? (config.externalPrograms?.browserCustom || "xdg-open") : b
+        let a = config.externalPrograms?.annotator || "napkin"
+        annotatorCommand = a === "custom" ? (config.externalPrograms?.annotatorCustom || "napkin") : a
     }
 }

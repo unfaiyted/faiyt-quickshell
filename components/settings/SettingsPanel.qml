@@ -1202,6 +1202,46 @@ Rectangle {
                                 }
                             }
                         }
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("screenshot path") ||
+                                     contentColumn.matchesSearch("screenshot save") ||
+                                     contentColumn.matchesSearch("screenshot directory") ||
+                                     contentColumn.matchesSearch("screenshot folder") ||
+                                     contentColumn.matchesSearch("screenshot location")
+                            label: "Screenshot Save Path"
+                            description: "Leave empty for ~/Pictures/Screenshots"
+
+                            SettingsTextInput {
+                                text: ConfigService.screenshotSavePath
+                                placeholder: "~/Pictures/Screenshots"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("utilities.screenshot.savePath", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("recording path") ||
+                                     contentColumn.matchesSearch("recording save") ||
+                                     contentColumn.matchesSearch("recording directory") ||
+                                     contentColumn.matchesSearch("recording folder") ||
+                                     contentColumn.matchesSearch("recording location") ||
+                                     contentColumn.matchesSearch("video path") ||
+                                     contentColumn.matchesSearch("video save")
+                            label: "Recording Save Path"
+                            description: "Leave empty for ~/Videos/Recordings"
+
+                            SettingsTextInput {
+                                text: ConfigService.recordingSavePath
+                                placeholder: "~/Videos/Recordings"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("utilities.recording.savePath", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
                     }
 
                     // Battery subsection
@@ -1987,6 +2027,278 @@ Rectangle {
                             onToggled: (value) => {
                                 ConfigService.setValue("windows.overlays.notifications", value)
                                 ConfigService.saveConfig()
+                            }
+                        }
+                    }
+                }
+
+                // ═══════════════════════════════════════════════════════════════
+                // SECTION 7: EXTERNAL PROGRAMS
+                // ═══════════════════════════════════════════════════════════════
+                SettingsSection {
+                    id: externalProgramsSection
+                    visible: contentColumn.matchesSearch("external") ||
+                             contentColumn.matchesSearch("programs") ||
+                             contentColumn.matchesSearch("terminal") ||
+                             contentColumn.matchesSearch("browser") ||
+                             contentColumn.matchesSearch("file manager") ||
+                             contentColumn.matchesSearch("annotator") ||
+                             contentColumn.matchesSearch("kitty") ||
+                             contentColumn.matchesSearch("alacritty")
+                    title: "External Programs"
+
+                    // Terminal preset model with exec flags
+                    property var terminalPresets: [
+                        {label: "kitty (Recommended)", value: "kitty", execFlag: "-e"},
+                        {label: "Alacritty", value: "alacritty", execFlag: "-e"},
+                        {label: "WezTerm", value: "wezterm", execFlag: "start --"},
+                        {label: "foot", value: "foot", execFlag: "--"},
+                        {label: "GNOME Terminal", value: "gnome-terminal", execFlag: "--"},
+                        {label: "Konsole", value: "konsole", execFlag: "-e"},
+                        {label: "xterm", value: "xterm", execFlag: "-e"},
+                        {label: "Custom", value: "custom", execFlag: "-e"}
+                    ]
+
+                    property var fileManagerPresets: [
+                        {label: "System Default (Recommended)", value: "xdg-open"},
+                        {label: "Dolphin", value: "dolphin"},
+                        {label: "Nautilus", value: "nautilus"},
+                        {label: "Thunar", value: "thunar"},
+                        {label: "Nemo", value: "nemo"},
+                        {label: "PCManFM", value: "pcmanfm"},
+                        {label: "Custom", value: "custom"}
+                    ]
+
+                    property var browserPresets: [
+                        {label: "System Default (Recommended)", value: "xdg-open"},
+                        {label: "Firefox", value: "firefox"},
+                        {label: "Chromium", value: "chromium"},
+                        {label: "Brave", value: "brave"},
+                        {label: "Google Chrome", value: "google-chrome-stable"},
+                        {label: "Vivaldi", value: "vivaldi"},
+                        {label: "Custom", value: "custom"}
+                    ]
+
+                    property var annotatorPresets: [
+                        {label: "Napkin (Recommended)", value: "napkin"},
+                        {label: "Swappy", value: "swappy"},
+                        {label: "Satty", value: "satty"},
+                        {label: "Custom", value: "custom"}
+                    ]
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Terminal Emulator
+                    // ─────────────────────────────────────────────────────────────
+                    CollapsibleSection {
+                        title: "Terminal Emulator"
+                        icon: "󰆍"
+                        expanded: true
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("terminal") ||
+                                     contentColumn.matchesSearch("kitty") ||
+                                     contentColumn.matchesSearch("alacritty")
+                            label: "Terminal"
+                            description: "Terminal emulator for running commands"
+
+                            DropdownSelect {
+                                id: terminalDropdown
+                                model: externalProgramsSection.terminalPresets
+                                currentIndex: {
+                                    let current = ConfigService.getValue("externalPrograms.terminal") || "kitty"
+                                    let presets = externalProgramsSection.terminalPresets
+                                    for (let i = 0; i < presets.length; i++) {
+                                        if (presets[i].value === current) return i
+                                    }
+                                    return 0
+                                }
+                                onSelected: (index, value) => {
+                                    let presets = externalProgramsSection.terminalPresets
+                                    ConfigService.setValue("externalPrograms.terminal", value)
+                                    // Auto-update exec flag when preset changes
+                                    if (value !== "custom") {
+                                        ConfigService.setValue("externalPrograms.terminalExecFlag", presets[index].execFlag)
+                                    }
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: (ConfigService.getValue("externalPrograms.terminal") === "custom") &&
+                                     (contentColumn.matchesSearch("terminal") || contentColumn.matchesSearch("custom"))
+                            label: "Custom Command"
+                            description: "Terminal executable name or path"
+
+                            SettingsTextInput {
+                                text: ConfigService.getValue("externalPrograms.terminalCustom") || ""
+                                placeholder: "e.g., /usr/bin/myterminal"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("externalPrograms.terminalCustom", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("terminal") ||
+                                     contentColumn.matchesSearch("exec") ||
+                                     contentColumn.matchesSearch("flag")
+                            label: "Exec Flag"
+                            description: "Flag to execute a command (-e, --, start --)"
+
+                            SettingsTextInput {
+                                text: ConfigService.getValue("externalPrograms.terminalExecFlag") || "-e"
+                                placeholder: "-e"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("externalPrograms.terminalExecFlag", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+                    }
+
+                    // ─────────────────────────────────────────────────────────────
+                    // File Manager
+                    // ─────────────────────────────────────────────────────────────
+                    CollapsibleSection {
+                        title: "File Manager"
+                        icon: "󰉋"
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("file") ||
+                                     contentColumn.matchesSearch("manager") ||
+                                     contentColumn.matchesSearch("dolphin") ||
+                                     contentColumn.matchesSearch("nautilus")
+                            label: "File Manager"
+                            description: "Application for opening files and folders"
+
+                            DropdownSelect {
+                                model: externalProgramsSection.fileManagerPresets
+                                currentIndex: {
+                                    let current = ConfigService.getValue("externalPrograms.fileManager") || "xdg-open"
+                                    let presets = externalProgramsSection.fileManagerPresets
+                                    for (let i = 0; i < presets.length; i++) {
+                                        if (presets[i].value === current) return i
+                                    }
+                                    return 0
+                                }
+                                onSelected: (index, value) => {
+                                    ConfigService.setValue("externalPrograms.fileManager", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: (ConfigService.getValue("externalPrograms.fileManager") === "custom") &&
+                                     (contentColumn.matchesSearch("file") || contentColumn.matchesSearch("custom"))
+                            label: "Custom Command"
+                            description: "File manager executable name or path"
+
+                            SettingsTextInput {
+                                text: ConfigService.getValue("externalPrograms.fileManagerCustom") || ""
+                                placeholder: "e.g., ranger"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("externalPrograms.fileManagerCustom", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+                    }
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Browser
+                    // ─────────────────────────────────────────────────────────────
+                    CollapsibleSection {
+                        title: "Browser"
+                        icon: "󰈹"
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("browser") ||
+                                     contentColumn.matchesSearch("firefox") ||
+                                     contentColumn.matchesSearch("chrome")
+                            label: "Browser"
+                            description: "Web browser for opening URLs"
+
+                            DropdownSelect {
+                                model: externalProgramsSection.browserPresets
+                                currentIndex: {
+                                    let current = ConfigService.getValue("externalPrograms.browser") || "xdg-open"
+                                    let presets = externalProgramsSection.browserPresets
+                                    for (let i = 0; i < presets.length; i++) {
+                                        if (presets[i].value === current) return i
+                                    }
+                                    return 0
+                                }
+                                onSelected: (index, value) => {
+                                    ConfigService.setValue("externalPrograms.browser", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: (ConfigService.getValue("externalPrograms.browser") === "custom") &&
+                                     (contentColumn.matchesSearch("browser") || contentColumn.matchesSearch("custom"))
+                            label: "Custom Command"
+                            description: "Browser executable name or path"
+
+                            SettingsTextInput {
+                                text: ConfigService.getValue("externalPrograms.browserCustom") || ""
+                                placeholder: "e.g., qutebrowser"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("externalPrograms.browserCustom", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+                    }
+
+                    // ─────────────────────────────────────────────────────────────
+                    // Screenshot Annotator
+                    // ─────────────────────────────────────────────────────────────
+                    CollapsibleSection {
+                        title: "Screenshot Annotator"
+                        icon: "󰏬"
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("annotator") ||
+                                     contentColumn.matchesSearch("screenshot") ||
+                                     contentColumn.matchesSearch("napkin")
+                            label: "Annotator"
+                            description: "Application for annotating screenshots"
+
+                            DropdownSelect {
+                                model: externalProgramsSection.annotatorPresets
+                                currentIndex: {
+                                    let current = ConfigService.getValue("externalPrograms.annotator") || "napkin"
+                                    let presets = externalProgramsSection.annotatorPresets
+                                    for (let i = 0; i < presets.length; i++) {
+                                        if (presets[i].value === current) return i
+                                    }
+                                    return 0
+                                }
+                                onSelected: (index, value) => {
+                                    ConfigService.setValue("externalPrograms.annotator", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: (ConfigService.getValue("externalPrograms.annotator") === "custom") &&
+                                     (contentColumn.matchesSearch("annotator") || contentColumn.matchesSearch("custom"))
+                            label: "Custom Command"
+                            description: "Annotator executable name or path"
+
+                            SettingsTextInput {
+                                text: ConfigService.getValue("externalPrograms.annotatorCustom") || ""
+                                placeholder: "e.g., flameshot"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("externalPrograms.annotatorCustom", value)
+                                    ConfigService.saveConfig()
+                                }
                             }
                         }
                     }

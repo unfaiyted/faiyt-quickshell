@@ -3,6 +3,50 @@
 # Script name
 SCRIPT_NAME=$(basename "$0")
 
+# Config file path
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/faiyt-qs/config.json"
+
+# Read path from config, with fallback
+get_config_path() {
+    local key="$1"
+    local default="$2"
+    if [ -f "$CONFIG_FILE" ] && command -v jq >/dev/null 2>&1; then
+        local value=$(jq -r "$key // empty" "$CONFIG_FILE" 2>/dev/null)
+        if [ -n "$value" ]; then
+            # Expand ~ to $HOME
+            echo "${value/#\~/$HOME}"
+            return
+        fi
+    fi
+    echo "$default"
+}
+
+# Ensure directory exists (auto-create if needed)
+ensure_dir() {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+        mkdir -p "$dir"
+    fi
+}
+
+# Get configured paths with defaults
+SCREENSHOT_DIR=$(get_config_path '.utilities.screenshot.savePath' "${HOME}/Pictures/Screenshots")
+RECORDING_DIR=$(get_config_path '.utilities.recording.savePath' "${HOME}/Videos/Recordings")
+
+# Validate that a monitor target exists
+validate_monitor() {
+    local target="$1"
+    if [ "$target" = "selection" ]; then
+        return 0
+    fi
+    if command -v hyprctl >/dev/null 2>&1; then
+        if hyprctl monitors -j | jq -e ".[] | select(.name == \"$target\")" >/dev/null 2>&1; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 # Function to display usage
 usage() {
   cat << EOF
@@ -10,54 +54,30 @@ Usage: $SCRIPT_NAME <command> [options]
 
 Commands:
   screenshot <target>     Take a screenshot
-    Targets:
-      selection            - Screenshot selected area
-      eDP-1               - Screenshot eDP-1 display
-      HDMI-A-1            - Screenshot HDMI-A-1 display
-      both                - Screenshot both displays
+  record <target>         Start/stop recording (MP4, NVENC H.265)
+  record-hq <target>      Start/stop high-quality recording (60fps, high bitrate)
+  record-gif <target>     Start/stop GIF recording
+  annotate <target>       Take screenshot and open in annotator for annotation
+  status                  Check if recording is active
+  list-targets            List available capture targets
+  convert <format>        Convert recordings (webm, iphone, youtube, gif)
 
-  record <target>        Start/stop recording (MP4, NVENC H.264)
-    Targets:
-      selection           - Record selected area
-      eDP-1              - Record eDP-1 display
-      HDMI-A-1           - Record HDMI-A-1 display
-      stop               - Stop current recording
-
-  record-hq <target>     Start/stop high-quality recording (60fps, high bitrate)
-    Targets:
-      selection           - Record selected area in high quality
-      eDP-1              - Record eDP-1 display in high quality
-      HDMI-A-1           - Record HDMI-A-1 display in high quality
-      stop               - Stop current recording
-
-  record-gif <target>    Start/stop GIF recording
-    Targets:
-      selection           - Record selected area as GIF
-      eDP-1              - Record eDP-1 display as GIF
-      HDMI-A-1           - Record HDMI-A-1 display as GIF
-      stop               - Stop current recording
-
-  annotate <target>      Take screenshot and open in napkin for annotation
-    Targets:
-      selection           - Screenshot selected area and annotate
-
-  status                 Check if recording is active (exit 0 if recording, 1 if not)
-
-  convert <format>       Convert recordings
-    Formats:
-      webm               - Convert MP4 files to WebM
-      iphone             - Convert MP4 files for iPhone
-      youtube            - Convert MP4 files for YouTube (high quality)
-      gif                - Convert MP4 files to GIF
+Targets:
+  selection               - User-selected area via slurp
+  <monitor-name>          - Specific monitor (use list-targets to see available)
+  stop                    - Stop current recording (record commands only)
 
 Examples:
   $SCRIPT_NAME screenshot selection
-  $SCRIPT_NAME record eDP-1
+  $SCRIPT_NAME record DP-1
   $SCRIPT_NAME record-hq eDP-1
   $SCRIPT_NAME record-gif selection
   $SCRIPT_NAME record stop
+  $SCRIPT_NAME list-targets
   $SCRIPT_NAME annotate selection
   $SCRIPT_NAME convert gif
+
+Note: Set FAIYT_ANNOTATOR env var to use a different annotator (default: napkin)
 
 EOF
   exit 1
@@ -228,9 +248,16 @@ record_gif() {
 COMMAND="$1"
 TARGET="$2"
 
-# Set up file paths
-IMG="${HOME}/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%m-%s).png"
-VID="${HOME}/Videos/Recordings/$(date +%Y-%m-%d_%H-%m-%s).mp4"
+# Ensure directories exist
+ensure_dir "$SCREENSHOT_DIR"
+ensure_dir "$RECORDING_DIR"
+
+# Set up file paths using configured directories
+IMG="${SCREENSHOT_DIR}/$(date +%Y-%m-%d_%H-%m-%s).png"
+VID="${RECORDING_DIR}/$(date +%Y-%m-%d_%H-%m-%s).mp4"
+
+# External programs (configurable via environment variables)
+ANNOTATOR="${FAIYT_ANNOTATOR:-napkin}"
 
 case "$COMMAND" in
   "screenshot")
@@ -240,27 +267,36 @@ case "$COMMAND" in
         wl-copy <"$IMG"
         notify_screenshot "$IMG"
         ;;
-      "eDP-1")
-        grim -c -o eDP-1 "$IMG"
+      "all")
+        # Screenshot all monitors combined
+        monitors=$(hyprctl monitors -j | jq -r '.[].name' 2>/dev/null)
+        temp_files=()
+        for mon in $monitors; do
+            temp_file="${IMG//.png/-${mon}.png}"
+            grim -c -o "$mon" "$temp_file"
+            temp_files+=("$temp_file")
+        done
+        if [ ${#temp_files[@]} -gt 1 ]; then
+            montage "${temp_files[@]}" -tile "${#temp_files[@]}x1" -geometry +0+0 "$IMG"
+            rm -f "${temp_files[@]}"
+        else
+            mv "${temp_files[0]}" "$IMG"
+        fi
         wl-copy <"$IMG"
-        notify_screenshot "$IMG"
-        ;;
-      "HDMI-A-1")
-        grim -c -o HDMI-A-1 "$IMG"
-        wl-copy <"$IMG"
-        notify_screenshot "$IMG"
-        ;;
-      "both")
-        grim -c -o eDP-1 "${IMG//.png/-eDP-1.png}"
-        grim -c -o HDMI-A-1 "${IMG//.png/-HDMI-A-1.png}"
-        montage "${IMG//.png/-eDP-1.png}" "${IMG//.png/-HDMI-A-1.png}" -tile 2x1 -geometry +0+0 "$IMG"
-        wl-copy <"$IMG"
-        rm "${IMG//.png/-eDP-1.png}" "${IMG//.png/-HDMI-A-1.png}"
         notify_screenshot "$IMG"
         ;;
       *)
-        echo "Error: Invalid screenshot target '$TARGET'"
-        usage
+        # Dynamic monitor target - validate it exists
+        if validate_monitor "$TARGET"; then
+            grim -c -o "$TARGET" "$IMG"
+            wl-copy <"$IMG"
+            notify_screenshot "$IMG"
+        else
+            echo "Error: Unknown target '$TARGET'"
+            echo "Available targets:"
+            $0 list-targets
+            exit 1
+        fi
         ;;
     esac
     ;;
@@ -275,27 +311,26 @@ case "$COMMAND" in
         echo "$VID" >/tmp/recording.txt
         record_video "$VID" -g "$(slurp)"
         ;;
-      "eDP-1")
-        wf-recorder_check
-        echo "$VID" >/tmp/recording.txt
-        record_video "$VID" -a -o eDP-1
-        ;;
-      "HDMI-A-1")
-        wf-recorder_check
-        echo "$VID" >/tmp/recording.txt
-        record_video "$VID" -a -o HDMI-A-1
-        ;;
       *)
-        echo "Error: Invalid record target '$TARGET'"
-        usage
+        # Dynamic monitor target - validate it exists
+        if validate_monitor "$TARGET"; then
+            wf-recorder_check
+            echo "$VID" >/tmp/recording.txt
+            record_video "$VID" -a -o "$TARGET"
+        else
+            echo "Error: Unknown target '$TARGET'"
+            echo "Available targets:"
+            $0 list-targets
+            exit 1
+        fi
         ;;
     esac
     ;;
   
   "record-hq")
     # Change file extension to mp4 for high quality recordings
-    VID_HQ="${HOME}/Videos/Recordings/$(date +%Y-%m-%d_%H-%m-%s)-hq.mp4"
-    
+    VID_HQ="${RECORDING_DIR}/$(date +%Y-%m-%d_%H-%m-%s)-hq.mp4"
+
     case "$TARGET" in
       "stop")
         wf-recorder_check
@@ -306,29 +341,27 @@ case "$COMMAND" in
         notify-send -a "Screen Capture" "High Quality Recording" "Starting YouTube-quality recording..."
         record_high_quality "$VID_HQ" -g "$(slurp)"
         ;;
-      "eDP-1")
-        wf-recorder_check
-        echo "$VID_HQ" >/tmp/recording.txt
-        notify-send -a "Screen Capture" "High Quality Recording" "Starting on eDP-1..."
-        record_high_quality "$VID_HQ" -a -o eDP-1
-        ;;
-      "HDMI-A-1")
-        wf-recorder_check
-        echo "$VID_HQ" >/tmp/recording.txt
-        notify-send -a "Screen Capture" "High Quality Recording" "Starting on HDMI-A-1..."
-        record_high_quality "$VID_HQ" -a -o HDMI-A-1
-        ;;
       *)
-        echo "Error: Invalid record-hq target '$TARGET'"
-        usage
+        # Dynamic monitor target - validate it exists
+        if validate_monitor "$TARGET"; then
+            wf-recorder_check
+            echo "$VID_HQ" >/tmp/recording.txt
+            notify-send -a "Screen Capture" "High Quality Recording" "Starting on $TARGET..."
+            record_high_quality "$VID_HQ" -a -o "$TARGET"
+        else
+            echo "Error: Unknown target '$TARGET'"
+            echo "Available targets:"
+            $0 list-targets
+            exit 1
+        fi
         ;;
     esac
     ;;
   
   "record-gif")
-    # GIF files go to a specific location
-    GIF="${HOME}/Videos/Recordings/$(date +%Y-%m-%d_%H-%m-%s).gif"
-    
+    # GIF files go to the configured recording directory
+    GIF="${RECORDING_DIR}/$(date +%Y-%m-%d_%H-%m-%s).gif"
+
     case "$TARGET" in
       "stop")
         wf-recorder_check
@@ -339,55 +372,96 @@ case "$COMMAND" in
         notify-send -a "Screen Capture" "GIF Recording" "Starting (15 FPS)..."
         record_gif "$GIF" -g "$(slurp)"
         ;;
-      "eDP-1")
-        wf-recorder_check
-        echo "$GIF" >/tmp/recording.txt
-        notify-send -a "Screen Capture" "GIF Recording" "Starting on eDP-1..."
-        record_gif "$GIF" -o eDP-1
-        ;;
-      "HDMI-A-1")
-        wf-recorder_check
-        echo "$GIF" >/tmp/recording.txt
-        notify-send -a "Screen Capture" "GIF Recording" "Starting on HDMI-A-1..."
-        record_gif "$GIF" -o HDMI-A-1
-        ;;
       *)
-        echo "Error: Invalid record-gif target '$TARGET'"
-        usage
+        # Dynamic monitor target - validate it exists
+        if validate_monitor "$TARGET"; then
+            wf-recorder_check
+            echo "$GIF" >/tmp/recording.txt
+            notify-send -a "Screen Capture" "GIF Recording" "Starting on $TARGET..."
+            record_gif "$GIF" -o "$TARGET"
+        else
+            echo "Error: Unknown target '$TARGET'"
+            echo "Available targets:"
+            $0 list-targets
+            exit 1
+        fi
         ;;
     esac
     ;;
 
   "annotate")
+    # Take screenshot based on target
     case "$TARGET" in
       "selection")
         grim -g "$(slurp)" "$IMG"
-        if [ -f "$IMG" ]; then
-          wl-copy <"$IMG"
-          ~/.local/bin/napkin --filename "$IMG" &
-          # Wait for napkin to open and force fullscreen via Hyprland
-          sleep 0.6
-          hyprctl dispatch fullscreen 0
+        ;;
+      "all")
+        # Screenshot all monitors combined
+        monitors=$(hyprctl monitors -j | jq -r '.[].name' 2>/dev/null)
+        temp_files=()
+        for mon in $monitors; do
+            temp_file="${IMG//.png/-${mon}.png}"
+            grim -c -o "$mon" "$temp_file"
+            temp_files+=("$temp_file")
+        done
+        if [ ${#temp_files[@]} -gt 1 ]; then
+            montage "${temp_files[@]}" -tile "${#temp_files[@]}x1" -geometry +0+0 "$IMG"
+            rm -f "${temp_files[@]}"
+        else
+            mv "${temp_files[0]}" "$IMG"
         fi
         ;;
       *)
-        echo "Error: Invalid annotate target '$TARGET'"
-        usage
+        # Dynamic monitor target - validate it exists
+        if validate_monitor "$TARGET"; then
+            grim -c -o "$TARGET" "$IMG"
+        else
+            echo "Error: Unknown target '$TARGET'"
+            echo "Available targets:"
+            $0 list-targets
+            exit 1
+        fi
         ;;
     esac
+
+    # Open annotator if screenshot was taken
+    if [ -f "$IMG" ]; then
+      wl-copy <"$IMG"
+      # Use configured annotator (set FAIYT_ANNOTATOR env var to override)
+      if command -v "$ANNOTATOR" >/dev/null 2>&1; then
+        "$ANNOTATOR" --filename "$IMG" &
+      elif [ -x "$HOME/.local/bin/$ANNOTATOR" ]; then
+        "$HOME/.local/bin/$ANNOTATOR" --filename "$IMG" &
+      else
+        notify-send -a "Screen Capture" "Error" "Annotator '$ANNOTATOR' not found"
+        exit 1
+      fi
+      # Wait for annotator to open and force fullscreen via Hyprland
+      sleep 0.6
+      hyprctl dispatch fullscreen 0
+    fi
     ;;
 
   "status")
     # Check if wf-recorder is running
     if pgrep -x "wf-recorder" >/dev/null; then
-     echo "true" 
-      exit 0  
+     echo "true"
+      exit 0
     else
       echo "false"
-      exit 0  
+      exit 0
     fi
     ;;
-  
+
+  "list-targets")
+    # Output available capture targets
+    echo "selection"
+    echo "all"
+    if command -v hyprctl >/dev/null 2>&1; then
+        hyprctl monitors -j | jq -r '.[].name' 2>/dev/null
+    fi
+    ;;
+
   "convert")
     case "$TARGET" in
       "webm")
@@ -397,7 +471,6 @@ case "$COMMAND" in
           exit 1
         fi
 
-        RECORDING_DIR="${HOME}/Videos/Recordings"
         CONVERTED=0
         TOTAL=0
 
@@ -435,7 +508,6 @@ case "$COMMAND" in
           exit 1
         fi
 
-        RECORDING_DIR="${HOME}/Videos/Recordings"
         CONVERTED=0
         SKIPPED_IPHONE=0
         SKIPPED_EXISTING=0
@@ -485,7 +557,6 @@ case "$COMMAND" in
           exit 1
         fi
 
-        RECORDING_DIR="${HOME}/Videos/Recordings"
         CONVERTED=0
         SKIPPED_YOUTUBE=0
         SKIPPED_EXISTING=0
@@ -547,7 +618,6 @@ case "$COMMAND" in
           exit 1
         fi
 
-        RECORDING_DIR="${HOME}/Videos/Recordings"
         CONVERTED=0
         SKIPPED_GIF=0
         SKIPPED_EXISTING=0

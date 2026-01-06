@@ -32,9 +32,13 @@ Singleton {
     }
 
     // Take screenshot with current mode
-    function capture() {
+    // target: "selection" (default), or monitor name like "eDP-1", "DP-1", etc.
+    function capture(target) {
+        var t = target || "selection"
         var mode = annotateEnabled ? "annotate" : "screenshot"
-        var cmd = scriptPath + " " + mode + " selection"
+        // Pass configured annotator via environment variable
+        var envPrefix = "FAIYT_ANNOTATOR=" + ConfigService.annotatorCommand + " "
+        var cmd = envPrefix + scriptPath + " " + mode + " " + t
         console.log("Capturing screenshot:", cmd)
         captureProc.command = ["hyprctl", "dispatch", "exec", cmd]
         captureProc.running = true
