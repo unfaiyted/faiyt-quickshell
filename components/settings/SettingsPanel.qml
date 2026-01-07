@@ -817,7 +817,10 @@ Rectangle {
                             contentColumn.matchesSearch("swap") ||
                             contentColumn.matchesSearch("cpu") ||
                             contentColumn.matchesSearch("download") ||
-                            contentColumn.matchesSearch("upload"))
+                            contentColumn.matchesSearch("upload") ||
+                            contentColumn.matchesSearch("gpu") ||
+                            contentColumn.matchesSearch("temp") ||
+                            contentColumn.matchesSearch("thermal"))
                         title: "System Resources Display"
                         icon: "󰍛"
 
@@ -886,6 +889,48 @@ Rectangle {
                                 checked: ConfigService.barResourceUpload
                                 onToggled: (value) => {
                                     ConfigService.setValue("bar.systemResources.upload", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("gpu") || contentColumn.matchesSearch("graphics")
+                            label: "GPU Usage"
+                            description: "Show GPU utilization (NVIDIA)"
+
+                            ToggleSwitch {
+                                checked: ConfigService.barResourceGpu
+                                onToggled: (value) => {
+                                    ConfigService.setValue("bar.systemResources.gpu", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("gpu") || contentColumn.matchesSearch("temp")
+                            label: "GPU Temperature"
+                            description: "Show GPU temperature (NVIDIA)"
+
+                            ToggleSwitch {
+                                checked: ConfigService.barResourceGpuTemp
+                                onToggled: (value) => {
+                                    ConfigService.setValue("bar.systemResources.gpuTemp", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: contentColumn.matchesSearch("cpu") || contentColumn.matchesSearch("temp") || contentColumn.matchesSearch("thermal")
+                            label: "CPU Temperature"
+                            description: "Show CPU temperature"
+
+                            ToggleSwitch {
+                                checked: ConfigService.barResourceCpuTemp
+                                onToggled: (value) => {
+                                    ConfigService.setValue("bar.systemResources.cpuTemp", value)
                                     ConfigService.saveConfig()
                                 }
                             }

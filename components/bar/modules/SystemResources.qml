@@ -14,7 +14,8 @@ BarGroup {
     // Hide entire group if all resources are hidden
     visible: ConfigService.barResourceRam || ConfigService.barResourceSwap ||
              ConfigService.barResourceCpu || ConfigService.barResourceDownload ||
-             ConfigService.barResourceUpload
+             ConfigService.barResourceUpload || ConfigService.barResourceGpu ||
+             ConfigService.barResourceGpuTemp || ConfigService.barResourceCpuTemp
 
     // Resource values
     property int ramUsage: 0
@@ -29,6 +30,17 @@ BarGroup {
     property string cpuDetails: ""
     property string netDownDetails: ""
     property string netUpDetails: ""
+
+    // GPU monitoring
+    property int gpuUsage: 0
+    property string gpuDetails: ""
+    property int gpuTemp: 0
+    property string gpuTempDetails: ""
+    property bool gpuAvailable: false
+
+    // CPU temperature
+    property int cpuTemp: 0
+    property string cpuTempDetails: ""
 
     // Network speed tracking
     property real lastRxBytes: 0
@@ -147,6 +159,46 @@ BarGroup {
         }
     }
 
+    // GPU monitoring process (NVIDIA via nvidia-smi)
+    Process {
+        id: gpuProcess
+        command: ["bash", "-c", "nvidia-smi -i 0 --query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits 2>/dev/null || echo ''"]
+        running: ConfigService.barResourceGpu || ConfigService.barResourceGpuTemp
+
+        stdout: SplitParser {
+            onRead: data => {
+                if (data.trim() === "") {
+                    sysResources.gpuAvailable = false
+                    return
+                }
+                sysResources.gpuAvailable = true
+                let parts = data.split(",").map(s => s.trim())
+                if (parts.length >= 4) {
+                    sysResources.gpuUsage = parseInt(parts[0]) || 0
+                    let memUsed = parseInt(parts[1]) || 0
+                    let memTotal = parseInt(parts[2]) || 1
+                    sysResources.gpuDetails = memUsed + "/" + memTotal + " MB\n" + Math.round((memUsed/memTotal)*100) + "% VRAM"
+                    sysResources.gpuTemp = parseInt(parts[3]) || 0
+                    sysResources.gpuTempDetails = sysResources.gpuTemp + "°C"
+                }
+            }
+        }
+    }
+
+    // CPU temperature monitoring process (via hwmon sysfs)
+    Process {
+        id: cpuTempProcess
+        command: ["bash", "-c", "cat /sys/class/hwmon/hwmon*/temp1_input 2>/dev/null | head -1 | awk '{printf \"%.0f\", $1/1000}' || echo '0'"]
+        running: ConfigService.barResourceCpuTemp
+
+        stdout: SplitParser {
+            onRead: data => {
+                sysResources.cpuTemp = parseInt(data.trim()) || 0
+                sysResources.cpuTempDetails = sysResources.cpuTemp + "°C"
+            }
+        }
+    }
+
     // Refresh timer
     Timer {
         interval: 2000
@@ -157,6 +209,8 @@ BarGroup {
             swapProcess.running = true
             cpuProcess.running = true
             netProcess.running = true
+            if (ConfigService.barResourceGpu || ConfigService.barResourceGpuTemp) gpuProcess.running = true
+            if (ConfigService.barResourceCpuTemp) cpuTempProcess.running = true
         }
     }
 
@@ -213,6 +267,36 @@ BarGroup {
             indicatorColor: Colors.rose
             tooltipText: sysResources.netUpDetails
             visible: ConfigService.barResourceUpload
+        }
+
+        // GPU usage indicator
+        ResourceIndicator {
+            icon: "󰢮"  // nf-md-expansion_card
+            label: "GPU"
+            value: sysResources.gpuUsage
+            indicatorColor: Colors.love
+            tooltipText: sysResources.gpuDetails
+            visible: ConfigService.barResourceGpu && sysResources.gpuAvailable
+        }
+
+        // GPU temperature indicator
+        ResourceIndicator {
+            icon: "󰔏"  // nf-md-thermometer
+            label: "GPU Temp"
+            value: Math.min(100, Math.round((sysResources.gpuTemp / 100) * 100))
+            indicatorColor: sysResources.gpuTemp > 80 ? Colors.love : (sysResources.gpuTemp > 60 ? Colors.warning : Colors.success)
+            tooltipText: sysResources.gpuTempDetails
+            visible: ConfigService.barResourceGpuTemp && sysResources.gpuAvailable
+        }
+
+        // CPU temperature indicator
+        ResourceIndicator {
+            icon: "󱃂"  // nf-md-thermometer_check
+            label: "CPU Temp"
+            value: Math.min(100, Math.round((sysResources.cpuTemp / 100) * 100))
+            indicatorColor: sysResources.cpuTemp > 80 ? Colors.love : (sysResources.cpuTemp > 60 ? Colors.warning : Colors.success)
+            tooltipText: sysResources.cpuTempDetails
+            visible: ConfigService.barResourceCpuTemp
         }
     }
 }

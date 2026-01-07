@@ -47,8 +47,8 @@ Currently Claude is the only working provider. Implement the stubbed ones:
 |------|-------------|----------|
 | **Journal Viewer** | Recent journalctl entries with severity filtering | System |
 | **Failed Services** | List failed systemd units with restart options | System |
-| **Temp Monitor** | CPU/GPU temperatures with warning thresholds | Monitor |
-| **GPU Stats** | NVIDIA/AMD GPU usage, VRAM, temperature | Monitor |
+| ~~**Temp Monitor**~~ | ~~CPU/GPU temperatures with warning thresholds~~ | ~~Monitor~~ | ✅ **IMPLEMENTED** - Bar module indicators for CPU/GPU temp |
+| ~~**GPU Stats**~~ | ~~NVIDIA/AMD GPU usage, VRAM, temperature~~ | ~~Monitor~~ | ✅ **IMPLEMENTED** - Bar module indicators for GPU usage/VRAM/temp |
 | **Battery Health** | Cycle count, capacity, wear level | System |
 | **Boot Time** | Systemd-analyze blame (what's slowing boot) | System |
 | **Kernel Info** | Version, parameters, modules | System |
@@ -112,7 +112,7 @@ Currently Claude is the only working provider. Implement the stubbed ones:
 | **Calendar events** | Next event countdown |
 | **Package updates** | Pending system updates count |
 | **VPN indicator** | Connection status with quick toggle |
-| **GPU usage** | Small GPU usage indicator |
+| ~~**GPU usage**~~ | ~~Small GPU usage indicator~~ | ✅ **IMPLEMENTED** |
 | **Docker status** | Running container count |
 | **Spotify/Music mini** | Compact now playing with controls |
 
@@ -139,7 +139,7 @@ Currently Claude is the only working provider. Implement the stubbed ones:
 | **Password** | "pass 16" generates 16-char password |
 
 ### Launcher Features
-- **Emoji picker**: Search and insert emojis
+~~- **Emoji picker**: Search and insert emojis~~
 - **Calculator history**: Keep last N calculations
 - **Bookmark search**: Search saved bookmarks
 - **Snippet search**: Search and paste snippets
@@ -208,7 +208,7 @@ Currently Claude is the only working provider. Implement the stubbed ones:
 ### High Impact, Reasonable Effort
 1. **Clipboard manager tab** - Universal utility
 2. **Git branch/stash tools** - Developer productivity
-3. **GPU/Temperature monitor** - System awareness
+3. ~~**GPU/Temperature monitor**~~ - ~~System awareness~~ ✅ **IMPLEMENTED** - Bar module indicators with NVIDIA GPU + CPU temp
 4. **Tool favorites/pins** - UX improvement
 5. **Ollama provider** - Local AI, privacy
 

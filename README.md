@@ -21,6 +21,9 @@ A feature-rich QuickShell desktop shell for Hyprland, featuring a top bar and du
   - CPU usage with load average
   - Network download speed (% of max bandwidth)
   - Network upload speed (% of max bandwidth)
+  - GPU usage with VRAM details (NVIDIA, optional)
+  - GPU temperature with color-coded thresholds (NVIDIA, optional)
+  - CPU temperature with color-coded thresholds (optional)
 - **Battery** - Battery level with charging indicator
 - **Music** - MPRIS media player with interactive tooltip:
   - Animated audio visualization bars (cava) when playing
@@ -127,7 +130,7 @@ Full-featured settings overlay for customizing the shell:
   - VPN connection name for nmcli
   - Night Light color temperature (2500K-6500K)
 - **Utility Buttons** - Toggle individual utility buttons (Screenshot, Recording, Color Picker, Wallpaper)
-- **System Resources** - Toggle individual resource indicators (RAM, Swap, CPU, Download, Upload)
+- **System Resources** - Toggle individual resource indicators (RAM, Swap, CPU, Download, Upload, GPU Usage, GPU Temp, CPU Temp)
 - **Default Modes** - Set default recording mode (Standard/High Quality/GIF) and screenshot mode (Screenshot/Annotate)
 - **Time & Weather** - Time format, weather city, temperature unit (C/F)
 - **Search/Launcher** - Max results, feature toggles (actions, commands, math results, directory search, AI search, web search)
@@ -407,6 +410,12 @@ Toast notifications that appear when notifications arrive:
 **Quick Toggles Dependencies:**
 - `hyprsunset` - Hyprland night light / blue light filter (optional)
 - `powerprofilesctl` - Power profile switching (optional)
+
+**GPU Monitoring:**
+- `nvidia-utils` - Provides `nvidia-smi` for NVIDIA GPU monitoring (optional)
+  - Enables GPU usage, VRAM, and temperature indicators in the bar
+  - Temperature indicators use color coding: green (<60°C), yellow (60-80°C), red (>80°C)
+  - GPU indicators auto-hide if nvidia-smi is not available
 
 **Music Visualization:**
 - `cava` - Audio visualizer for animated bars in the music module

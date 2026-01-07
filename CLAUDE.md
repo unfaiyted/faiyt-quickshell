@@ -138,6 +138,23 @@ Services.ConfigService.getValue("bar.modules.clock", true)
 Services.ConfigService.setValue("theme", "rose-pine-moon")
 ```
 
+### System Resources Configuration
+The SystemResources bar module supports toggleable indicators via `bar.systemResources.*`:
+
+| Config Path | Default | Description |
+|-------------|---------|-------------|
+| `bar.systemResources.ram` | true | RAM usage indicator |
+| `bar.systemResources.swap` | true | Swap usage indicator |
+| `bar.systemResources.cpu` | true | CPU usage indicator |
+| `bar.systemResources.download` | true | Network download speed |
+| `bar.systemResources.upload` | true | Network upload speed |
+| `bar.systemResources.gpu` | false | NVIDIA GPU usage (requires nvidia-smi) |
+| `bar.systemResources.gpuTemp` | false | NVIDIA GPU temperature |
+| `bar.systemResources.cpuTemp` | false | CPU temperature (via hwmon sysfs) |
+
+Temperature indicators use color coding: green (<60°C), yellow (60-80°C), red (>80°C).
+GPU indicators auto-hide if nvidia-smi is not available.
+
 ## Adding New Features
 
 ### New Bar Module
@@ -183,6 +200,7 @@ Services.ConfigService.setValue("theme", "rose-pine-moon")
 **Screen Capture:** grim, slurp, wf-recorder, hyprpicker, napkin (annotation)
 **Quick Toggles:** hyprsunset (night light), powerprofilesctl
 **Brightness:** brightnessctl (for screen and keyboard backlight control)
+**GPU Monitoring:** nvidia-utils (provides nvidia-smi for NVIDIA GPUs)
 **Music:** cava (visualization)
 **Stickers:** openssl, python3, curl, imagemagick/ffmpeg
 

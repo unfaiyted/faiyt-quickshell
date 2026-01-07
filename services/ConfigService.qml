@@ -50,7 +50,10 @@ Singleton {
                 swap: true,
                 cpu: true,
                 download: true,
-                upload: true
+                upload: true,
+                gpu: false,       // NVIDIA GPU usage (requires nvidia-smi)
+                gpuTemp: false,   // NVIDIA GPU temperature
+                cpuTemp: false    // CPU temperature via hwmon
             }
         },
 
@@ -110,7 +113,8 @@ Singleton {
                 aiSearch: false,
                 webSearch: false,
                 gifSearch: true,
-                tmuxSearch: true
+                tmuxSearch: true,
+                bookmarkSearch: true
             },
             evaluators: {
                 mathEvaluator: true,
@@ -127,6 +131,14 @@ Singleton {
         stickers: {
             enabled: true,
             packs: []  // [{id: string, key: string, name: string}]
+        },
+
+        // Bookmarks
+        bookmarks: {
+            browserType: "auto",        // "auto", "firefox", "zen"
+            profilePath: "",            // Custom profile path (empty = auto-detect)
+            showFavicons: true,         // Enable favicon fetching
+            refreshOnOpen: true         // Refresh bookmarks when launcher opens
         },
 
         // AI Configuration (API keys use environment variables for security)
@@ -375,6 +387,9 @@ Singleton {
     property bool barResourceCpu: config.bar?.systemResources?.cpu !== false
     property bool barResourceDownload: config.bar?.systemResources?.download !== false
     property bool barResourceUpload: config.bar?.systemResources?.upload !== false
+    property bool barResourceGpu: config.bar?.systemResources?.gpu === true
+    property bool barResourceGpuTemp: config.bar?.systemResources?.gpuTemp === true
+    property bool barResourceCpuTemp: config.bar?.systemResources?.cpuTemp === true
 
     // Utility defaults convenience properties
     property string recordingDefaultMode: config.utilities?.recording?.defaultMode || "record"
@@ -481,6 +496,9 @@ Singleton {
         barResourceCpu = config.bar?.systemResources?.cpu !== false
         barResourceDownload = config.bar?.systemResources?.download !== false
         barResourceUpload = config.bar?.systemResources?.upload !== false
+        barResourceGpu = config.bar?.systemResources?.gpu === true
+        barResourceGpuTemp = config.bar?.systemResources?.gpuTemp === true
+        barResourceCpuTemp = config.bar?.systemResources?.cpuTemp === true
 
         // Utility defaults
         recordingDefaultMode = config.utilities?.recording?.defaultMode || "record"
