@@ -102,6 +102,9 @@ declare -A ARCH_PACKAGES=(
     ["openssl"]="openssl"
     ["python3"]="python"
 
+    # Bookmarks
+    ["sqlite3"]="sqlite"
+
     # System Info - Required
     ["free"]="procps-ng"
     ["top"]="procps-ng"
@@ -176,6 +179,9 @@ declare -A FEDORA_PACKAGES=(
     ["openssl"]="openssl"
     ["python3"]="python3"
 
+    # Bookmarks
+    ["sqlite3"]="sqlite"
+
     # System Info - Required
     ["free"]="procps-ng"
     ["top"]="procps-ng"
@@ -225,6 +231,7 @@ OPTIONAL_TOOLS=(
     "grim" "slurp" "wf-recorder" "hyprpicker" "napkin" "montage"
     "ffmpeg" "ffprobe" "convert"
     "openssl" "python3"
+    "sqlite3"
     "fc-list"
     "hyprsunset" "powerprofilesctl"
     "swww"

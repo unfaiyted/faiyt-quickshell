@@ -59,6 +59,7 @@ Singleton {
     GifResults { id: gifResults }
     TmuxResults { id: tmuxResults }
     QuickActionResults { id: quickActionResults }
+    BookmarkResults { id: bookmarkResults }
 
     // Re-trigger search when GIF results are ready (async)
     Connections {
@@ -126,6 +127,7 @@ Singleton {
         "sticker": ["sticker:", "st:", "s:"],
         "gif": ["gif:", "g:"],
         "tmux": ["tmux:", "t:"],
+        "bookmark": ["bookmark:", "bm:", "b:"],
         "directory": ["d:", "dir:", "directory:"],
         "clipboard": ["clip:", "clipboard:", "cb:"],
         "search": ["search:", "!g", "!d", "!c"],
@@ -211,6 +213,12 @@ Singleton {
                 // System actions
                 let sysRes = systemResults.search(query, false)
                 allResults = allResults.concat(sysRes)
+
+                // Bookmarks
+                if (Services.ConfigService.getValue("search.enableFeatures.bookmarkSearch") ?? true) {
+                    let bmRes = bookmarkResults.search(query, false)
+                    allResults = allResults.concat(bmRes)
+                }
             }
 
             // Commands - only show if no evaluator result and query looks like a command
@@ -240,6 +248,8 @@ Singleton {
             if (Services.ConfigService.getValue("search.enableFeatures.tmuxSearch") ?? true) {
                 allResults = tmuxResults.search(query, isPrefixSearch)
             }
+        } else if (searchType === "BOOKMARK") {
+            allResults = bookmarkResults.search(query, isPrefixSearch)
         }
 
         // Global sort by usage boost for unified search
@@ -411,6 +421,8 @@ Singleton {
                 return "tmux:" + (result.data?.sessionName || "") + ":" + (result.data?.windowIndex ?? 0)
             case "cmd":
                 return "cmd:" + hashString(result.data?.command || result.title)
+            case "bookmark":
+                return "bookmark:" + (result.data?.url || result.title)
             case "window":
                 return null  // Windows are ephemeral, don't track
             default:

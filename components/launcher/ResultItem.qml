@@ -35,12 +35,27 @@ Rectangle {
             color: Colors.surface
             anchors.verticalCenter: parent.verticalCenter
 
+            // Favicon image (for bookmarks)
+            Image {
+                id: faviconImage
+                anchors.centerIn: parent
+                width: 18
+                height: 18
+                source: result?.iconImage ? "file://" + result.iconImage : ""
+                visible: status === Image.Ready
+                asynchronous: true
+                smooth: true
+                mipmap: true
+            }
+
+            // NerdFont icon fallback
             Text {
                 anchors.centerIn: parent
                 text: result ? (result.icon || "󰀻") : "󰀻"
                 font.family: Fonts.icon
                 font.pixelSize: 18
                 color: isSelected ? Colors.primary : Colors.foreground
+                visible: !faviconImage.visible
             }
         }
 

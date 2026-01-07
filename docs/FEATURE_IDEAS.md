@@ -141,7 +141,7 @@ Currently Claude is the only working provider. Implement the stubbed ones:
 ### Launcher Features
 ~~- **Emoji picker**: Search and insert emojis~~
 - **Calculator history**: Keep last N calculations
-- **Bookmark search**: Search saved bookmarks
+- ~~**Bookmark search**: Search saved bookmarks~~ ✅ **IMPLEMENTED** - Search Firefox/Zen browser bookmarks with favicon support
 - **Snippet search**: Search and paste snippets
 - **Recent files**: Search recently opened files
 - **File search**: Integration with locate/fd

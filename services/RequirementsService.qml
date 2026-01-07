@@ -59,6 +59,9 @@ Singleton {
         { name: "openssl", category: "Stickers", required: false, description: "Sticker decryption" },
         { name: "python3", category: "Stickers", required: false, description: "Protobuf parsing" },
 
+        // Bookmark Search (Optional)
+        { name: "sqlite3", category: "Bookmarks", required: false, description: "Browser bookmark database" },
+
         // System Info (Required)
         { name: "free", category: "System Info", required: true, description: "RAM usage" },
         { name: "top", category: "System Info", required: true, description: "CPU usage" },

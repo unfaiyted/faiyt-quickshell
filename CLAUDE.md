@@ -82,6 +82,7 @@ All services are singletons registered in `services/qmldir`:
 | FontService | Font configuration |
 | BrightnessService | Screen brightness control via brightnessctl/sysfs |
 | KeyboardBacklightService | Keyboard backlight control via sysfs |
+| BookmarkService | Browser bookmark loading with favicon caching |
 
 ### State Singletons
 Component-specific state is managed by singletons within each component directory:
@@ -186,6 +187,7 @@ GPU indicators auto-hide if nvidia-smi is not available.
 | `sticker:` `s:` | Signal stickers |
 | `gif:` `g:` | GIF search (Tenor) |
 | `tmux:` `t:` | Tmux sessions/windows |
+| `bookmark:` `bm:` `b:` | Browser bookmarks |
 | `sys:` | System actions |
 | `?` | List all prefixes |
 
@@ -203,6 +205,7 @@ GPU indicators auto-hide if nvidia-smi is not available.
 **GPU Monitoring:** nvidia-utils (provides nvidia-smi for NVIDIA GPUs)
 **Music:** cava (visualization)
 **Stickers:** openssl, python3, curl, imagemagick/ffmpeg
+**Bookmarks:** sqlite3, curl (for Firefox/Zen Browser bookmark search and favicon fetching)
 
 ## Legacy Reference
 

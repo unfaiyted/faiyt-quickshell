@@ -205,6 +205,7 @@ System dependency checker that validates required and optional tools:
 - Screen Capture (grim, slurp, wf-recorder, hyprpicker, napkin, montage)
 - Media (ffmpeg, ffprobe, convert)
 - Stickers (openssl, python3)
+- Bookmarks (sqlite3)
 - System Info (free, top, uptime, whoami, hostname, fc-list)
 - Quick Toggles (hyprsunset, powerprofilesctl)
 - Wallpaper (swww)
@@ -229,6 +230,7 @@ Application launcher with instant evaluators and multiple search modes:
 - **Stickers** (`sticker:`, `st:`, `s:`) - Signal sticker packs with grid view
 - **GIFs** (`gif:`, `g:`) - Search and copy GIFs via Tenor API
 - **Tmux** (`tmux:`, `t:`) - Search and attach to tmux sessions in kitty terminal
+- **Bookmarks** (`bookmark:`, `bm:`, `b:`) - Search browser bookmarks with favicons
 
 **Instant Evaluators:**
 Real-time calculations displayed on the right side of the input as you type:
@@ -289,6 +291,15 @@ Real-time calculations displayed on the right side of the input as you type:
 - Type a new name to create a fresh tmux session
 - Icons indicate active windows and attached sessions
 - Can be disabled in Settings → Search Features → Tmux Sessions
+
+**Browser Bookmarks** (`b:`, `bm:`, or `bookmark:`):
+- Auto-detects Zen Browser or Firefox profile
+- Searches bookmark titles, URLs, and descriptions
+- Displays website favicons (cached locally)
+- Click or press Enter to open in configured browser
+- Bookmarks also appear in unified search (no prefix)
+- Favicons cached at `~/.cache/faiyt-qs/favicons/`
+- Configure browser type in Settings → Search Features → Bookmarks
 
 **Quick Actions** (no prefix needed):
 Quick actions appear in unified search alongside apps, providing fast access to:
@@ -425,6 +436,10 @@ Toast notifications that appear when notifications arrive:
 - `python3` - For parsing protobuf manifests
 - `curl` - For downloading stickers from Signal CDN
 - `imagemagick` or `ffmpeg` - For WebP to PNG conversion
+
+**Bookmark Search:**
+- `sqlite3` - For reading Firefox/Zen Browser bookmarks from places.sqlite
+- `curl` - For fetching website favicons (DuckDuckGo favicon service)
 
 ## Installation
 
@@ -586,7 +601,8 @@ faiyt-qs/
 │   │   │   ├── StickerResults.qml   # Signal sticker search
 │   │   │   ├── GifResults.qml       # Tenor GIF search
 │   │   │   ├── TmuxResults.qml      # Tmux session search
-│   │   │   └── QuickActionResults.qml # Quick actions (panels, toggles, media)
+│   │   │   ├── QuickActionResults.qml # Quick actions (panels, toggles, media)
+│   │   │   └── BookmarkResults.qml  # Browser bookmark search
 │   │   └── evaluators/          # Instant evaluators
 │   │       ├── MathEvaluator.qml
 │   │       ├── PercentageEvaluator.qml
@@ -655,7 +671,8 @@ faiyt-qs/
 │   ├── RequirementsService.qml  # System dependency checking
 │   ├── StickerService.qml       # Signal sticker pack management
 │   ├── ThemeService.qml         # Theme switching and custom theme management
-│   └── UsageStatsService.qml    # Launcher usage tracking for smart sorting
+│   ├── UsageStatsService.qml    # Launcher usage tracking for smart sorting
+│   └── BookmarkService.qml      # Browser bookmark loading and favicon caching
 ├── scripts/
 │   ├── screen-capture.sh        # Screenshot and recording script
 │   ├── sticker-decrypt.sh       # Signal sticker decryption (HKDF + AES)
