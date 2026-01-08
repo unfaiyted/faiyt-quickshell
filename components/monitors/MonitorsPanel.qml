@@ -65,7 +65,8 @@ Rectangle {
 
                 Text {
                     text: "Display Configuration"
-                    font.pixelSize: 18
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.xlarge
                     font.weight: Font.DemiBold
                     color: Colors.foreground
                     anchors.verticalCenter: parent.verticalCenter
@@ -84,7 +85,8 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.pixelSize: 16
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.large
                         color: closeArea.containsMouse ? Colors.foreground : Colors.foregroundAlt
                     }
 
@@ -159,7 +161,8 @@ Rectangle {
 
                         Text {
                             text: "Apply"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.weight: Font.Medium
                             color: MonitorsState.hasChanges ? Colors.background : Colors.foregroundMuted
                         }
@@ -202,7 +205,8 @@ Rectangle {
 
                         Text {
                             text: "Reset"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.weight: Font.Medium
                             color: Colors.foreground
                         }
@@ -244,7 +248,8 @@ Rectangle {
 
                         Text {
                             text: "Auto-Align"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.weight: Font.Medium
                             color: Colors.foreground
                         }

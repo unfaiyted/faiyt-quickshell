@@ -80,7 +80,8 @@ Rectangle {
             id: primaryLabel
             anchors.centerIn: parent
             text: "PRIMARY"
-            font.pixelSize: 9
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.tiny
             font.weight: Font.DemiBold
             font.letterSpacing: 0.5
             color: Colors.background
@@ -95,7 +96,8 @@ Rectangle {
 
         Text {
             text: monitor ? monitor.name : ""
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             font.weight: Font.Medium
             color: Colors.foreground
             elide: Text.ElideRight
@@ -104,7 +106,7 @@ Rectangle {
 
         Text {
             text: monitor ? `${monitor.width}x${monitor.height}@${monitor.refreshRate.toFixed(0)}Hz` : ""
-            font.pixelSize: 10
+            font.pixelSize: Fonts.tiny
             font.family: Fonts.mono
             color: Colors.foregroundAlt
             elide: Text.ElideRight
@@ -113,7 +115,7 @@ Rectangle {
 
         Text {
             text: monitor ? `${position.x}, ${position.y}` : ""
-            font.pixelSize: 9
+            font.pixelSize: Fonts.tiny
             font.family: Fonts.mono
             color: Colors.foregroundMuted
         }

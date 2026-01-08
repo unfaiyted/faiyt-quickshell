@@ -50,7 +50,8 @@ Rectangle {
 
                 Text {
                     text: selectedMonitor ? `${selectedMonitor.name} Settings` : "Monitor Settings"
-                    font.pixelSize: 14
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     font.weight: Font.DemiBold
                     color: Colors.foreground
                     anchors.verticalCenter: parent.verticalCenter
@@ -114,7 +115,8 @@ Rectangle {
 
                     Text {
                         text: "Resolution"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         font.weight: Font.Medium
                         color: Colors.foreground
                     }
@@ -152,7 +154,8 @@ Rectangle {
                                     id: modeText
                                     anchors.centerIn: parent
                                     text: mode
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: isActive ? Colors.primary : Colors.foreground
                                 }
 
@@ -184,7 +187,8 @@ Rectangle {
 
                     Text {
                         text: "Scale"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         font.weight: Font.Medium
                         color: Colors.foreground
                     }
@@ -220,7 +224,8 @@ Rectangle {
                                 Text {
                                     anchors.centerIn: parent
                                     text: scaleValue + "x"
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: isActive ? Colors.primary : Colors.foreground
                                 }
 
@@ -252,7 +257,8 @@ Rectangle {
 
                     Text {
                         text: "Transform"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         font.weight: Font.Medium
                         color: Colors.foreground
                     }
@@ -299,7 +305,8 @@ Rectangle {
                                     id: transformText
                                     anchors.centerIn: parent
                                     text: modelData.label
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: isActive ? Colors.primary : Colors.foreground
                                 }
 
