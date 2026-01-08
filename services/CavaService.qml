@@ -99,6 +99,24 @@ Singleton {
         simulatedValues = Array(barCount).fill(0)
     }
 
+    // Downsample values by averaging groups of bars
+    // Useful for displaying fewer bars while representing the full frequency spectrum
+    function getDownsampledValues(targetCount) {
+        if (values.length === 0) return Array(targetCount).fill(0)
+        const groupSize = Math.floor(values.length / targetCount)
+        let result = []
+        for (let i = 0; i < targetCount; i++) {
+            const start = i * groupSize
+            const end = Math.min(start + groupSize, values.length)
+            let sum = 0
+            for (let j = start; j < end; j++) {
+                sum += values[j]
+            }
+            result.push(Math.floor(sum / (end - start)))
+        }
+        return result
+    }
+
     onBarCountChanged: {
         if (cavaProc.running) {
             close()

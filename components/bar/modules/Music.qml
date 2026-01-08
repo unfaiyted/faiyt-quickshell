@@ -141,8 +141,8 @@ BarGroup {
                 anchors.bottom: parent.bottom
 
                 Repeater {
-                    // Only show first 6 bars in the bar module
-                    model: CavaService.values.slice(0, 6)
+                    // Show 6 downsampled bars representing full frequency spectrum
+                    model: CavaService.getDownsampledValues(6)
                     Rectangle {
                         width: 3
                         height: Math.max(3, modelData * 0.14)
