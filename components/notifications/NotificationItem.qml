@@ -71,7 +71,7 @@ Item {
                         anchors.centerIn: parent
                         text: IconService.getIcon(root.notif?.appName ?? "")
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.background
                     }
                 }
@@ -83,7 +83,8 @@ Item {
                     Layout.leftMargin: 8
 
                     text: root.notif?.appName ?? "Notification"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     font.bold: true
                     color: Colors.foreground
                     elide: Text.ElideRight
@@ -101,7 +102,7 @@ Item {
                         anchors.centerIn: parent
                         text: "󰅖"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: closeArea.containsMouse ? Colors.background : Colors.foreground
                     }
 
@@ -135,7 +136,8 @@ Item {
                 Layout.bottomMargin: root.notif?.body ? 4 : 12
 
                 text: root.notif?.summary ?? ""
-                font.pixelSize: 13
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.body
                 font.bold: true
                 color: Colors.foreground
                 elide: Text.ElideRight
@@ -153,7 +155,8 @@ Item {
                 visible: root.notif?.body?.length > 0
 
                 text: root.notif?.body ?? ""
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foregroundAlt
                 elide: Text.ElideRight
                 wrapMode: Text.WordWrap
@@ -205,7 +208,8 @@ Item {
                             id: actionText
                             anchors.centerIn: parent
                             text: actionBtn.modelData?.text ?? ""
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: actionArea.containsMouse ? Colors.background : Colors.foreground
                         }
 
