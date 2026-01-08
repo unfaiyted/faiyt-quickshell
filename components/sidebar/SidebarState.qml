@@ -50,19 +50,32 @@ Singleton {
 
     property bool leftOpen: false
     property bool rightOpen: false
+    property bool powerMenuOpen: false
 
     function toggleLeft() {
         rightOpen = false  // Close other sidebar
+        powerMenuOpen = false
         leftOpen = !leftOpen
     }
 
     function toggleRight() {
         leftOpen = false  // Close other sidebar
+        powerMenuOpen = false
         rightOpen = !rightOpen
+    }
+
+    function togglePowerMenu() {
+        powerMenuOpen = !powerMenuOpen
     }
 
     function closeAll() {
         leftOpen = false
         rightOpen = false
+        powerMenuOpen = false
+    }
+
+    function closePopups() {
+        // Close popups like power menu without closing sidebars
+        powerMenuOpen = false
     }
 }

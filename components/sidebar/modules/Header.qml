@@ -1,9 +1,11 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
+import Quickshell
 import Quickshell.Io
 import "../../../theme"
 import "../../../components/settings"
 import "../../common"
+import ".."
 
 Item {
     id: header
@@ -268,21 +270,29 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: powerProcess.running = true
-                }
-
-                Process {
-                    id: powerProcess
-                    command: ["systemctl", "poweroff"]
+                    onClicked: SidebarState.togglePowerMenu()
                 }
 
                 HintTarget {
                     targetElement: powerBtn
                     scope: "sidebar-right"
-                    action: () => powerProcess.running = true
+                    action: () => SidebarState.togglePowerMenu()
                 }
             }
         }
+    }
+
+    // Power menu popup (at root level for proper window anchoring)
+    PowerMenu {
+        id: powerMenu
+        anchor.window: QsWindow.window
+        anchor.onAnchoring: {
+            const pos = powerBtn.mapToItem(QsWindow.window.contentItem, 0, powerBtn.height)
+            anchor.rect = Qt.rect(pos.x - 120, pos.y + 4, powerBtn.width, 1)
+        }
+        anchor.edges: Edges.Top
+        anchor.gravity: Edges.Top
+        anchorItem: powerBtn
     }
 
     // Bottom border

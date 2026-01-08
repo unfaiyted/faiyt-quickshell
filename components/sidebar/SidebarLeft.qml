@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../../theme"
 import "../../services"
 import "modules"
@@ -24,9 +25,43 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus - Exclusive when hints active for reliable key capture
-    WlrLayershell.keyboardFocus: (expanded || HintNavigationService.active) ?
-        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // Layer and keyboard focus - using OnDemand instead of Exclusive to allow focus grab to work
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+    // Focus grab to close sidebar when clicking outside
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [leftSidebar]
+        active: false
+
+        onCleared: {
+            console.log("[SidebarLeft] Focus grab cleared, active:", active)
+            if (!active) {
+                SidebarState.closeAll()
+            }
+        }
+    }
+
+    // Activate focus grab with small delay after sidebar opens
+    Timer {
+        id: grabActivateTimer
+        interval: 100
+        onTriggered: {
+            if (leftSidebar.expanded) {
+                focusGrab.active = true
+                console.log("[SidebarLeft] Focus grab activated")
+            }
+        }
+    }
+
+    onExpandedChanged: {
+        if (expanded) {
+            grabActivateTimer.start()
+        } else {
+            focusGrab.active = false
+        }
+    }
 
     // Hide window when not expanded (after animation completes) or disabled in config
     visible: ConfigService.windowSidebarLeftEnabled && (expanded || slideAnimation.running || bgFadeAnim.running)

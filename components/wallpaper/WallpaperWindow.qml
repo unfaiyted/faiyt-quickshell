@@ -1,9 +1,11 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../../theme"
 import "../../services"
 import "../common"
+import "../sidebar"
 
 PanelWindow {
     id: wallpaperWindow
@@ -32,9 +34,33 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus mode - Exclusive when hints active for reliable key capture
-    WlrLayershell.keyboardFocus: (expanded || HintNavigationService.active) ?
-        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // Layer and keyboard focus - OnDemand allows focus grab to work
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+    // Focus grab to close when clicking outside
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [wallpaperWindow]
+        active: false
+
+        onCleared: {
+            if (!active) {
+                WallpaperState.hide()
+            }
+        }
+    }
+
+    // Activate focus grab with small delay after panel opens
+    Timer {
+        id: grabActivateTimer
+        interval: 100
+        onTriggered: {
+            if (wallpaperWindow.expanded) {
+                focusGrab.active = true
+            }
+        }
+    }
 
     visible: ConfigService.windowWallpaperEnabled && (expanded || animating)
 
@@ -573,8 +599,12 @@ PanelWindow {
     // Handle visibility changes for animations
     onExpandedChanged: {
         if (expanded) {
+            // Close sidebars when wallpaper panel opens
+            SidebarState.closeAll()
             slideInAnimation.start()
+            grabActivateTimer.start()
         } else {
+            focusGrab.active = false
             slideOutAnimation.start()
         }
     }

@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import "../../services"
+import "../../theme"
 
 PanelWindow {
     id: overlay
@@ -29,10 +31,14 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Dark background with fade animation
-    Rectangle {
+    // Layer shell config - Top layer (above windows, below Overlay where sidebars are)
+    WlrLayershell.namespace: "quickshell:sidebar-overlay"
+    WlrLayershell.layer: WlrLayer.Top
+
+    // Dark background with rounded corners
+    Canvas {
+        id: bgCanvas
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.3)
         opacity: overlay.isOpen ? 1 : 0
 
         Behavior on opacity {
@@ -42,13 +48,63 @@ PanelWindow {
                 easing.type: Easing.OutCubic
             }
         }
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.reset()
+
+            var w = width
+            var h = height
+            var r = 24  // Corner radius to match bar/sidebar
+
+            ctx.fillStyle = Qt.rgba(0, 0, 0, 0.3)
+            ctx.beginPath()
+
+            // Start from top-left
+            if (overlay.rightEffectivelyOpen && !overlay.leftEffectivelyOpen) {
+                // Round top-left corner (right sidebar open, left closed)
+                ctx.moveTo(r, 0)
+                ctx.lineTo(w, 0)
+                ctx.lineTo(w, h)
+                ctx.lineTo(0, h)
+                ctx.lineTo(0, r)
+                ctx.arc(r, r, r, Math.PI, Math.PI * 1.5, false)
+            } else if (overlay.leftEffectivelyOpen && !overlay.rightEffectivelyOpen) {
+                // Round top-right corner (left sidebar open, right closed)
+                ctx.moveTo(0, 0)
+                ctx.lineTo(w - r, 0)
+                ctx.arc(w - r, r, r, -Math.PI / 2, 0, false)
+                ctx.lineTo(w, h)
+                ctx.lineTo(0, h)
+            } else if (overlay.leftEffectivelyOpen && overlay.rightEffectivelyOpen) {
+                // Both sidebars open - no rounded corners on overlay
+                ctx.rect(0, 0, w, h)
+            } else {
+                // Both corners rounded (neither sidebar open - shouldn't happen but handle it)
+                ctx.moveTo(r, 0)
+                ctx.lineTo(w - r, 0)
+                ctx.arc(w - r, r, r, -Math.PI / 2, 0, false)
+                ctx.lineTo(w, h)
+                ctx.lineTo(0, h)
+                ctx.lineTo(0, r)
+                ctx.arc(r, r, r, Math.PI, Math.PI * 1.5, false)
+            }
+
+            ctx.closePath()
+            ctx.fill()
+        }
+
+        // Repaint when sidebar state changes
+        Connections {
+            target: SidebarState
+            function onLeftOpenChanged() { bgCanvas.requestPaint() }
+            function onRightOpenChanged() { bgCanvas.requestPaint() }
+        }
+
+        Component.onCompleted: requestPaint()
     }
 
-    // Click anywhere to close sidebars
-    MouseArea {
-        anchors.fill: parent
-        focus: true
-        onClicked: SidebarState.closeAll()
-        Keys.onEscapePressed: SidebarState.closeAll()
-    }
+    // Also repaint on size change
+    onWidthChanged: bgCanvas.requestPaint()
+    onHeightChanged: bgCanvas.requestPaint()
 }

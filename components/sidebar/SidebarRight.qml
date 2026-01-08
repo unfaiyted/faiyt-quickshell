@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../../theme"
 import "../../services"
 import "../common"
@@ -23,9 +24,43 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
 
-    // Keyboard focus for Escape key and hint navigation
-    WlrLayershell.keyboardFocus: (expanded || HintNavigationService.active) ?
-        WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // Layer and keyboard focus - using OnDemand instead of Exclusive to allow focus grab to work
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+    // Focus grab to close sidebar when clicking outside
+    HyprlandFocusGrab {
+        id: focusGrab
+        windows: [rightSidebar]
+        active: false
+
+        onCleared: {
+            console.log("[SidebarRight] Focus grab cleared, active:", active)
+            if (!active) {
+                SidebarState.closeAll()
+            }
+        }
+    }
+
+    // Activate focus grab with small delay after sidebar opens
+    Timer {
+        id: grabActivateTimer
+        interval: 100
+        onTriggered: {
+            if (rightSidebar.expanded) {
+                focusGrab.active = true
+                console.log("[SidebarRight] Focus grab activated")
+            }
+        }
+    }
+
+    onExpandedChanged: {
+        if (expanded) {
+            grabActivateTimer.start()
+        } else {
+            focusGrab.active = false
+        }
+    }
 
     // Hide window when not expanded (after animation completes) or disabled in config
     visible: ConfigService.windowSidebarRightEnabled && (expanded || slideAnimation.running || bgFadeAnim.running)
@@ -89,6 +124,23 @@ PanelWindow {
                     id: slideAnimation
                     duration: 250
                     easing.type: Easing.OutCubic
+                }
+            }
+
+            // Click handler to close popups (like power menu) when clicking sidebar background
+            MouseArea {
+                anchors.fill: parent
+                propagateComposedEvents: true
+                onClicked: function(mouse) {
+                    if (SidebarState.powerMenuOpen) {
+                        SidebarState.closePopups()
+                        mouse.accepted = true
+                    } else {
+                        mouse.accepted = false
+                    }
+                }
+                onPressed: function(mouse) {
+                    mouse.accepted = SidebarState.powerMenuOpen
                 }
             }
 
@@ -232,9 +284,13 @@ PanelWindow {
                 }
             }
 
-            // Standard escape to close sidebar
+            // Standard escape - close power menu first, then sidebar
             if (event.key === Qt.Key_Escape) {
-                SidebarState.rightOpen = false
+                if (SidebarState.powerMenuOpen) {
+                    SidebarState.closePopups()
+                } else {
+                    SidebarState.rightOpen = false
+                }
                 event.accepted = true
             }
         }
