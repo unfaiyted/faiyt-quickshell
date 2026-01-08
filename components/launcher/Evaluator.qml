@@ -18,7 +18,9 @@ QtObject {
         onResultReady: evaluator.asyncResultReady()
     }
     property DateEvaluator dateEval: DateEvaluator {}
-    property HashEvaluator hashEval: HashEvaluator {}
+    property HashEvaluator hashEval: HashEvaluator {
+        onResultReady: evaluator.asyncResultReady()
+    }
     property UuidEvaluator uuidEval: UuidEvaluator {}
     property LoremEvaluator loremEval: LoremEvaluator {}
     property PasswordEvaluator passwordEval: PasswordEvaluator {}

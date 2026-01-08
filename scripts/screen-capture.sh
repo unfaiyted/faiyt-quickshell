@@ -437,7 +437,7 @@ case "$COMMAND" in
         exit 1
       fi
       # Wait for annotator to open and force fullscreen via Hyprland
-      sleep 0.6
+      sleep 2 
       hyprctl dispatch fullscreen 0
     fi
     ;;

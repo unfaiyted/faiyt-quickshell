@@ -144,11 +144,22 @@ Rectangle {
         activeDropdownModel = []
         dropdownSearchText = ""
         dropdownVisible = false
+        themePanel.forceActiveFocus()  // Restore focus to panel for keyboard handling
     }
 
-    function selectDropdownItem(index, value) {
-        activeDropdownIndex = index
-        dropdownSelected(index, value)
+    function selectDropdownItem(filteredIndex, value) {
+        // Find the actual index in the original model (filtered index may differ)
+        let originalIndex = -1
+        for (let i = 0; i < activeDropdownModel.length; i++) {
+            if (activeDropdownModel[i].value === value) {
+                originalIndex = i
+                break
+            }
+        }
+        if (originalIndex === -1) originalIndex = filteredIndex
+
+        activeDropdownIndex = originalIndex
+        dropdownSelected(originalIndex, value)
         closeDropdown()
     }
 

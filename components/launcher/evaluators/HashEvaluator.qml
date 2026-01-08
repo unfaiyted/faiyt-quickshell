@@ -2,7 +2,11 @@ import QtQuick
 import Quickshell.Io
 
 QtObject {
+    id: hashEvaluator
     property string name: "hash"
+
+    // Signal emitted when async result is ready
+    signal resultReady()
 
     // Supported hash algorithms and their commands
     property var algorithms: {
@@ -21,6 +25,8 @@ QtObject {
     property var hashProcess: Process {
         id: hashProcess
         property string output: ""
+        property string pendingCacheKey: ""
+        property string pendingAlgo: ""
 
         stdout: SplitParser {
             onRead: data => {
@@ -113,6 +119,9 @@ QtObject {
             cache[cacheKey] = result
             lastQuery = cacheKey
             lastResult = result
+
+            // Notify that result is ready
+            hashEvaluator.resultReady()
         }
     }
 

@@ -35,8 +35,8 @@ QtObject {
         let trimmed = input.trim().toLowerCase()
         if (!trimmed) return null
 
-        // Pattern 1: "days until <date/holiday>"
-        let untilMatch = trimmed.match(/^days?\s+until\s+(.+)$/)
+        // Pattern 1: "days until <date/holiday>" or "days till <date/holiday>"
+        let untilMatch = trimmed.match(/^days?\s+(?:until|till)\s+(.+)$/)
         if (untilMatch) {
             return calculateDaysUntil(untilMatch[1])
         }
