@@ -71,7 +71,8 @@ Rectangle {
 
                 Text {
                     text: "System Requirements"
-                    font.pixelSize: 18
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.xlarge
                     font.weight: Font.Bold
                     color: Colors.foreground
                 }
@@ -80,7 +81,8 @@ Rectangle {
                     text: RequirementsService.checkComplete
                         ? (RequirementsService.installedCount + "/" + RequirementsService.totalCount + " dependencies available")
                         : "Checking dependencies..."
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundMuted
                 }
             }
@@ -102,7 +104,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: ""
                     font.family: Fonts.icon
-                    font.pixelSize: 14
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foregroundAlt
                 }
 
@@ -160,13 +162,14 @@ Rectangle {
                 Text {
                     text: ""
                     font.family: Fonts.icon
-                    font.pixelSize: 14
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.error
                 }
 
                 Text {
                     text: "Some required dependencies are missing"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.error
                 }
             }
@@ -237,7 +240,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: ""
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foreground
                         visible: checkbox.dontShowChecked
                     }
@@ -265,7 +268,8 @@ Rectangle {
 
                 Text {
                     text: "Don't show on startup"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -289,7 +293,8 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "Refresh"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foreground
                 }
 
@@ -324,7 +329,8 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "Close"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.primary
                 }
 
@@ -384,7 +390,7 @@ Rectangle {
                 Text {
                     text: ""
                     font.family: Fonts.icon
-                    font.pixelSize: 12
+                    font.pixelSize: Fonts.iconSmall
                     color: Colors.foregroundAlt
                     rotation: categorySection.expanded ? 90 : 0
 
@@ -396,7 +402,8 @@ Rectangle {
                 // Category name
                 Text {
                     text: categorySection.categoryName
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     font.weight: Font.Medium
                     color: Colors.foreground
                 }
@@ -418,7 +425,8 @@ Rectangle {
                         id: statusText
                         anchors.centerIn: parent
                         text: categorySection.stats.installed + "/" + categorySection.stats.total
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: categorySection.stats.missingRequired
                             ? Colors.error
                             : (categorySection.stats.installed === categorySection.stats.total
@@ -483,7 +491,7 @@ Rectangle {
                             Text {
                                 text: modelData.installed ? "" : ""
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: modelData.installed
                                     ? Colors.foam
                                     : (modelData.required ? Colors.error : Colors.warning)
@@ -492,7 +500,7 @@ Rectangle {
                             // Tool name
                             Text {
                                 text: modelData.name
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.small
                                 font.family: Fonts.mono
                                 color: Colors.foreground
                             }
@@ -509,7 +517,8 @@ Rectangle {
                                     id: reqText
                                     anchors.centerIn: parent
                                     text: "required"
-                                    font.pixelSize: 9
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     color: Colors.primary
                                 }
                             }
@@ -519,7 +528,8 @@ Rectangle {
                             // Description
                             Text {
                                 text: modelData.description
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foregroundMuted
                             }
                         }
