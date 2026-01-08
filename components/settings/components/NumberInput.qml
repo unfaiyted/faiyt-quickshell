@@ -39,7 +39,8 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: "−"
-                font.pixelSize: 16
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.large
                 color: numberInput.value > numberInput.min ? Colors.foreground : Colors.foregroundMuted
             }
 
@@ -66,7 +67,8 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             text: numberInput.value.toString()
-            font.pixelSize: 13
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.body
             color: Colors.foreground
             selectByMouse: true
             validator: IntValidator { bottom: numberInput.min; top: numberInput.max }
@@ -90,7 +92,8 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: "+"
-                font.pixelSize: 16
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.large
                 color: numberInput.value < numberInput.max ? Colors.foreground : Colors.foregroundMuted
             }
 

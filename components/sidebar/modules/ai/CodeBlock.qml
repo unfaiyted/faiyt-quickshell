@@ -48,7 +48,7 @@ Rectangle {
                 anchors.leftMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
                 text: language || "text"
-                font.pixelSize: 10
+                font.pixelSize: Fonts.tiny
                 font.family: Fonts.mono
                 color: Colors.foregroundMuted
             }
@@ -70,7 +70,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: copyButton.copySuccess ? "󰄬" : "󰆏"
                     font.family: Fonts.icon
-                    font.pixelSize: 12
+                    font.pixelSize: Fonts.iconSmall
                     color: copyButton.copySuccess ? Colors.success : Colors.foregroundMuted
                 }
 
@@ -141,8 +141,8 @@ Rectangle {
                         }
                         return nums.join('\n')
                     }
-                    font.family: "JetBrains Mono, monospace"
-                    font.pixelSize: 11
+                    font.family: Fonts.mono
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundMuted
                     textFormat: Text.PlainText
                     lineHeight: 1.4
@@ -160,8 +160,8 @@ Rectangle {
                 TextEdit {
                     id: codeText
                     text: SyntaxHighlighter.highlight(code, language)
-                    font.family: "JetBrains Mono, monospace"
-                    font.pixelSize: 11
+                    font.family: Fonts.mono
+                    font.pixelSize: Fonts.small
                     color: Colors.foreground
                     textFormat: TextEdit.RichText
                     wrapMode: TextEdit.NoWrap

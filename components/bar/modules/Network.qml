@@ -115,7 +115,7 @@ BarGroup {
         anchors.centerIn: parent
         text: network.status
         color: network.connected ? Colors.foreground : Colors.error
-        font.pixelSize: 14
+        font.pixelSize: Fonts.iconMedium
         font.family: Fonts.icon
     }
 
@@ -199,7 +199,8 @@ BarGroup {
                 Text {
                     text: network.connected ? network.connectionType : "Disconnected"
                     color: network.connected ? Colors.foreground : Colors.error
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     font.bold: true
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -208,7 +209,8 @@ BarGroup {
                     visible: network.connectionName.length > 0
                     text: network.connectionName
                     color: Colors.subtle
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -238,14 +240,15 @@ BarGroup {
                         Text {
                             text: "󰩟 " + network.ipAddress
                             color: ipMouseArea.containsMouse ? Colors.foreground : Colors.muted
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             text: "󰆏"
                             font.family: Fonts.icon
-                            font.pixelSize: 10
+                            font.pixelSize: Fonts.iconTiny
                             color: ipMouseArea.containsMouse ? Colors.primary : Colors.muted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -296,7 +299,8 @@ BarGroup {
                             id: gatewayText
                             text: "󰛳 " + network.gateway
                             color: gatewayMouseArea.containsMouse ? Colors.foreground : Colors.muted
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             anchors.verticalCenter: parent.verticalCenter
 
                             MouseArea {
@@ -321,7 +325,7 @@ BarGroup {
                         Text {
                             text: "󰆏"
                             font.family: Fonts.icon
-                            font.pixelSize: 10
+                            font.pixelSize: Fonts.iconTiny
                             color: gatewayMouseArea.containsMouse || gatewayLinkArea.containsMouse ? Colors.primary : Colors.muted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -339,7 +343,7 @@ BarGroup {
                                 anchors.centerIn: parent
                                 text: "󰈁"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: gatewayLinkArea.containsMouse ? Colors.foam : Colors.muted
                             }
 
@@ -375,7 +379,8 @@ BarGroup {
                     visible: network.device.length > 0
                     text: "󰾲 " + network.device
                     color: Colors.muted
-                    font.pixelSize: 10
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }

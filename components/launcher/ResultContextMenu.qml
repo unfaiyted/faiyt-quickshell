@@ -202,7 +202,7 @@ PopupWindow {
                 Text {
                     text: entry?.icon ?? ""
                     font.family: Fonts.icon
-                    font.pixelSize: 14
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -210,8 +210,9 @@ PopupWindow {
                 // Text
                 Text {
                     text: entry?.text ?? ""
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foreground
-                    font.pixelSize: 12
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -219,8 +220,9 @@ PopupWindow {
                 Text {
                     visible: entry?.submenu ?? false
                     text: "󰅂"
+                    font.family: Fonts.icon
+                    font.pixelSize: Fonts.iconTiny
                     color: Colors.muted
-                    font.pixelSize: 10
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }

@@ -130,7 +130,8 @@ Item {
         // Color name
         Text {
             text: formatColorName(colorRow.colorKey)
-            font.pixelSize: 13
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.body
             color: Colors.foreground
             width: 140
             anchors.verticalCenter: parent.verticalCenter
@@ -153,7 +154,7 @@ Item {
                 id: hexInput
                 anchors.fill: parent
                 anchors.margins: 8
-                font.pixelSize: 13
+                font.pixelSize: Fonts.body
                 font.family: Fonts.mono
                 color: Colors.foreground
                 selectByMouse: true

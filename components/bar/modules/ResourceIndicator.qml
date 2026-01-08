@@ -56,7 +56,8 @@ Item {
                 Text {
                     text: indicator.label
                     color: indicator.indicatorColor
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     font.bold: true
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -64,7 +65,8 @@ Item {
                 Text {
                     text: indicator.value + "%"
                     color: Colors.foreground
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -72,7 +74,8 @@ Item {
                     visible: indicator.tooltipText !== ""
                     text: indicator.tooltipText
                     color: Colors.muted
-                    font.pixelSize: 9
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     lineHeight: 1.2
@@ -142,7 +145,7 @@ Item {
     Text {
         anchors.centerIn: parent
         text: indicator.icon
-        font.pixelSize: 12
+        font.pixelSize: Fonts.iconSmall
         font.family: Fonts.icon
         color: indicator.indicatorColor
     }

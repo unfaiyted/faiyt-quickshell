@@ -44,7 +44,7 @@ Item {
             Text {
                 text: ""
                 font.family: Fonts.icon
-                font.pixelSize: 12
+                font.pixelSize: Fonts.iconSmall
                 color: Colors.foregroundAlt
                 anchors.verticalCenter: parent.verticalCenter
                 rotation: collapsibleSection.expanded ? 90 : 0
@@ -59,7 +59,7 @@ Item {
                 visible: collapsibleSection.icon !== ""
                 text: collapsibleSection.icon
                 font.family: Fonts.icon
-                font.pixelSize: 14
+                font.pixelSize: Fonts.iconMedium
                 color: Colors.primary
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -67,7 +67,8 @@ Item {
             // Title
             Text {
                 text: collapsibleSection.title
-                font.pixelSize: 13
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.body
                 font.weight: Font.Medium
                 color: Colors.foreground
                 anchors.verticalCenter: parent.verticalCenter

@@ -56,7 +56,8 @@ Rectangle {
 
             Text {
                 text: row.label
-                font.pixelSize: 14
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.weight: Font.Medium
                 color: Colors.foreground
             }
@@ -64,7 +65,8 @@ Rectangle {
             Text {
                 visible: row.description.length > 0
                 text: row.description
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foregroundAlt
                 wrapMode: Text.WordWrap
                 width: parent.width

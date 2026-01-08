@@ -251,7 +251,7 @@ BarGroup {
                     visible: trayItemContainer.hasNerdIcon
                     text: IconService.getIcon(trayItemContainer.trayId)
                     font.family: Fonts.icon
-                    font.pixelSize: 14
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
                 }
 
@@ -269,7 +269,7 @@ BarGroup {
                     visible: !trayItemContainer.hasNerdIcon && trayIcon.status !== Image.Ready
                     text: IconService.getIcon("")
                     font.family: Fonts.icon
-                    font.pixelSize: 14
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
                 }
 
@@ -366,7 +366,8 @@ BarGroup {
                             Text {
                                 text: trayItemContainer.displayName || "Unknown"
                                 color: Colors.foreground
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 font.bold: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
@@ -375,7 +376,8 @@ BarGroup {
                                 visible: trayData.tooltipTitle && trayData.tooltipTitle.length > 0
                                 text: trayData.tooltipTitle
                                 color: Colors.muted
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }

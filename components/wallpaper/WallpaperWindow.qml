@@ -133,13 +133,14 @@ PanelWindow {
                     Text {
                         text: "󰸉"
                         font.family: Fonts.icon
-                        font.pixelSize: 20
+                        font.pixelSize: Fonts.iconLarge
                         color: Colors.primary
                     }
 
                     Text {
                         text: "Wallpapers"
-                        font.pixelSize: 16
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.large
                         font.bold: true
                         color: Colors.foreground
                     }
@@ -159,7 +160,7 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: "󰅖"
                         font.family: Fonts.icon
-                        font.pixelSize: 14
+                        font.pixelSize: Fonts.iconMedium
                         color: closeArea.containsMouse ? Colors.background : Colors.foreground
                     }
 
@@ -199,7 +200,7 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: "󰅁"
                         font.family: Fonts.icon
-                        font.pixelSize: 20
+                        font.pixelSize: Fonts.iconLarge
                         color: Colors.foreground
                     }
 
@@ -250,21 +251,23 @@ PanelWindow {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰋩"
                             font.family: Fonts.icon
-                            font.pixelSize: 48
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "No wallpapers found"
-                            font.pixelSize: 14
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.medium
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Add images to " + WallpaperState.wallpaperDir
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -285,7 +288,7 @@ PanelWindow {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰑓"
                             font.family: Fonts.icon
-                            font.pixelSize: 32
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.primary
 
                             RotationAnimation on rotation {
@@ -300,7 +303,8 @@ PanelWindow {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Loading wallpapers..."
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -321,7 +325,7 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: "󰅂"
                         font.family: Fonts.icon
-                        font.pixelSize: 20
+                        font.pixelSize: Fonts.iconLarge
                         color: Colors.foreground
                     }
 
@@ -358,7 +362,8 @@ PanelWindow {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: WallpaperState.pageIndicator
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
 
@@ -383,7 +388,8 @@ PanelWindow {
                             Text {
                                 anchors.centerIn: parent
                                 text: "h"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 font.bold: true
                                 color: Colors.foreground
                             }
@@ -391,7 +397,8 @@ PanelWindow {
 
                         Text {
                             text: "/"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -407,7 +414,8 @@ PanelWindow {
                             Text {
                                 anchors.centerIn: parent
                                 text: "l"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 font.bold: true
                                 color: Colors.foreground
                             }
@@ -415,7 +423,8 @@ PanelWindow {
 
                         Text {
                             text: "Navigate"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -436,14 +445,16 @@ PanelWindow {
                             Text {
                                 anchors.centerIn: parent
                                 text: "↵"
-                                font.pixelSize: 12
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foreground
                             }
                         }
 
                         Text {
                             text: "Apply"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -464,7 +475,8 @@ PanelWindow {
                             Text {
                                 anchors.centerIn: parent
                                 text: "Esc"
-                                font.pixelSize: 9
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 font.bold: true
                                 color: Colors.foreground
                             }
@@ -472,7 +484,8 @@ PanelWindow {
 
                         Text {
                             text: "Close"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
                         }

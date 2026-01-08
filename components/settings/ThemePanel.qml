@@ -307,7 +307,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: "󰅁"
                         font.family: Fonts.icon
-                        font.pixelSize: 14
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.foregroundAlt
                     }
 
@@ -331,7 +331,7 @@ Rectangle {
                 Text {
                     text: "󰏘"
                     font.family: Fonts.icon
-                    font.pixelSize: 20
+                    font.pixelSize: Fonts.iconLarge
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -339,7 +339,8 @@ Rectangle {
                 // Title
                 Text {
                     text: themePanel.isEditMode ? ("Editing: " + (themePanel.editingTheme?.displayName || "")) : "Theme Manager"
-                    font.pixelSize: 18
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.xlarge
                     font.weight: Font.DemiBold
                     color: Colors.foreground
                     anchors.verticalCenter: parent.verticalCenter
@@ -371,14 +372,15 @@ Rectangle {
                             Text {
                                 text: "󰏘"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: themePanel.activeTab === "themes" ? Colors.primary : Colors.foregroundAlt
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: "Themes"
-                                font.pixelSize: 12
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 font.weight: themePanel.activeTab === "themes" ? Font.Medium : Font.Normal
                                 color: themePanel.activeTab === "themes" ? Colors.primary : Colors.foregroundAlt
                                 anchors.verticalCenter: parent.verticalCenter
@@ -421,14 +423,15 @@ Rectangle {
                             Text {
                                 text: "󰛖"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: themePanel.activeTab === "fonts" ? Colors.primary : Colors.foregroundAlt
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: "Fonts"
-                                font.pixelSize: 12
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 font.weight: themePanel.activeTab === "fonts" ? Font.Medium : Font.Normal
                                 color: themePanel.activeTab === "fonts" ? Colors.primary : Colors.foregroundAlt
                                 anchors.verticalCenter: parent.verticalCenter
@@ -473,14 +476,15 @@ Rectangle {
                         Text {
                             text: "󰐕"
                             font.family: Fonts.icon
-                            font.pixelSize: 14
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             text: "Create New"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.weight: Font.Medium
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
@@ -525,7 +529,8 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         color: Colors.foregroundAlt
                     }
 
@@ -576,7 +581,8 @@ Rectangle {
                     // Section: Built-in Themes
                     Text {
                         text: "Built-in Themes"
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         font.weight: Font.DemiBold
                         color: Colors.foregroundAlt
                     }
@@ -610,7 +616,8 @@ Rectangle {
                     Text {
                         visible: ThemeService.availableThemes.filter(t => !t.isBuiltin).length > 0
                         text: "Custom Themes"
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         font.weight: Font.DemiBold
                         color: Colors.foregroundAlt
                     }
@@ -727,7 +734,8 @@ Rectangle {
 
                 Text {
                     text: formatColorName(themePanel.activePickerKey)
-                    font.pixelSize: 14
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     font.weight: Font.DemiBold
                     color: Colors.foreground
 
@@ -752,7 +760,8 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                     }
 
@@ -796,7 +805,8 @@ Rectangle {
 
                 Text {
                     text: "Hue"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
 
@@ -849,7 +859,8 @@ Rectangle {
 
                 Text {
                     text: "Saturation"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
 
@@ -897,7 +908,8 @@ Rectangle {
 
                 Text {
                     text: "Lightness"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
 
@@ -1016,7 +1028,7 @@ Rectangle {
                     Text {
                         text: "󰍉"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -1026,7 +1038,8 @@ Rectangle {
                         width: parent.width - 24
                         height: parent.height
                         verticalAlignment: TextInput.AlignVCenter
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                         clip: true
                         text: themePanel.dropdownSearchText
@@ -1047,7 +1060,8 @@ Rectangle {
                         Text {
                             visible: !searchInput.text && !searchInput.activeFocus
                             text: "Search fonts..."
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -1078,7 +1092,8 @@ Rectangle {
                     }
                     return "Showing 25 of " + total + " fonts"
                 }
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
                 horizontalAlignment: Text.AlignRight
                 rightPadding: 4
@@ -1132,7 +1147,8 @@ Rectangle {
                             Text {
                                 width: parent.width
                                 text: modelData.label
-                                font.pixelSize: 12
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: dropdownItem.isHighlighted || dropdownItem.isSelected ? Colors.foreground : Colors.foregroundAlt
                                 elide: Text.ElideRight
                             }
@@ -1142,7 +1158,7 @@ Rectangle {
                                 visible: modelData.value !== "" && (dropdownItem.isHighlighted || dropdownItem.isSelected)
                                 width: parent.width
                                 text: themePanel.activeDropdownPreview
-                                font.pixelSize: 11
+                                font.pixelSize: Fonts.small
                                 font.family: modelData.value
                                 color: Colors.foreground
                                 elide: Text.ElideRight
@@ -1153,7 +1169,8 @@ Rectangle {
                                 visible: modelData.value !== "" && !dropdownItem.isHighlighted && !dropdownItem.isSelected
                                 width: parent.width
                                 text: themePanel.activeDropdownPreview
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 font.italic: true
                                 color: Colors.foregroundMuted
                                 elide: Text.ElideRight
@@ -1168,7 +1185,8 @@ Rectangle {
                             anchors.rightMargin: 12
                             verticalAlignment: Text.AlignVCenter
                             text: modelData.label
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             color: dropdownItem.isHighlighted || dropdownItem.isSelected ? Colors.foreground : Colors.foregroundAlt
                             elide: Text.ElideRight
                         }

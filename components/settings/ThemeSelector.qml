@@ -19,14 +19,15 @@ Column {
         Text {
             text: "󰏘"
             font.family: Fonts.icon
-            font.pixelSize: 20
+            font.pixelSize: Fonts.iconLarge
             color: Colors.foreground
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
             text: "Theme"
-            font.pixelSize: 16
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.large
             font.weight: Font.DemiBold
             color: Colors.foreground
             anchors.verticalCenter: parent.verticalCenter
@@ -52,14 +53,15 @@ Column {
                 Text {
                     text: "󰏫"
                     font.family: Fonts.icon
-                    font.pixelSize: 12
+                    font.pixelSize: Fonts.iconSmall
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Text {
                     text: "Customize"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -152,7 +154,7 @@ Column {
                         Text {
                             text: modelData.icon
                             font.family: Fonts.icon
-                            font.pixelSize: 24
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foreground
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -163,14 +165,16 @@ Column {
 
                             Text {
                                 text: modelData.displayName
-                                font.pixelSize: 15
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.medium
                                 font.weight: Font.DemiBold
                                 color: Colors.foreground
                             }
 
                             Text {
                                 text: modelData.description
-                                font.pixelSize: 13
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.body
                                 color: Colors.foregroundAlt
                             }
                         }
@@ -182,7 +186,7 @@ Column {
                             visible: themeOption.isActive
                             text: "󰄬"
                             font.family: Fonts.icon
-                            font.pixelSize: 20
+                            font.pixelSize: Fonts.iconLarge
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -246,19 +250,21 @@ Column {
             Text {
                 text: "󰏘"
                 font.family: Fonts.icon
-                font.pixelSize: 14
+                font.pixelSize: Fonts.iconMedium
                 color: Colors.foregroundAlt
             }
 
             Text {
                 text: ThemeService.availableThemes.filter(t => !t.isBuiltin).length + " custom theme(s) available"
-                font.pixelSize: 13
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.body
                 color: Colors.foregroundAlt
             }
 
             Text {
                 text: "→"
-                font.pixelSize: 13
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.body
                 color: Colors.primary
             }
 
@@ -271,7 +277,8 @@ Column {
                 Text {
                     id: openThemeManagerText
                     text: "Open Theme Manager"
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     color: Colors.primary
                 }
 

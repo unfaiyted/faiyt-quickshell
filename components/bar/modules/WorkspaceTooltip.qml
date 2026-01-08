@@ -158,7 +158,8 @@ Rectangle {
         anchors.topMargin: 8
         text: "Workspace " + tooltip.workspaceId
         color: Colors.foreground
-        font.pixelSize: 12
+        font.family: Fonts.ui
+        font.pixelSize: Fonts.small
         font.bold: true
     }
 
@@ -169,7 +170,8 @@ Rectangle {
         anchors.topMargin: 2
         text: tooltip.windowsInWorkspace.length + " window" + (tooltip.windowsInWorkspace.length !== 1 ? "s" : "")
         color: Colors.muted
-        font.pixelSize: 9
+        font.family: Fonts.ui
+        font.pixelSize: Fonts.tiny
     }
 
     // Preview area
@@ -196,7 +198,8 @@ Rectangle {
             visible: tooltip.windowsInWorkspace.length === 0
             text: "Empty workspace"
             color: Colors.muted
-            font.pixelSize: 10
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.tiny
         }
 
         // Window previews using ToplevelManager
@@ -316,7 +319,8 @@ Rectangle {
                             width: parent.width - 6
                             text: windowItem.winData?.title ?? "Unknown"
                             color: Colors.foreground
-                            font.pixelSize: 8
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             elide: Text.ElideRight
                             horizontalAlignment: Text.AlignHCenter
                         }

@@ -49,7 +49,8 @@ Item {
             // Title
             Text {
                 text: "AI Settings"
-                font.pixelSize: 16
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.large
                 font.bold: true
                 color: Colors.foreground
             }
@@ -76,13 +77,14 @@ Item {
                         Text {
                             text: "󰧑"
                             font.family: Fonts.icon
-                            font.pixelSize: 16
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.primary
                         }
 
                         Text {
                             text: "Claude"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.bold: true
                             color: Colors.foreground
                         }
@@ -95,7 +97,8 @@ Item {
 
                         Text {
                             text: "API Key"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
 
@@ -117,7 +120,7 @@ Item {
                                 Text {
                                     text: ClaudeService.hasApiKey() ? "󰄬" : "󰅜"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 14
+                                    font.pixelSize: Fonts.iconMedium
                                     color: ClaudeService.hasApiKey() ? Colors.success : Colors.error
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -126,7 +129,8 @@ Item {
                                     text: ClaudeService.hasApiKey()
                                         ? "ANTHROPIC_API_KEY is set"
                                         : "ANTHROPIC_API_KEY not found"
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: ClaudeService.hasApiKey() ? Colors.success : Colors.error
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -135,7 +139,8 @@ Item {
 
                         Text {
                             text: "Set ANTHROPIC_API_KEY in your shell environment"
-                            font.pixelSize: 9
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             color: Colors.foregroundMuted
                         }
                     }
@@ -147,7 +152,8 @@ Item {
 
                         Text {
                             text: "Model"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
 
@@ -179,7 +185,8 @@ Item {
                                 contentItem: Text {
                                     leftPadding: 8
                                     text: formatModelName(ConfigService.aiModels[modelCombo.currentIndex] || "")
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -189,7 +196,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "󰅀"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 10
+                                    font.pixelSize: Fonts.iconTiny
                                     color: Colors.foregroundMuted
                                 }
 
@@ -227,7 +234,8 @@ Item {
                                         anchors.leftMargin: 8
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: formatModelName(modelDelegate.modelData)
-                                        font.pixelSize: 11
+                                        font.family: Fonts.ui
+                                        font.pixelSize: Fonts.small
                                         color: Colors.foreground
                                     }
 
@@ -272,7 +280,8 @@ Item {
 
                             Text {
                                 text: "Temperature"
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foregroundAlt
                             }
 
@@ -280,7 +289,8 @@ Item {
 
                             Text {
                                 text: tempSlider.value.toFixed(1)
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foreground
                             }
                         }
@@ -350,13 +360,14 @@ Item {
                         Text {
                             text: "󰒓"
                             font.family: Fonts.icon
-                            font.pixelSize: 16
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.accent
                         }
 
                         Text {
                             text: "MCP Servers"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.bold: true
                             color: Colors.foreground
                         }
@@ -365,7 +376,8 @@ Item {
 
                         Text {
                             text: MCPClient.availableTools.length + " tools"
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             color: Colors.foregroundMuted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -409,7 +421,8 @@ Item {
                                     // Server name
                                     Text {
                                         text: modelData.name
-                                        font.pixelSize: 11
+                                        font.family: Fonts.ui
+                                        font.pixelSize: Fonts.small
                                         color: Colors.foreground
                                         anchors.verticalCenter: parent.verticalCenter
                                         width: parent.width - 80
@@ -462,7 +475,7 @@ Item {
                                             anchors.centerIn: parent
                                             text: "󰅖"
                                             font.family: Fonts.icon
-                                            font.pixelSize: 10
+                                            font.pixelSize: Fonts.iconTiny
                                             color: removeArea.containsMouse ? Colors.error : Colors.foregroundMuted
                                         }
 
@@ -488,7 +501,8 @@ Item {
                     // Empty state
                     Text {
                         text: "No MCP servers configured"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundMuted
                         visible: MCPClient.servers.length === 0
                     }
@@ -508,13 +522,14 @@ Item {
                             Text {
                                 text: "󰐕"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: Colors.primary
                             }
 
                             Text {
                                 text: "Add MCP Server"
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foreground
                             }
                         }
@@ -553,7 +568,8 @@ Item {
 
                     Text {
                         text: "System Prompt"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         font.bold: true
                         color: Colors.foreground
                     }
@@ -576,7 +592,8 @@ Item {
                                 text: ConfigService.aiSystemPrompt
                                 placeholderText: "Optional system prompt..."
                                 placeholderTextColor: Colors.foregroundMuted
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foreground
                                 wrapMode: TextEdit.Wrap
                                 background: null
@@ -625,7 +642,8 @@ Item {
 
             Text {
                 text: "Add MCP Server"
-                font.pixelSize: 14
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.bold: true
                 color: Colors.foreground
             }
@@ -636,7 +654,8 @@ Item {
 
                 Text {
                     text: "Name"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
 
@@ -650,7 +669,8 @@ Item {
                         id: serverNameInput
                         anchors.fill: parent
                         anchors.margins: 8
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                         clip: true
                         selectByMouse: true
@@ -674,7 +694,8 @@ Item {
 
                 Text {
                     text: "Command (e.g., npx -y @modelcontextprotocol/server-filesystem /home)"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                     wrapMode: Text.WordWrap
                 }
@@ -689,7 +710,8 @@ Item {
                         id: serverCommandInput
                         anchors.fill: parent
                         anchors.margins: 8
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                         clip: true
                         selectByMouse: true
@@ -721,7 +743,8 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: "Cancel"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                     }
 
@@ -751,7 +774,8 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: "Add"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.background
                     }
 

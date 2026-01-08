@@ -78,7 +78,8 @@ Item {
             // Notification count
             Text {
                 text: notificationCount() > 0 ? notificationCount() + " Notification" + (notificationCount() > 1 ? "s" : "") : "Notifications"
-                font.pixelSize: 14
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.bold: true
                 color: Colors.foreground
                 anchors.verticalCenter: parent.verticalCenter
@@ -100,7 +101,7 @@ Item {
                     anchors.centerIn: parent
                     text: notifications.doNotDisturb ? "󰂛" : "󰂚"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: notifications.doNotDisturb ? Colors.error : Colors.foreground
                 }
 
@@ -133,7 +134,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰆴"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
                 }
 
@@ -168,21 +169,23 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "󰂚"
                     font.family: Fonts.icon
-                    font.pixelSize: 48
+                    font.pixelSize: Fonts.iconHuge
                     color: Colors.foregroundMuted
                 }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "No notifications"
-                    font.pixelSize: 14
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     color: Colors.foregroundMuted
                 }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "You're all caught up!"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
             }
@@ -262,7 +265,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: getAppIcon(notification ? notification.appName : "")
                                         font.family: Fonts.icon
-                                        font.pixelSize: 18
+                                        font.pixelSize: Fonts.xlarge
                                         color: Colors.background
                                     }
                                 }
@@ -279,7 +282,8 @@ Item {
 
                                         Text {
                                             text: notification ? (notification.appName || "App") : "App"
-                                            font.pixelSize: 11
+                                            font.family: Fonts.ui
+                                            font.pixelSize: Fonts.small
                                             color: Colors.foregroundAlt
                                             elide: Text.ElideRight
                                             width: parent.width - 60
@@ -287,14 +291,16 @@ Item {
 
                                         Text {
                                             text: formatTime(notification ? notification.time : null)
-                                            font.pixelSize: 10
+                                            font.family: Fonts.ui
+                                            font.pixelSize: Fonts.tiny
                                             color: Colors.foregroundMuted
                                         }
                                     }
 
                                     Text {
                                         text: notification ? (notification.summary || "") : ""
-                                        font.pixelSize: 12
+                                        font.family: Fonts.ui
+                                        font.pixelSize: Fonts.small
                                         font.bold: true
                                         color: Colors.foreground
                                         elide: Text.ElideRight
@@ -315,7 +321,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: "󰅖"
                                         font.family: Fonts.icon
-                                        font.pixelSize: 14
+                                        font.pixelSize: Fonts.iconMedium
                                         color: dismissArea.containsMouse ? Colors.background : Colors.foregroundMuted
                                     }
 
@@ -341,7 +347,8 @@ Item {
                             Text {
                                 width: parent.width
                                 text: notification ? (notification.body || "") : ""
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foregroundAlt
                                 elide: Text.ElideRight
                                 maximumLineCount: 2
@@ -354,7 +361,8 @@ Item {
                                 id: bodyText
                                 width: parent.width
                                 text: notification ? (notification.body || "") : ""
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foregroundAlt
                                 wrapMode: Text.WordWrap
                                 visible: expanded
@@ -392,7 +400,8 @@ Item {
                                             id: actionText
                                             anchors.centerIn: parent
                                             text: modelData ? modelData.text : ""
-                                            font.pixelSize: 11
+                                            font.family: Fonts.ui
+                                            font.pixelSize: Fonts.small
                                             color: actionArea.containsMouse ? Colors.background : Colors.foreground
                                         }
 
@@ -421,7 +430,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: expanded ? "󰅃" : "󰅀"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: Colors.foregroundMuted
                                 visible: notification && (notification.body || (notification.actions && notification.actions.length > 0))
                             }

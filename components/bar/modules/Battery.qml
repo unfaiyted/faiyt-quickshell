@@ -66,7 +66,8 @@ BarGroup {
             Text {
                 anchors.centerIn: parent
                 text: batteryModule.percentage.toString()
-                font.pixelSize: 7
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 font.bold: true
                 color: batteryModule.batteryColor
                 horizontalAlignment: Text.AlignHCenter
@@ -79,7 +80,8 @@ BarGroup {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: batteryModule.charging ? "⚡" : "%"
-            font.pixelSize: 10
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.tiny
             color: batteryModule.batteryColor
         }
     }
@@ -124,7 +126,8 @@ BarGroup {
                 Text {
                     text: batteryModule.percentage + "%"
                     color: batteryModule.batteryColor
-                    font.pixelSize: 14
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     font.bold: true
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -132,7 +135,8 @@ BarGroup {
                 Text {
                     text: batteryModule.statusText
                     color: Colors.subtle
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -148,7 +152,8 @@ BarGroup {
                     visible: batteryModule.timeRemaining > 0
                     text: (batteryModule.charging ? "󱐋 " : "󰁾 ") + batteryModule.timeRemainingText + (batteryModule.charging ? " until full" : " remaining")
                     color: Colors.muted
-                    font.pixelSize: 10
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }

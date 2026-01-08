@@ -191,7 +191,7 @@ Item {
                     Text {
                         text: "󰍉"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -201,7 +201,8 @@ Item {
                         width: parent.width - 24
                         height: parent.height
                         verticalAlignment: TextInput.AlignVCenter
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                         clip: true
                         text: dropdownOverlay.searchText
@@ -219,7 +220,8 @@ Item {
                         Text {
                             visible: !searchInput.text && !searchInput.activeFocus
                             text: "Search..."
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -239,7 +241,8 @@ Item {
                     }
                     return "Showing 25 of " + total
                 }
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
                 horizontalAlignment: Text.AlignRight
                 rightPadding: 4
@@ -293,7 +296,8 @@ Item {
                                 Text {
                                     width: parent.width
                                     text: modelData.label
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: listItem.isHighlighted || listItem.isSelected ? Colors.foreground : Colors.foregroundAlt
                                     elide: Text.ElideRight
                                 }
@@ -302,7 +306,7 @@ Item {
                                     visible: modelData.value !== "" && (listItem.isHighlighted || listItem.isSelected)
                                     width: parent.width
                                     text: dropdownOverlay.previewText
-                                    font.pixelSize: 11
+                                    font.pixelSize: Fonts.small
                                     font.family: modelData.value
                                     color: Colors.foreground
                                     elide: Text.ElideRight
@@ -312,7 +316,7 @@ Item {
                                     visible: modelData.value !== "" && !listItem.isHighlighted && !listItem.isSelected
                                     width: parent.width
                                     text: dropdownOverlay.previewText
-                                    font.pixelSize: 11
+                                    font.pixelSize: Fonts.small
                                     font.italic: true
                                     color: Colors.foregroundMuted
                                     elide: Text.ElideRight
@@ -327,7 +331,8 @@ Item {
                                 anchors.rightMargin: 12
                                 verticalAlignment: Text.AlignVCenter
                                 text: modelData.label
-                                font.pixelSize: 13
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.body
                                 color: listItem.isHighlighted || listItem.isSelected ? Colors.foreground : Colors.foregroundAlt
                                 elide: Text.ElideRight
                             }

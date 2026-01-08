@@ -59,7 +59,7 @@ Item {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: results.length > 0 && results[0].type === "sticker-add" ? "📦" : "🎨"
-                    font.pixelSize: 48
+                    font.pixelSize: Fonts.iconHuge * 2
                     font.family: Fonts.emoji
                 }
 
@@ -67,7 +67,8 @@ Item {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: results.length > 0 ? results[0].title : "Stickers"
-                    font.pixelSize: 16
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.large
                     font.weight: Font.DemiBold
                     color: Colors.foreground
                 }
@@ -77,7 +78,8 @@ Item {
                     width: parent.width
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: results.length > 0 ? results[0].description : ""
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     color: Colors.foregroundMuted
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -98,7 +100,8 @@ Item {
                     Text {
                         width: parent.width
                         text: "How to add stickers:"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.weight: Font.Medium
                         color: Colors.foreground
                         horizontalAlignment: Text.AlignHCenter
@@ -118,7 +121,7 @@ Item {
                                 id: codeText
                                 anchors.centerIn: parent
                                 text: "s: add <signal-url>"
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.small
                                 font.family: Fonts.mono
                                 color: Colors.primary
                             }
@@ -128,7 +131,8 @@ Item {
                     Text {
                         width: parent.width
                         text: "Find stickers at signalstickers.org"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                         horizontalAlignment: Text.AlignHCenter
                     }
@@ -153,14 +157,15 @@ Item {
                         Text {
                             text: "󰋚"
                             font.family: Fonts.icon
-                            font.pixelSize: 16
+                            font.pixelSize: Fonts.iconMedium
                             color: addButtonArea.containsMouse ? Colors.background : Colors.iris
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             text: "Download & Add Pack"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.weight: Font.Medium
                             color: addButtonArea.containsMouse ? Colors.background : Colors.foreground
                             anchors.verticalCenter: parent.verticalCenter
@@ -199,7 +204,7 @@ Item {
             Text {
                 text: "󰋚"
                 font.family: Fonts.icon
-                font.pixelSize: 14
+                font.pixelSize: Fonts.iconMedium
                 color: Colors.iris
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -213,7 +218,8 @@ Item {
 
             Text {
                 text: "Downloading stickers..."
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.iris
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -286,7 +292,8 @@ Item {
                 anchors.top: parent.bottom
                 anchors.topMargin: 4
                 text: "←"
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
             }
         }
@@ -359,7 +366,7 @@ Item {
                         }
                         return "?"
                     }
-                    font.pixelSize: 64
+                    font.pixelSize: Fonts.iconHuge * 2.5
                     font.family: Fonts.emoji
                     visible: previewImage.status !== Image.Ready
                 }
@@ -385,7 +392,7 @@ Item {
                             }
                             return ""
                         }
-                        font.pixelSize: 14
+                        font.pixelSize: Fonts.iconMedium
                         font.family: Fonts.emoji
                     }
                 }
@@ -410,14 +417,16 @@ Item {
 
                     Text {
                         text: "↵"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.bold: true
                         color: Colors.iris
                     }
 
                     Text {
                         text: "copy"
-                        font.pixelSize: 10
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.tiny
                         color: Colors.foregroundMuted
                     }
                 }
@@ -464,7 +473,8 @@ Item {
                 anchors.top: parent.bottom
                 anchors.topMargin: 4
                 text: "→"
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
             }
         }
@@ -546,7 +556,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: modelData?.emoji || "?"
-                    font.pixelSize: 48
+                    font.pixelSize: Fonts.iconHuge * 2
                     font.family: Fonts.emoji
                     visible: stickerImage.status !== Image.Ready && stickerImage.status !== Image.Loading
                 }
@@ -556,7 +566,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰋚"
                     font.family: Fonts.icon
-                    font.pixelSize: 24
+                    font.pixelSize: Fonts.iconHuge
                     color: Colors.foregroundMuted
                     visible: stickerImage.status === Image.Loading
 
@@ -585,7 +595,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: modelData?.emoji || ""
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         font.family: Fonts.emoji
                     }
                 }

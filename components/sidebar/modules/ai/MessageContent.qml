@@ -57,7 +57,8 @@ Item {
         Text {
             visible: isStreaming && parsedBlocks.length > 0
             text: cursorVisible ? "▌" : " "
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: Colors.foreground
 
             property bool cursorVisible: true
@@ -74,7 +75,8 @@ Item {
         Text {
             visible: isStreaming && parsedBlocks.length === 0
             text: cursorVisible ? "▌" : " "
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: Colors.foreground
 
             property bool cursorVisible: true
@@ -98,7 +100,8 @@ Item {
                 const formatted = MarkdownParser.markdownToRichText(blockData.content, themeColors)
                 return formatted
             }
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: isError ? Colors.error : Colors.foreground
             wrapMode: TextEdit.Wrap
             textFormat: TextEdit.RichText

@@ -83,7 +83,7 @@ Item {
                         return "󰵸"
                     }
                     font.family: Fonts.icon
-                    font.pixelSize: 48
+                    font.pixelSize: Fonts.iconHuge * 2
                     color: {
                         if (results.length === 0) return Colors.foregroundMuted
                         if (results[0].data?.needsSetup) return Colors.gold
@@ -104,7 +104,8 @@ Item {
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: results.length > 0 ? results[0].title : "GIF Search"
-                    font.pixelSize: 16
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.large
                     font.weight: Font.DemiBold
                     color: Colors.foreground
                 }
@@ -114,7 +115,8 @@ Item {
                     width: parent.width
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: results.length > 0 ? results[0].description : ""
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     color: Colors.foregroundMuted
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -138,7 +140,8 @@ Item {
                     Text {
                         width: parent.width
                         text: "How to set up:"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.weight: Font.Medium
                         color: Colors.foreground
                         horizontalAlignment: Text.AlignHCenter
@@ -151,14 +154,16 @@ Item {
 
                         Text {
                             text: "1."
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.weight: Font.Medium
                             color: Colors.primary
                         }
 
                         Text {
                             text: "Get a free API key from"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                         }
 
@@ -174,7 +179,8 @@ Item {
                                 id: linkText
                                 anchors.centerIn: parent
                                 text: "developers.google.com/tenor"
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.primary
                             }
 
@@ -195,14 +201,16 @@ Item {
 
                         Text {
                             text: "2."
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.weight: Font.Medium
                             color: Colors.primary
                         }
 
                         Text {
                             text: "Add to your shell config:"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                         }
                     }
@@ -218,7 +226,7 @@ Item {
                             id: envCode
                             anchors.centerIn: parent
                             text: "export TENOR_API_KEY=\"your-key\""
-                            font.pixelSize: 11
+                            font.pixelSize: Fonts.small
                             font.family: Fonts.mono
                             color: Colors.iris
                         }
@@ -276,14 +284,15 @@ Item {
                     Text {
                         text: "󰌹"
                         font.family: Fonts.icon
-                        font.pixelSize: 16
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.foam
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Copy URL"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         color: Colors.foreground
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -330,14 +339,15 @@ Item {
                     Text {
                         text: "󰋩"
                         font.family: Fonts.icon
-                        font.pixelSize: 16
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.iris
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Copy Image"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         color: Colors.foreground
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -392,14 +402,15 @@ Item {
             Text {
                 text: "󰷊"
                 font.family: Fonts.icon
-                font.pixelSize: 18
+                font.pixelSize: Fonts.iconLarge
                 color: Colors.iris
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Text {
                 text: "GIF Categories"
-                font.pixelSize: 15
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.weight: Font.Medium
                 color: Colors.foreground
                 anchors.verticalCenter: parent.verticalCenter
@@ -410,7 +421,8 @@ Item {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Select a category or type to search"
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: Colors.foregroundMuted
         }
     }
@@ -501,7 +513,8 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: modelData?.title || "Category"
-                    font.pixelSize: 14
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     font.weight: Font.Medium
                     color: index === gifGridView.selectedIndex ? Colors.iris : Colors.foreground
                     horizontalAlignment: Text.AlignHCenter
@@ -614,7 +627,8 @@ Item {
                 anchors.top: parent.bottom
                 anchors.topMargin: 4
                 text: "←"
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
             }
         }
@@ -685,7 +699,7 @@ Item {
                     visible: previewGif.status === Image.Loading
                     text: "󰋚"
                     font.family: Fonts.icon
-                    font.pixelSize: 32
+                    font.pixelSize: Fonts.iconHuge * 1.3
                     color: Colors.foregroundMuted
 
                     SequentialAnimation on opacity {
@@ -702,7 +716,7 @@ Item {
                     visible: previewGif.status === Image.Error
                     text: "󰀦"
                     font.family: Fonts.icon
-                    font.pixelSize: 32
+                    font.pixelSize: Fonts.iconHuge * 1.3
                     color: Colors.love
                 }
             }
@@ -726,14 +740,16 @@ Item {
 
                     Text {
                         text: "↵"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.bold: true
                         color: Colors.iris
                     }
 
                     Text {
                         text: "copy"
-                        font.pixelSize: 10
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.tiny
                         color: Colors.foregroundMuted
                     }
                 }
@@ -780,7 +796,8 @@ Item {
                 anchors.top: parent.bottom
                 anchors.topMargin: 4
                 text: "→"
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
             }
         }
@@ -864,7 +881,7 @@ Item {
                     visible: gifImage.status === Image.Loading || gifImage.status === Image.Null
                     text: "󰋚"
                     font.family: Fonts.icon
-                    font.pixelSize: 24
+                    font.pixelSize: Fonts.iconHuge
                     color: Colors.foregroundMuted
 
                     SequentialAnimation on opacity {
@@ -881,7 +898,7 @@ Item {
                     visible: gifImage.status === Image.Error
                     text: "󰀦"
                     font.family: Fonts.icon
-                    font.pixelSize: 24
+                    font.pixelSize: Fonts.iconHuge
                     color: Colors.love
                 }
 

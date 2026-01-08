@@ -84,7 +84,8 @@ Rectangle {
 
                     Text {
                         text: "Settings"
-                        font.pixelSize: 18
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.xlarge
                         font.weight: Font.DemiBold
                         color: Colors.foreground
                     }
@@ -103,7 +104,8 @@ Rectangle {
                         Text {
                             anchors.centerIn: parent
                             text: "✕"
-                            font.pixelSize: 14
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.medium
                             color: Colors.foregroundAlt
                         }
 
@@ -151,7 +153,7 @@ Rectangle {
                         Text {
                             text: "󰍉"
                             font.family: Fonts.icon
-                            font.pixelSize: 14
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -161,7 +163,8 @@ Rectangle {
                             width: parent.width - 30
                             height: parent.height
                             verticalAlignment: Text.AlignVCenter
-                            font.pixelSize: 14
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.medium
                             color: Colors.foreground
                             selectByMouse: true
                             clip: true
@@ -204,7 +207,8 @@ Rectangle {
                                 anchors.fill: parent
                                 verticalAlignment: Text.AlignVCenter
                                 text: "Search settings..."
-                                font.pixelSize: 14
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.medium
                                 color: Colors.foregroundMuted
                                 visible: searchInput.text.length === 0
                             }
@@ -334,7 +338,8 @@ Rectangle {
                                 Text {
                                     id: displayBtnText
                                     text: "Open Display Settings"
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -398,7 +403,8 @@ Rectangle {
                                 Text {
                                     id: reqBtnText
                                     text: "View Requirements"
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -1189,7 +1195,8 @@ Rectangle {
 
                                 Text {
                                     text: "Use IANA timezone IDs (e.g., Europe/London)"
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     font.italic: true
                                     color: Colors.foregroundMuted
                                 }
@@ -2032,7 +2039,8 @@ Rectangle {
 
                                 Text {
                                     text: "Find packs at signalstickers.org"
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     font.italic: true
                                     color: Colors.foregroundMuted
                                 }
@@ -2365,7 +2373,8 @@ Rectangle {
 
                         Text {
                             text: "Some changes require a restart to take effect."
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.weight: Font.Medium
                             color: Colors.warning
                         }
@@ -2383,7 +2392,8 @@ Rectangle {
                                 id: restartText
                                 anchors.centerIn: parent
                                 text: "Restart QuickShell"
-                                font.pixelSize: 13
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.body
                                 font.weight: Font.Medium
                                 color: Colors.foreground
                             }

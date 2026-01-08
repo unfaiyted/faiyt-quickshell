@@ -26,7 +26,7 @@ Item {
         id: iconText
         anchors.centerIn: parent
         text: "󰄀"
-        font.pixelSize: 14
+        font.pixelSize: Fonts.iconMedium
         font.family: Fonts.icon
         color: mouseArea.containsMouse ? Colors.rose : Colors.foreground
 
@@ -107,7 +107,8 @@ Item {
                 id: tooltipText
                 anchors.centerIn: parent
                 text: "Screenshot"
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foreground
             }
         }
@@ -182,7 +183,7 @@ Item {
                         Text {
                             text: !ScreenshotState.annotateEnabled ? "󰄵" : "󰄱"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -190,7 +191,7 @@ Item {
                         Text {
                             text: "󰄀"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -198,7 +199,8 @@ Item {
                         Text {
                             text: "Screenshot"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -246,7 +248,7 @@ Item {
                         Text {
                             text: ScreenshotState.annotateEnabled ? "󰄵" : "󰄱"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -254,7 +256,7 @@ Item {
                         Text {
                             text: "󰏫"
                             color: Colors.iris
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -262,7 +264,8 @@ Item {
                         Text {
                             text: "Annotate"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -305,7 +308,8 @@ Item {
                 Text {
                     text: "Screenshot Target"
                     color: Colors.muted
-                    font.pixelSize: 10
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     leftPadding: 8
                     visible: MonitorsState.monitors.length > 0
                 }
@@ -329,7 +333,7 @@ Item {
                         Text {
                             text: "󰩭"
                             color: Colors.iris
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -337,7 +341,8 @@ Item {
                         Text {
                             text: "Selection"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -373,7 +378,7 @@ Item {
                         Text {
                             text: "󰍺"
                             color: Colors.foam
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -381,7 +386,8 @@ Item {
                         Text {
                             text: "All Monitors"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }

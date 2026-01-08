@@ -76,14 +76,15 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰋗"
                             font.family: Fonts.icon
-                            font.pixelSize: 48
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Coming Soon"
-                            font.pixelSize: 16
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.large
                             font.bold: true
                             color: Colors.foreground
                         }
@@ -91,7 +92,8 @@ Item {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: provider.charAt(0).toUpperCase() + provider.slice(1) + " integration\nis under development"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                             horizontalAlignment: Text.AlignHCenter
                         }

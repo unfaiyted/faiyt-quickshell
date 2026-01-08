@@ -168,7 +168,8 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: header.username.charAt(0).toUpperCase()
-                    font.pixelSize: 18
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.xlarge
                     font.bold: true
                     color: Colors.background
                 }
@@ -182,20 +183,23 @@ Item {
 
             Text {
                 text: header.username
-                font.pixelSize: 14
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.bold: true
                 color: Colors.foreground
             }
 
             Text {
                 text: "@" + header.hostname
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foregroundAlt
             }
 
             Text {
                 text: header.uptime
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
                 visible: header.uptime !== ""
             }
@@ -224,7 +228,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰒓"
                     font.family: Fonts.icon
-                    font.pixelSize: 18
+                    font.pixelSize: Fonts.xlarge
                     color: Colors.foreground
                 }
 
@@ -255,7 +259,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰐥"
                     font.family: Fonts.icon
-                    font.pixelSize: 18
+                    font.pixelSize: Fonts.xlarge
                     color: Colors.error
                 }
 

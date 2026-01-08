@@ -48,7 +48,8 @@ Rectangle {
         // Section title
         Text {
             text: section.title
-            font.pixelSize: 14
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.medium
             font.weight: Font.DemiBold
             font.capitalization: Font.AllUppercase
             font.letterSpacing: 0.5

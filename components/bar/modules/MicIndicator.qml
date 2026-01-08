@@ -60,7 +60,7 @@ BarGroup {
         anchors.centerIn: parent
         text: "󰍭"
         color: Colors.love
-        font.pixelSize: 14
+        font.pixelSize: Fonts.iconMedium
         font.family: Fonts.icon
     }
 
@@ -115,7 +115,8 @@ BarGroup {
                 anchors.centerIn: parent
                 text: "Click to unmute"
                 color: Colors.foreground
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
             }
         }
     }

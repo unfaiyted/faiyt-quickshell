@@ -53,7 +53,8 @@ Item {
                         ? (AIState.isProcessing ? "Waiting for response..." : "Type a message...")
                         : "Configure API key in Settings"
                     placeholderTextColor: Colors.foregroundMuted
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foreground
                     background: null
                     wrapMode: TextEdit.Wrap
@@ -142,7 +143,7 @@ Item {
                     anchors.centerIn: parent
                     text: AIState.isProcessing ? "󰅖" : "󰒊"
                     font.family: Fonts.icon
-                    font.pixelSize: 18
+                    font.pixelSize: Fonts.iconLarge
                     color: {
                         if (AIState.isProcessing) {
                             return sendArea.containsMouse ? Colors.background : Colors.error

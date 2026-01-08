@@ -41,7 +41,7 @@ BarGroup {
             visible: windowTitle.appClass !== "" && content.hasNerdIcon
             text: IconService.getIcon(windowTitle.appClass)
             font.family: Fonts.icon
-            font.pixelSize: 14
+            font.pixelSize: Fonts.iconMedium
             color: Colors.foreground
         }
 
@@ -49,10 +49,10 @@ BarGroup {
         Image {
             id: appIcon
             anchors.verticalCenter: parent.verticalCenter
-            width: 14
-            height: 14
+            width: Fonts.iconMedium
+            height: Fonts.iconMedium
             source: content.iconPath
-            sourceSize: Qt.size(14, 14)
+            sourceSize: Qt.size(Fonts.iconMedium, Fonts.iconMedium)
             visible: !content.hasNerdIcon && status === Image.Ready
         }
 
@@ -62,7 +62,7 @@ BarGroup {
             visible: windowTitle.appClass !== "" && !content.hasNerdIcon && appIcon.status !== Image.Ready
             text: IconService.getIcon("")
             font.family: Fonts.icon
-            font.pixelSize: 14
+            font.pixelSize: Fonts.iconMedium
             color: Colors.foreground
         }
 
@@ -76,7 +76,8 @@ BarGroup {
                 return t
             }
             color: Colors.foregroundAlt
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
         }
     }
 }

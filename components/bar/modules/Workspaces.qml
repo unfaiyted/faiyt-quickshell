@@ -76,7 +76,8 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: wsIndicator.wsId
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: wsIndicator.isActive ? Colors.base
                          : wsIndicator.isOccupied ? Colors.foreground
                          : Colors.subtle

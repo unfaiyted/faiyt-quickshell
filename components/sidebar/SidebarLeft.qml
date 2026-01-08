@@ -119,14 +119,15 @@ PanelWindow {
                             Text {
                                 text: AIState.activeMainTab === 0 ? "󰚩" : "󰦖"
                                 font.family: Fonts.icon
-                                font.pixelSize: 24
+                                font.pixelSize: Fonts.iconHuge
                                 color: Colors.primary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: AIState.activeMainTab === 0 ? "AI Chat" : "Tools"
-                                font.pixelSize: 18
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.xlarge
                                 font.bold: true
                                 color: Colors.foreground
                                 anchors.verticalCenter: parent.verticalCenter

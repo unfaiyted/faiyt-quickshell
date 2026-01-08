@@ -53,7 +53,7 @@ Rectangle {
                 anchors.centerIn: parent
                 text: result ? (result.icon || "󰀻") : "󰀻"
                 font.family: Fonts.icon
-                font.pixelSize: 18
+                font.pixelSize: Fonts.iconLarge
                 color: isSelected ? Colors.primary : Colors.foreground
                 visible: !faviconImage.visible
             }
@@ -69,7 +69,8 @@ Rectangle {
             Text {
                 width: parent.width
                 text: result ? (result.title || "") : ""
-                font.pixelSize: 14
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.bold: isSelected
                 color: Colors.foreground
                 elide: Text.ElideRight
@@ -79,7 +80,8 @@ Rectangle {
             Text {
                 width: parent.width
                 text: result ? (result.description || "") : ""
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foregroundAlt
                 elide: Text.ElideRight
                 visible: text.length > 0
@@ -102,7 +104,8 @@ Rectangle {
             id: typeBadgeText
             anchors.centerIn: parent
             text: result ? (result.type || "") : ""
-            font.pixelSize: 9
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.tiny
             font.bold: true
             color: Colors.foregroundMuted
             textFormat: Text.PlainText

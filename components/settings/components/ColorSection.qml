@@ -48,14 +48,15 @@ Rectangle {
             Text {
                 text: colorSection.icon
                 font.family: Fonts.icon
-                font.pixelSize: 16
+                font.pixelSize: Fonts.iconMedium
                 color: Colors.primary
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Text {
                 text: colorSection.title
-                font.pixelSize: 14
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.weight: Font.DemiBold
                 color: Colors.foreground
                 anchors.verticalCenter: parent.verticalCenter
@@ -75,7 +76,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: colorSection.collapsed ? "󰅂" : "󰅀"
                     font.family: Fonts.icon
-                    font.pixelSize: 14
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foregroundAlt
 
                     Behavior on text { PropertyAnimation { duration: 0 } }

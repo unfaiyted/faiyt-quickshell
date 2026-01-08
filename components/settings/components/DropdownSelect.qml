@@ -89,7 +89,8 @@ Item {
                 height: parent.height
                 verticalAlignment: Text.AlignVCenter
                 text: dropdown.currentLabel
-                font.pixelSize: 13
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.body
                 color: Colors.foreground
                 elide: Text.ElideRight
             }
@@ -102,7 +103,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 text: dropdown.popupOpen ? "󰅃" : "󰅀"
                 font.family: Fonts.icon
-                font.pixelSize: 12
+                font.pixelSize: Fonts.iconSmall
                 color: Colors.foregroundAlt
             }
         }

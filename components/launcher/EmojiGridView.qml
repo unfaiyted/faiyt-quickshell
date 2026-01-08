@@ -103,7 +103,8 @@ Item {
                         id: tooltipText
                         anchors.centerIn: parent
                         text: modelData?.title || ""
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                     }
                 }

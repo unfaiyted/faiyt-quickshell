@@ -255,7 +255,7 @@ Item {
                             return "󰤯"
                         }
                         font.family: Fonts.icon
-                        font.pixelSize: 16
+                        font.pixelSize: Fonts.iconMedium
                         color: wifiPanel.enabled ? Colors.background : Colors.foregroundMuted
                     }
                 }
@@ -267,7 +267,8 @@ Item {
 
                     Text {
                         text: "Wi-Fi"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         font.bold: true
                         color: Colors.foreground
                     }
@@ -275,7 +276,8 @@ Item {
                     Text {
                         text: !wifiPanel.enabled ? "Off" :
                               wifiPanel.currentSsid !== "" ? wifiPanel.currentSsid : "Not connected"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                         elide: Text.ElideRight
                         width: 120
@@ -288,7 +290,8 @@ Item {
                 // Signal strength
                 Text {
                     text: wifiPanel.currentSignal + "%"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                     anchors.verticalCenter: parent.verticalCenter
                     visible: wifiPanel.currentSsid !== ""
@@ -342,7 +345,8 @@ Item {
 
             Text {
                 text: "Available Networks"
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 font.bold: true
                 color: Colors.foregroundAlt
                 anchors.verticalCenter: parent.verticalCenter
@@ -363,7 +367,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰑓"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
 
                     RotationAnimation on rotation {
@@ -414,13 +418,14 @@ Item {
                     Text {
                         text: "󰌾"
                         font.family: Fonts.icon
-                        font.pixelSize: 16
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.foreground
                     }
 
                     Text {
                         text: "Connect to " + wifiPanel.passwordSsid
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.bold: true
                         color: Colors.foreground
                     }
@@ -436,7 +441,8 @@ Item {
                         id: passwordField
                         anchors.fill: parent
                         anchors.margins: 10
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                         echoMode: TextInput.Password
                         clip: true
@@ -458,7 +464,8 @@ Item {
                         anchors.leftMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Password"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundMuted
                         visible: passwordField.text === ""
                     }
@@ -477,7 +484,8 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: "Cancel"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foreground
                         }
 
@@ -503,7 +511,8 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: "Connect"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.bold: true
                             color: wifiPanel.passwordInput !== "" ? Colors.background : Colors.foregroundMuted
                         }
@@ -557,14 +566,15 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰤭"
                             font.family: Fonts.icon
-                            font.pixelSize: 32
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: wifiPanel.enabled ? "No networks found" : "WiFi is off"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                         }
                     }
@@ -602,7 +612,7 @@ Item {
                                     return "󰤯"
                                 }
                                 font.family: Fonts.icon
-                                font.pixelSize: 18
+                                font.pixelSize: Fonts.xlarge
                                 color: isConnected ? Colors.primary : Colors.foreground
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -611,7 +621,7 @@ Item {
                             Text {
                                 text: "󰌾"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: network.secured
@@ -625,7 +635,8 @@ Item {
 
                                 Text {
                                     text: network.ssid
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     elide: Text.ElideRight
                                     width: parent.width
@@ -633,7 +644,8 @@ Item {
 
                                 Text {
                                     text: "Connected"
-                                    font.pixelSize: 10
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     color: Colors.success
                                     visible: isConnected
                                 }
@@ -642,7 +654,8 @@ Item {
                             // Signal percentage
                             Text {
                                 text: network.signal + "%"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 color: Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -658,7 +671,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰑓"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 14
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.primary
                                     visible: isConnecting
 
@@ -676,7 +689,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰄬"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 14
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.success
                                     visible: showSuccess
                                 }
@@ -686,7 +699,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰅖"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 14
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.error
                                     visible: showFailed
                                 }

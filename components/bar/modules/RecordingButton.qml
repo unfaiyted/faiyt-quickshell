@@ -27,7 +27,7 @@ Item {
         anchors.centerIn: parent
         // Video camera when idle, record dot when recording
         text: RecordingState.isRecording ? "󰑋" : "󰕧"
-        font.pixelSize: 14
+        font.pixelSize: Fonts.iconMedium
         font.family: Fonts.icon
         color: RecordingState.isRecording ? Colors.error :
                (mouseArea.containsMouse ? Colors.rose : Colors.foreground)
@@ -141,7 +141,8 @@ Item {
                 id: tooltipText
                 anchors.centerIn: parent
                 text: RecordingState.isRecording ? "Stop Recording" : "Screen Recording"
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foreground
             }
         }
@@ -216,7 +217,7 @@ Item {
                         Text {
                             text: RecordingState.recordingMode === "record" ? "󰄵" : "󰄱"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -224,7 +225,7 @@ Item {
                         Text {
                             text: "󰕧"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -232,7 +233,8 @@ Item {
                         Text {
                             text: "Standard"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -280,7 +282,7 @@ Item {
                         Text {
                             text: RecordingState.recordingMode === "record-hq" ? "󰄵" : "󰄱"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -288,7 +290,7 @@ Item {
                         Text {
                             text: "󰗃"
                             color: Colors.love
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -296,7 +298,8 @@ Item {
                         Text {
                             text: "High Quality"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -344,7 +347,7 @@ Item {
                         Text {
                             text: RecordingState.recordingMode === "record-gif" ? "󰄵" : "󰄱"
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -352,7 +355,7 @@ Item {
                         Text {
                             text: "󰵸"
                             color: Colors.foam
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -360,7 +363,8 @@ Item {
                         Text {
                             text: "GIF"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -403,7 +407,8 @@ Item {
                 Text {
                     text: "Record Target"
                     color: Colors.muted
-                    font.pixelSize: 10
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     leftPadding: 8
                     visible: MonitorsState.monitors.length > 0
                 }
@@ -427,7 +432,7 @@ Item {
                         Text {
                             text: "󰩭"
                             color: Colors.iris
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             font.family: Fonts.icon
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -435,7 +440,8 @@ Item {
                         Text {
                             text: "Selection"
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }

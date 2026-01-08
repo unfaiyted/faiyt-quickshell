@@ -28,15 +28,16 @@ Item {
 
                     Text {
                         text: "󰆦"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 16
+                        font.family: Fonts.icon
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "UI Scale"
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         font.weight: Font.DemiBold
                         color: Colors.foreground
                         anchors.verticalCenter: parent.verticalCenter
@@ -44,7 +45,8 @@ Item {
 
                     Text {
                         text: Math.round(ThemeService.fonts.scale * 100) + "%"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -53,7 +55,8 @@ Item {
                 Text {
                     width: parent.width
                     text: "Adjust the size of all text and icons in the interface"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                     wrapMode: Text.WordWrap
                 }
@@ -84,15 +87,16 @@ Item {
 
                     Text {
                         text: "󰛖"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 16
+                        font.family: Fonts.icon
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Font Families"
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         font.weight: Font.DemiBold
                         color: Colors.foreground
                         anchors.verticalCenter: parent.verticalCenter
@@ -102,7 +106,8 @@ Item {
                 Text {
                     width: parent.width
                     text: "Customize fonts for different parts of the interface"
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                     wrapMode: Text.WordWrap
                 }
@@ -121,8 +126,8 @@ Item {
 
                         Text {
                             text: "󰔟"
-                            font.family: "Symbols Nerd Font"
-                            font.pixelSize: 14
+                            font.family: Fonts.icon
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -137,7 +142,8 @@ Item {
 
                         Text {
                             text: "Loading fonts..."
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             color: Colors.foregroundAlt
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -212,15 +218,16 @@ Item {
 
                     Text {
                         text: "󰄬"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 16
+                        font.family: Fonts.icon
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Preview"
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         font.weight: Font.DemiBold
                         color: Colors.foreground
                         anchors.verticalCenter: parent.verticalCenter
@@ -250,7 +257,8 @@ Item {
 
                             Text {
                                 text: "UI Text"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 color: Colors.foregroundMuted
                             }
 
@@ -270,7 +278,8 @@ Item {
 
                             Text {
                                 text: "Monospace"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 color: Colors.foregroundMuted
                             }
 
@@ -301,7 +310,8 @@ Item {
 
                             Text {
                                 text: "Icons"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 color: Colors.foregroundMuted
                             }
 
@@ -324,7 +334,8 @@ Item {
 
                             Text {
                                 text: "Emoji"
-                                font.pixelSize: 10
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 color: Colors.foregroundMuted
                             }
 
@@ -357,15 +368,16 @@ Item {
 
                     Text {
                         text: "󰑓"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 14
+                        font.family: Fonts.icon
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Reset to Defaults"
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -428,8 +440,8 @@ Item {
             // Icon
             Text {
                 text: fontRow.icon
-                font.family: "Symbols Nerd Font"
-                font.pixelSize: 18
+                font.family: Fonts.icon
+                font.pixelSize: Fonts.iconLarge
                 color: Colors.primary
                 Layout.preferredWidth: 24
             }
@@ -441,14 +453,16 @@ Item {
 
                 Text {
                     text: fontRow.label
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     font.weight: Font.Medium
                     color: Colors.foreground
                 }
 
                 Text {
                     text: fontRow.description
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                 }
             }

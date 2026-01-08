@@ -93,8 +93,8 @@ Item {
                 Text {
                     width: parent.width
                     text: fontPicker.currentLabel
-                    font.pixelSize: 12
-                    font.family: fontPicker.currentValue !== "" ? fontPicker.currentValue : Qt.application.font.family
+                    font.pixelSize: Fonts.small
+                    font.family: fontPicker.currentValue !== "" ? fontPicker.currentValue : (Fonts.ui || Qt.application.font.family)
                     color: Colors.foreground
                     elide: Text.ElideRight
                 }
@@ -103,8 +103,8 @@ Item {
                     visible: fontPicker.showPreview && fontPicker.currentValue !== ""
                     width: parent.width
                     text: fontPicker.previewText
-                    font.pixelSize: 10
-                    font.family: fontPicker.currentValue !== "" ? fontPicker.currentValue : Qt.application.font.family
+                    font.pixelSize: Fonts.tiny
+                    font.family: fontPicker.currentValue !== "" ? fontPicker.currentValue : (Fonts.ui || Qt.application.font.family)
                     color: Colors.foregroundAlt
                     elide: Text.ElideRight
                 }
@@ -118,7 +118,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 text: fontPicker.popupOpen ? "󰅃" : "󰅀"
                 font.family: Fonts.icon
-                font.pixelSize: 12
+                font.pixelSize: Fonts.iconSmall
                 color: Colors.foregroundAlt
             }
         }

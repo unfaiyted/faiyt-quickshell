@@ -127,7 +127,8 @@ Item {
 
             Text {
                 text: "Output"
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 font.bold: true
                 color: Colors.foregroundAlt
                 anchors.verticalCenter: parent.verticalCenter
@@ -151,14 +152,15 @@ Item {
 
                     Text {
                         text: "Device"
-                        font.pixelSize: 10
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.tiny
                         color: Colors.foreground
                     }
 
                     Text {
                         text: "󰅀"
                         font.family: Fonts.icon
-                        font.pixelSize: 10
+                        font.pixelSize: Fonts.iconTiny
                         color: Colors.foreground
                     }
                 }
@@ -218,14 +220,15 @@ Item {
                             Text {
                                 text: isDefault ? "󰄬" : "󰝦"
                                 font.family: Fonts.icon
-                                font.pixelSize: 14
+                                font.pixelSize: Fonts.iconMedium
                                 color: isDefault ? Colors.primary : Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: getNodeName(device)
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foreground
                                 elide: Text.ElideRight
                                 width: parent.width - 30
@@ -288,7 +291,7 @@ Item {
                             anchors.centerIn: parent
                             text: getSpeakerIcon(Pipewire.defaultAudioSink)
                             font.family: Fonts.icon
-                            font.pixelSize: 18
+                            font.pixelSize: Fonts.xlarge
                             color: Colors.background
                         }
 
@@ -321,7 +324,8 @@ Item {
 
                         Text {
                             text: getNodeName(Pipewire.defaultAudioSink)
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foreground
                             elide: Text.ElideRight
                             width: parent.width
@@ -330,7 +334,8 @@ Item {
                         Text {
                             text: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio && Pipewire.defaultAudioSink.audio.muted
                                 ? "Muted" : volumePercent(Pipewire.defaultAudioSink) + "%"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -400,7 +405,8 @@ Item {
 
             Text {
                 text: "Input"
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 font.bold: true
                 color: Colors.foregroundAlt
                 anchors.verticalCenter: parent.verticalCenter
@@ -424,14 +430,15 @@ Item {
 
                     Text {
                         text: "Device"
-                        font.pixelSize: 10
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.tiny
                         color: Colors.foreground
                     }
 
                     Text {
                         text: "󰅀"
                         font.family: Fonts.icon
-                        font.pixelSize: 10
+                        font.pixelSize: Fonts.iconTiny
                         color: Colors.foreground
                     }
                 }
@@ -491,14 +498,15 @@ Item {
                             Text {
                                 text: isDefault ? "󰄬" : "󰝦"
                                 font.family: Fonts.icon
-                                font.pixelSize: 14
+                                font.pixelSize: Fonts.iconMedium
                                 color: isDefault ? Colors.foam : Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: getNodeName(device)
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: Colors.foreground
                                 elide: Text.ElideRight
                                 width: parent.width - 30
@@ -562,7 +570,7 @@ Item {
                             text: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio && Pipewire.defaultAudioSource.audio.muted
                                 ? "󰍭" : "󰍬"
                             font.family: Fonts.icon
-                            font.pixelSize: 18
+                            font.pixelSize: Fonts.xlarge
                             color: Colors.background
                         }
 
@@ -595,7 +603,8 @@ Item {
 
                         Text {
                             text: getNodeName(Pipewire.defaultAudioSource)
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foreground
                             elide: Text.ElideRight
                             width: parent.width
@@ -604,7 +613,8 @@ Item {
                         Text {
                             text: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio && Pipewire.defaultAudioSource.audio.muted
                                 ? "Muted" : volumePercent(Pipewire.defaultAudioSource) + "%"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -670,7 +680,8 @@ Item {
         // ═══════════════════════════════════════════════════════════
         Text {
             text: "Applications"
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             font.bold: true
             color: Colors.foregroundAlt
         }
@@ -707,14 +718,15 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰝚"
                             font.family: Fonts.icon
-                            font.pixelSize: 24
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "No audio streams"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                         }
                     }
@@ -759,7 +771,7 @@ Item {
                                             anchors.centerIn: parent
                                             text: IconService.getIcon(stream ? stream.name : "")
                                             font.family: Fonts.icon
-                                            font.pixelSize: 14
+                                            font.pixelSize: Fonts.iconMedium
                                             color: isMuted ? Colors.foregroundMuted : Colors.background
                                         }
 
@@ -787,7 +799,8 @@ Item {
                                     // App name
                                     Text {
                                         text: getNodeName(stream)
-                                        font.pixelSize: 11
+                                        font.family: Fonts.ui
+                                        font.pixelSize: Fonts.small
                                         color: Colors.foreground
                                         elide: Text.ElideRight
                                         width: parent.width - 120
@@ -797,7 +810,8 @@ Item {
                                     // Volume percentage
                                     Text {
                                         text: volumePercent(stream) + "%"
-                                        font.pixelSize: 10
+                                        font.family: Fonts.ui
+                                        font.pixelSize: Fonts.tiny
                                         color: Colors.foregroundAlt
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
@@ -818,14 +832,14 @@ Item {
                                             Text {
                                                 text: "󰕾"
                                                 font.family: Fonts.icon
-                                                font.pixelSize: 10
+                                                font.pixelSize: Fonts.iconTiny
                                                 color: Colors.foregroundAlt
                                             }
 
                                             Text {
                                                 text: "󰅀"
                                                 font.family: Fonts.icon
-                                                font.pixelSize: 8
+                                                font.pixelSize: Fonts.tiny
                                                 color: Colors.foregroundAlt
                                             }
                                         }
@@ -928,14 +942,15 @@ Item {
                                             Text {
                                                 text: isDefault ? "󰄬" : "󰝦"
                                                 font.family: Fonts.icon
-                                                font.pixelSize: 12
+                                                font.pixelSize: Fonts.iconSmall
                                                 color: isDefault ? Colors.primary : Colors.foregroundMuted
                                                 anchors.verticalCenter: parent.verticalCenter
                                             }
 
                                             Text {
                                                 text: getNodeName(sink)
-                                                font.pixelSize: 10
+                                                font.family: Fonts.ui
+                                                font.pixelSize: Fonts.tiny
                                                 color: Colors.foreground
                                                 elide: Text.ElideRight
                                                 width: parent.width - 30

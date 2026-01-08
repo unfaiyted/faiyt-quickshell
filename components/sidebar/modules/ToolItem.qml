@@ -110,7 +110,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: toolIcon
                         font.family: Fonts.icon
-                        font.pixelSize: 18
+                        font.pixelSize: Fonts.iconLarge
                         color: Colors.background
                     }
                 }
@@ -123,14 +123,16 @@ Rectangle {
 
                     Text {
                         text: toolName
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         font.bold: true
                         color: Colors.foreground
                     }
 
                     Text {
                         text: toolDescription
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                         elide: Text.ElideRight
                         width: parent.width
@@ -142,7 +144,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     text: expanded ? "󰅃" : "󰅀"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foregroundMuted
                 }
             }
@@ -172,7 +174,7 @@ Rectangle {
                     Text {
                         text: "󰑓"
                         font.family: Fonts.icon
-                        font.pixelSize: 16
+                        font.pixelSize: Fonts.iconMedium
                         color: Colors.primary
 
                         RotationAnimation on rotation {
@@ -186,7 +188,8 @@ Rectangle {
 
                     Text {
                         text: "Running..."
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                     }
                 }
@@ -198,7 +201,7 @@ Rectangle {
                     anchors.margins: 12
                     text: error ? error : result
                     font.family: Fonts.mono
-                    font.pixelSize: 11
+                    font.pixelSize: Fonts.small
                     color: error ? Colors.error : Colors.foreground
                     wrapMode: Text.WrapAnywhere
                     visible: !loading && (result || error)
@@ -220,7 +223,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: "󰆏"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foregroundMuted
                     }
 

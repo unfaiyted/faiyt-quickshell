@@ -65,7 +65,7 @@ Item {
                 Text {
                     text: "󰍉"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foregroundMuted
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -74,7 +74,8 @@ Item {
                     id: searchInput
                     width: parent.width - 30
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     color: Colors.foreground
                     clip: true
 
@@ -91,7 +92,8 @@ Item {
                     Text {
                         anchors.fill: parent
                         text: "Search tools..."
-                        font.pixelSize: 13
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
                         color: Colors.foregroundMuted
                         visible: !searchInput.text && !searchInput.activeFocus
                     }
@@ -129,13 +131,14 @@ Item {
                         Text {
                             text: modelData.icon
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: selectedCategory === modelData.id ? Colors.background : Colors.foreground
                         }
 
                         Text {
                             text: modelData.name
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             color: selectedCategory === modelData.id ? Colors.background : Colors.foreground
                             visible: parent.width > 50
                         }
@@ -200,14 +203,15 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰍉"
                             font.family: Fonts.icon
-                            font.pixelSize: 32
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "No tools found"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                         }
                     }

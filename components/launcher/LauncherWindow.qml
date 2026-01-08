@@ -411,7 +411,8 @@ PanelWindow {
                 Text {
                     anchors.centerIn: parent
                     text: "No results found"
-                    font.pixelSize: 14
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     color: Colors.foregroundMuted
                 }
             }
@@ -434,14 +435,16 @@ PanelWindow {
 
                         Text {
                             text: LauncherState.isGridMode ? "←↑↓→" : "↑↓"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.bold: true
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             text: "Navigate"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -452,14 +455,16 @@ PanelWindow {
 
                         Text {
                             text: "↵"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.bold: true
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             text: LauncherState.isGridMode ? "Copy" : "Open"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -470,14 +475,16 @@ PanelWindow {
 
                         Text {
                             text: "Esc"
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             font.bold: true
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             text: "Close"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -488,14 +495,16 @@ PanelWindow {
 
                         Text {
                             text: "C-;"
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             font.bold: true
                             color: HintNavigationService.active ? Colors.iris : Colors.foregroundMuted
                         }
 
                         Text {
                             text: "Hints"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: HintNavigationService.active ? Colors.iris : Colors.foregroundAlt
                         }
                     }

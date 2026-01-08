@@ -110,7 +110,7 @@ Rectangle {
                 property bool isGenerating: generateThumbnail.running || mkdirProcess.running || wallpaperItem.needsThumbnail
                 text: isGenerating ? "󰑓" : "󰋩"
                 font.family: Fonts.icon
-                font.pixelSize: isGenerating ? 24 : 32
+                font.pixelSize: isGenerating ? Fonts.iconHuge : Fonts.iconHuge
                 color: Colors.foregroundMuted
 
                 RotationAnimation on rotation {

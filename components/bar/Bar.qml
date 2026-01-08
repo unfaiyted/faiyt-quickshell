@@ -84,7 +84,7 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             text: IconService.getDistroIcon()
             font.family: Fonts.icon
-            font.pixelSize: 22
+            font.pixelSize: Fonts.iconLarge
             color: Colors.primary
             visible: ConfigService.barModuleDistroIcon
         }

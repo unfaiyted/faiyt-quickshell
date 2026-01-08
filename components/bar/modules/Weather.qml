@@ -259,14 +259,15 @@ BarGroup {
             visible: !weather.loading
             text: weather.getWeatherIcon(weather.currentWeather.conditionCode)
             font.family: Fonts.icon
-            font.pixelSize: 14
+            font.pixelSize: Fonts.iconMedium
             color: weather.getWeatherColor(weather.currentWeather.conditionCode)
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
             text: weather.loading ? "..." : weather.currentWeather.temp + "°"
-            font.pixelSize: 11
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: Colors.foreground
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -350,7 +351,7 @@ BarGroup {
                     Text {
                         text: weather.getWeatherIcon(weather.currentWeather.conditionCode)
                         font.family: Fonts.icon
-                        font.pixelSize: 32
+                        font.pixelSize: Fonts.iconHuge
                         color: weather.getWeatherColor(weather.currentWeather.conditionCode)
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -362,14 +363,16 @@ BarGroup {
                         Text {
                             text: weather.location
                             color: Colors.foreground
-                            font.pixelSize: 14
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.medium
                             font.bold: true
                         }
 
                         Text {
                             text: weather.currentWeather.condition
                             color: Colors.foregroundAlt
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                         }
                     }
                 }
@@ -390,7 +393,8 @@ BarGroup {
 
                         Text {
                             text: weather.currentWeather.temp + "°" + ConfigService.temperatureUnit
-                            font.pixelSize: 28
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.huge
                             font.bold: true
                             color: Colors.foreground
                             anchors.verticalCenter: parent.verticalCenter
@@ -399,7 +403,7 @@ BarGroup {
                         Text {
                             text: "󰆏"
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: tempRowArea.containsMouse ? Colors.primary : Colors.muted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -435,7 +439,8 @@ BarGroup {
                     visible: weather.currentWeather.feelsLike.length > 0
                     text: "Feels like " + weather.currentWeather.feelsLike + "°"
                     color: Colors.muted
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -460,12 +465,13 @@ BarGroup {
                         Text {
                             text: "󰖎"
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: Colors.foam
                         }
                         Text {
                             text: weather.currentWeather.humidity + "%"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -478,12 +484,13 @@ BarGroup {
                         Text {
                             text: "󰖝"
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: Colors.iris
                         }
                         Text {
                             text: weather.currentWeather.wind + " " + weather.currentWeather.windDir
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -496,12 +503,13 @@ BarGroup {
                         Text {
                             text: "󰖙"
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: Colors.gold
                         }
                         Text {
                             text: "UV " + weather.currentWeather.uvIndex
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -514,12 +522,13 @@ BarGroup {
                         Text {
                             text: "󰁕"
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: Colors.subtle
                         }
                         Text {
                             text: weather.currentWeather.pressure + " hPa"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -535,7 +544,8 @@ BarGroup {
                 // 3-Day Forecast
                 Text {
                     text: "3-Day Forecast"
-                    font.pixelSize: 10
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     font.bold: true
                     color: Colors.muted
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -561,7 +571,8 @@ BarGroup {
 
                                 Text {
                                     text: weather.getDayName(modelData.date)
-                                    font.pixelSize: 10
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     font.bold: true
                                     color: Colors.foreground
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -570,14 +581,15 @@ BarGroup {
                                 Text {
                                     text: weather.getWeatherIcon(modelData.conditionCode)
                                     font.family: Fonts.icon
-                                    font.pixelSize: 18
+                                    font.pixelSize: Fonts.xlarge
                                     color: weather.getWeatherColor(modelData.conditionCode)
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
 
                                 Text {
                                     text: modelData.high + "° / " + modelData.low + "°"
-                                    font.pixelSize: 10
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     color: Colors.foregroundAlt
                                     anchors.horizontalCenter: parent.horizontalCenter
                                 }
@@ -604,12 +616,13 @@ BarGroup {
                         Text {
                             text: "󰖛"
                             font.family: Fonts.icon
-                            font.pixelSize: 14
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.gold
                         }
                         Text {
                             text: weather.sunrise
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }
@@ -620,12 +633,13 @@ BarGroup {
                         Text {
                             text: "󰖚"
                             font.family: Fonts.icon
-                            font.pixelSize: 14
+                            font.pixelSize: Fonts.iconMedium
                             color: Colors.love
                         }
                         Text {
                             text: weather.sunset
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundAlt
                         }
                     }

@@ -103,7 +103,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰅁"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
                 }
 
@@ -134,7 +134,8 @@ Item {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: monthName(viewDate.getMonth()) + " " + viewDate.getFullYear()
-                        font.pixelSize: 14
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.medium
                         font.bold: true
                         color: Colors.foreground
                     }
@@ -159,7 +160,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰅂"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.foreground
                 }
 
@@ -190,7 +191,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰃭"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.primary
                 }
 
@@ -221,7 +222,8 @@ Item {
                 Text {
                     width: parent.width / 7
                     text: modelData
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     font.bold: true
                     color: Colors.foregroundMuted
                     horizontalAlignment: Text.AlignHCenter
@@ -249,7 +251,8 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: modelData.day
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.bold: modelData.today
                         color: modelData.today ? Colors.background :
                                modelData.current ? Colors.foreground : Colors.foregroundMuted
@@ -285,7 +288,7 @@ Item {
                 Text {
                     text: "󰥔"
                     font.family: Fonts.icon
-                    font.pixelSize: 20
+                    font.pixelSize: Fonts.iconLarge
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -297,14 +300,16 @@ Item {
                     Text {
                         id: timeText
                         text: Qt.formatTime(currentDate, "hh:mm:ss")
-                        font.pixelSize: 16
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.large
                         font.bold: true
                         color: Colors.foreground
                     }
 
                     Text {
                         text: Qt.formatDate(currentDate, "dddd, MMMM d")
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                     }
                 }

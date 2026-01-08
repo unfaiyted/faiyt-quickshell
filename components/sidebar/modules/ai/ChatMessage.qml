@@ -39,7 +39,7 @@ Rectangle {
                 anchors.centerIn: parent
                 text: role === "user" ? "󰀄" : "󰧑"
                 font.family: Fonts.icon
-                font.pixelSize: 14
+                font.pixelSize: Fonts.iconMedium
                 color: Colors.background
             }
         }
@@ -53,7 +53,8 @@ Rectangle {
             // Role label
             Text {
                 text: role === "user" ? "You" : "Claude"
-                font.pixelSize: 10
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 font.bold: true
                 color: role === "user"
                     ? Colors.primary
@@ -73,7 +74,8 @@ Rectangle {
             // Timestamp
             Text {
                 text: formatTime(timestamp)
-                font.pixelSize: 9
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.tiny
                 color: Colors.foregroundMuted
                 visible: !isStreaming
             }

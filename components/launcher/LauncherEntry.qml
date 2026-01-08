@@ -30,7 +30,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             text: ""
             font.family: Fonts.icon
-            font.pixelSize: 18
+            font.pixelSize: Fonts.iconLarge
             color: Colors.foregroundMuted
         }
 
@@ -50,7 +50,8 @@ Rectangle {
                 height: parent.height
 
                 text: LauncherState.searchText
-                font.pixelSize: 16
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.large
                 color: Colors.foreground
                 selectionColor: Colors.primary
                 selectedTextColor: Colors.background
@@ -97,7 +98,8 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     verticalAlignment: Text.AlignVCenter
                     text: "Search apps, commands, files..."
-                    font.pixelSize: 16
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.large
                     color: Colors.foregroundMuted
                     visible: searchField.text.length === 0
                 }
@@ -244,7 +246,8 @@ Rectangle {
                             id: copiedText
                             visible: showCopied
                             text: "Copied!"
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.bold: true
                             color: Colors.success
                             anchors.verticalCenter: parent.verticalCenter
@@ -255,7 +258,8 @@ Rectangle {
                             id: evalDisplay
                             visible: !showCopied && LauncherState.evalResult
                             text: LauncherState.evalResult ? LauncherState.evalResult.value : ""
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
                             elide: Text.ElideMiddle
@@ -304,7 +308,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: "󰅖"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foregroundMuted
                     }
 

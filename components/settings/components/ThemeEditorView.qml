@@ -90,7 +90,8 @@ Item {
 
                         Text {
                             text: "Display Name"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.weight: Font.DemiBold
                             color: Colors.foregroundAlt
                         }
@@ -107,7 +108,8 @@ Item {
                                 id: displayNameInput
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                font.pixelSize: 14
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.medium
                                 color: Colors.foreground
                                 text: editorView.theme?.displayName || ""
                                 selectByMouse: true
@@ -128,7 +130,8 @@ Item {
 
                         Text {
                             text: "Description"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.weight: Font.DemiBold
                             color: Colors.foregroundAlt
                         }
@@ -145,7 +148,8 @@ Item {
                                 id: descriptionInput
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                font.pixelSize: 14
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.medium
                                 color: Colors.foreground
                                 text: editorView.theme?.description || ""
                                 selectByMouse: true

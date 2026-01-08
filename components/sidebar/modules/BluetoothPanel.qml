@@ -31,7 +31,8 @@ Item {
 
             Text {
                 text: "Bluetooth"
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 font.bold: true
                 color: Colors.foregroundAlt
                 anchors.verticalCenter: parent.verticalCenter
@@ -55,14 +56,15 @@ Item {
 
                     Text {
                         text: "Adapter"
-                        font.pixelSize: 10
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.tiny
                         color: Colors.foreground
                     }
 
                     Text {
                         text: "󰅀"
                         font.family: Fonts.icon
-                        font.pixelSize: 10
+                        font.pixelSize: Fonts.iconTiny
                         color: Colors.foreground
                     }
                 }
@@ -122,7 +124,7 @@ Item {
                             Text {
                                 text: isSelected ? "󰄬" : "󰝦"
                                 font.family: Fonts.icon
-                                font.pixelSize: 14
+                                font.pixelSize: Fonts.iconMedium
                                 color: isSelected ? Colors.primary : Colors.foregroundMuted
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -133,7 +135,8 @@ Item {
 
                                 Text {
                                     text: adapterItem.name
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     elide: Text.ElideRight
                                     width: adaptersList.width - 50
@@ -141,7 +144,8 @@ Item {
 
                                 Text {
                                     text: adapterItem.powered ? "Powered on" : "Powered off"
-                                    font.pixelSize: 9
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     color: adapterItem.powered ? Colors.success : Colors.foregroundMuted
                                 }
                             }
@@ -196,7 +200,7 @@ Item {
                         anchors.centerIn: parent
                         text: bluetoothPanel.powered ? "󰂯" : "󰂲"
                         font.family: Fonts.icon
-                        font.pixelSize: 16
+                        font.pixelSize: Fonts.iconMedium
                         color: bluetoothPanel.powered ? Colors.background : Colors.foregroundMuted
                     }
                 }
@@ -209,7 +213,8 @@ Item {
 
                     Text {
                         text: bluetoothPanel.currentAdapter ? bluetoothPanel.currentAdapter.name : "No adapter"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                         elide: Text.ElideRight
                         width: parent.width
@@ -219,7 +224,8 @@ Item {
                         property int connectedCount: bluetoothPanel.devices.filter(d => d.connected).length
                         text: !bluetoothPanel.powered ? "Off" :
                               connectedCount > 0 ? connectedCount + " connected" : "Ready"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                     }
                 }
@@ -291,7 +297,8 @@ Item {
 
                     Text {
                         text: "My Devices"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.bold: true
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
@@ -312,7 +319,7 @@ Item {
                             anchors.centerIn: parent
                             text: "󰑓"
                             font.family: Fonts.icon
-                            font.pixelSize: 16
+                            font.pixelSize: Fonts.iconMedium
                             color: bluetoothPanel.scanning ? Colors.primary : Colors.foreground
 
                             RotationAnimation on rotation {
@@ -350,7 +357,8 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: "No paired devices"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundMuted
                     }
                 }
@@ -405,7 +413,7 @@ Item {
                                         return "󰂯"
                                     }
                                     font.family: Fonts.icon
-                                    font.pixelSize: 16
+                                    font.pixelSize: Fonts.iconMedium
                                     color: device.connected ? Colors.background : Colors.foreground
                                 }
                             }
@@ -418,7 +426,8 @@ Item {
 
                                 Text {
                                     text: device.name
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     elide: Text.ElideRight
                                     width: parent.width
@@ -435,7 +444,8 @@ Item {
                                         }
                                         return "Paired"
                                     }
-                                    font.pixelSize: 10
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     color: device.connected ? Colors.success : Colors.foregroundMuted
                                 }
                             }
@@ -450,7 +460,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰑓"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 16
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.primary
                                     visible: isConnecting
 
@@ -467,7 +477,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰄬"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 16
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.success
                                     visible: device.connected && !isConnecting
                                 }
@@ -511,7 +521,8 @@ Item {
 
                     Text {
                         text: "Available Devices"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.bold: true
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
@@ -520,7 +531,7 @@ Item {
                     Text {
                         text: "󰑓"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
 
@@ -543,7 +554,8 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: "Searching for devices..."
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundMuted
                     }
                 }
@@ -598,7 +610,7 @@ Item {
                                         return "󰂯"
                                     }
                                     font.family: Fonts.icon
-                                    font.pixelSize: 16
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.foreground
                                 }
                             }
@@ -611,7 +623,8 @@ Item {
 
                                 Text {
                                     text: device.name
-                                    font.pixelSize: 12
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     elide: Text.ElideRight
                                     width: parent.width
@@ -619,7 +632,8 @@ Item {
 
                                 Text {
                                     text: isPairing ? "Pairing..." : "Tap to pair"
-                                    font.pixelSize: 10
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.tiny
                                     color: Colors.foregroundMuted
                                 }
                             }
@@ -634,7 +648,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: "󰑓"
                                     font.family: Fonts.icon
-                                    font.pixelSize: 16
+                                    font.pixelSize: Fonts.iconMedium
                                     color: Colors.primary
                                     visible: isPairing
 
@@ -682,14 +696,15 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰂲"
                             font.family: Fonts.icon
-                            font.pixelSize: 32
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Bluetooth is off"
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foregroundMuted
                         }
                     }

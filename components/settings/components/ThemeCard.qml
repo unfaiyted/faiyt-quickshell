@@ -67,7 +67,7 @@ Rectangle {
             Text {
                 text: themeData?.icon || "󰏘"
                 font.family: Fonts.icon
-                font.pixelSize: 24
+                font.pixelSize: Fonts.iconHuge
                 color: Colors.foreground
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -79,7 +79,8 @@ Rectangle {
 
                 Text {
                     text: themeData?.displayName || "Unknown Theme"
-                    font.pixelSize: 15
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.medium
                     font.weight: Font.DemiBold
                     color: Colors.foreground
                     elide: Text.ElideRight
@@ -88,7 +89,8 @@ Rectangle {
 
                 Text {
                     text: themeData?.description || ""
-                    font.pixelSize: 13
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.body
                     color: Colors.foregroundAlt
                     elide: Text.ElideRight
                     width: parent.width
@@ -102,7 +104,7 @@ Rectangle {
                 visible: themeCard.isActive
                 text: "󰄬"
                 font.family: Fonts.icon
-                font.pixelSize: 20
+                font.pixelSize: Fonts.iconLarge
                 color: Colors.primary
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -150,14 +152,15 @@ Rectangle {
                     Text {
                         text: "󰆏"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Duplicate"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foregroundAlt
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -196,14 +199,15 @@ Rectangle {
                     Text {
                         text: "󰏫"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Edit"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.primary
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -243,14 +247,15 @@ Rectangle {
                     Text {
                         text: "󰆴"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.error
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Text {
                         text: "Delete"
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.error
                         anchors.verticalCenter: parent.verticalCenter
                     }

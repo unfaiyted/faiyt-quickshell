@@ -110,7 +110,8 @@ Item {
                     id: tooltipText
                     anchors.centerIn: parent
                     text: Math.round(scaleSlider.scaleValue * 100) + "%"
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     font.weight: Font.Medium
                     color: Colors.foreground
                 }
@@ -150,7 +151,8 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: modelData.label
-                        font.pixelSize: 12
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         font.weight: scaleSlider.scaleValue === modelData.value ? Font.Medium : Font.Normal
                         color: scaleSlider.scaleValue === modelData.value ? Colors.primary : Colors.foregroundAlt
                     }

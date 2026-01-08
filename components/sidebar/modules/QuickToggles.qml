@@ -446,7 +446,7 @@ Item {
                 Text {
                     text: toggleBtn.icon
                     font.family: Fonts.icon
-                    font.pixelSize: 18
+                    font.pixelSize: Fonts.iconLarge
                     color: toggleBtn.active ? toggleBtn.activeColor : Colors.foregroundAlt
 
                     Behavior on color {
@@ -456,7 +456,8 @@ Item {
 
                 Text {
                     text: toggleBtn.label
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     font.bold: true
                     color: toggleBtn.active ? Colors.foreground : Colors.foregroundAlt
 
@@ -485,7 +486,8 @@ Item {
                     id: tooltipText
                     anchors.centerIn: parent
                     text: toggleBtn.tooltip
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foreground
                 }
             }

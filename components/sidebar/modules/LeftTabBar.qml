@@ -79,7 +79,7 @@ Item {
                                 text: tabBar.tabData[index] ? tabBar.tabData[index].icon : ""
                                 color: tabButton.isActive ? Colors.accent : Colors.foregroundAlt
                                 font.family: Fonts.icon
-                                font.pixelSize: 14
+                                font.pixelSize: Fonts.iconMedium
 
                                 Behavior on color {
                                     ColorAnimation { duration: 150 }
@@ -91,7 +91,8 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: tabBar.tabData[index] ? tabBar.tabData[index].label : ""
                                 color: tabButton.isActive ? Colors.accent : Colors.foregroundAlt
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 font.weight: tabButton.isActive ? Font.DemiBold : Font.Normal
 
                                 Behavior on color {

@@ -34,7 +34,7 @@ Item {
                 anchors.centerIn: parent
                 text: AIState.conversationSidebarOpen ? "󰧛" : "󰧜"
                 font.family: Fonts.icon
-                font.pixelSize: 16
+                font.pixelSize: Fonts.iconMedium
                 color: Colors.foreground
             }
 
@@ -71,14 +71,15 @@ Item {
                 Text {
                     text: "󰧑"
                     font.family: Fonts.icon
-                    font.pixelSize: 12
+                    font.pixelSize: Fonts.iconSmall
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Text {
                     text: formatModelName(AIState.getCurrentModel())
-                    font.pixelSize: 11
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foreground
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -86,7 +87,7 @@ Item {
                 Text {
                     text: "󰅀"
                     font.family: Fonts.icon
-                    font.pixelSize: 8
+                    font.pixelSize: Fonts.iconTiny
                     color: Colors.foregroundMuted
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -139,7 +140,8 @@ Item {
                                 anchors.leftMargin: 8
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: formatModelName(modelData)
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 color: modelData === AIState.getCurrentModel() ? Colors.primary : Colors.foreground
                                 font.weight: modelData === AIState.getCurrentModel() ? Font.DemiBold : Font.Normal
                             }
@@ -192,7 +194,8 @@ Item {
                 const conv = AIState.activeConversation
                 return (conv && conv.name) ? conv.name : "New Conversation"
             }
-            font.pixelSize: 11
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: Colors.foregroundAlt
             elide: Text.ElideRight
         }
@@ -211,7 +214,7 @@ Item {
                 anchors.centerIn: parent
                 text: "󰃢"
                 font.family: Fonts.icon
-                font.pixelSize: 14
+                font.pixelSize: Fonts.iconMedium
                 color: clearArea.containsMouse ? Colors.error : Colors.foregroundMuted
             }
 
@@ -245,7 +248,7 @@ Item {
                 anchors.centerIn: parent
                 text: "󰐕"
                 font.family: Fonts.icon
-                font.pixelSize: 14
+                font.pixelSize: Fonts.iconMedium
                 color: newChatArea.containsMouse ? Colors.background : Colors.foreground
             }
 

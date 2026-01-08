@@ -36,14 +36,15 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "󰭻"
                 font.family: Fonts.icon
-                font.pixelSize: 56
+                font.pixelSize: Fonts.iconHuge
                 color: Colors.foregroundMuted
             }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: AIState.hasApiKey() ? "Start a conversation" : "API Key Required"
-                font.pixelSize: 15
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.medium
                 font.bold: true
                 color: Colors.foreground
             }
@@ -53,7 +54,8 @@ Item {
                 text: AIState.hasApiKey()
                     ? "Type a message below to begin"
                     : "Go to Settings tab to add your API key"
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foregroundMuted
             }
         }
@@ -112,7 +114,7 @@ Item {
                     id: spinnerIcon
                     text: "󰑓"
                     font.family: Fonts.icon
-                    font.pixelSize: 16
+                    font.pixelSize: Fonts.iconMedium
                     color: Colors.primary
                     anchors.verticalCenter: parent.verticalCenter
 
@@ -127,7 +129,8 @@ Item {
 
                 Text {
                     text: "Thinking..."
-                    font.pixelSize: 12
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.small
                     color: Colors.foregroundAlt
                     anchors.verticalCenter: parent.verticalCenter
                 }

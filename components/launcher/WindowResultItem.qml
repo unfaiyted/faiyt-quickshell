@@ -66,7 +66,7 @@ Rectangle {
                 visible: !windowPreview.captureSource
                 text: result ? (result.icon || "󰖯") : "󰖯"
                 font.family: Fonts.icon
-                font.pixelSize: 24
+                font.pixelSize: Fonts.iconHuge
                 color: Colors.foregroundMuted
             }
 
@@ -90,7 +90,8 @@ Rectangle {
             Text {
                 width: parent.width
                 text: result ? (result.title || "Untitled") : ""
-                font.pixelSize: 13
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.body
                 font.bold: isSelected
                 color: Colors.foreground
                 elide: Text.ElideRight
@@ -100,7 +101,8 @@ Rectangle {
             Text {
                 width: parent.width
                 text: result ? (result.description || "") : ""
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foregroundAlt
                 elide: Text.ElideRight
                 visible: text.length > 0
@@ -122,7 +124,8 @@ Rectangle {
                     let ws = result?.data?.winData?.workspace?.id
                     return ws !== undefined ? ws.toString() : "?"
                 }
-                font.pixelSize: 12
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 font.bold: true
                 color: isSelected ? Colors.background : Colors.foreground
             }
@@ -144,7 +147,8 @@ Rectangle {
             id: typeBadgeText
             anchors.centerIn: parent
             text: "window"
-            font.pixelSize: 9
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.tiny
             font.bold: true
             color: Colors.foregroundMuted
         }

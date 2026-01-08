@@ -42,7 +42,8 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: "All"
-                    font.pixelSize: 10
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
                     font.bold: true
                     color: packBar.selectedPackId === "" ? Colors.iris : Colors.foreground
                 }
@@ -90,7 +91,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: modelData.coverEmoji || "📦"
-                        font.pixelSize: 18
+                        font.pixelSize: Fonts.iconLarge
                         font.family: Fonts.emoji
                     }
 
@@ -134,7 +135,8 @@ Item {
                             id: packTooltipText
                             anchors.centerIn: parent
                             text: modelData.name || "Sticker Pack"
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             color: Colors.foreground
                         }
                     }

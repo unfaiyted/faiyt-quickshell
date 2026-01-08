@@ -156,7 +156,8 @@ BarGroup {
         anchors.centerIn: parent
         text: clockContainer.currentTime
         color: Colors.foreground
-        font.pixelSize: 12
+        font.family: Fonts.ui
+        font.pixelSize: Fonts.small
         font.bold: true
     }
 
@@ -246,7 +247,8 @@ BarGroup {
                         Text {
                             text: clockContainer.fullDate
                             color: Colors.foreground
-                            font.pixelSize: 12
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.bold: true
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -254,7 +256,7 @@ BarGroup {
                         Text {
                             text: "󰆏"
                             font.family: Fonts.icon
-                            font.pixelSize: 10
+                            font.pixelSize: Fonts.iconTiny
                             color: dateRowArea.containsMouse ? Colors.primary : Colors.muted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -303,7 +305,7 @@ BarGroup {
                         Text {
                             text: "󰥔"
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
                             color: Colors.primary
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -311,14 +313,16 @@ BarGroup {
                         Text {
                             text: "Local"
                             color: Colors.foregroundAlt
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             text: clockContainer.fullTime
                             color: Colors.foreground
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             font.bold: true
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -326,7 +330,7 @@ BarGroup {
                         Text {
                             text: "󰆏"
                             font.family: Fonts.icon
-                            font.pixelSize: 10
+                            font.pixelSize: Fonts.iconTiny
                             color: localTimeArea.containsMouse ? Colors.primary : Colors.muted
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -374,7 +378,7 @@ BarGroup {
                             Text {
                                 text: "󰗶"
                                 font.family: Fonts.icon
-                                font.pixelSize: 12
+                                font.pixelSize: Fonts.iconSmall
                                 color: Colors.foam
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -382,7 +386,8 @@ BarGroup {
                             Text {
                                 text: modelData.label
                                 color: Colors.foregroundAlt
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 width: 80
                                 elide: Text.ElideRight
                                 anchors.verticalCenter: parent.verticalCenter
@@ -391,14 +396,16 @@ BarGroup {
                             Text {
                                 text: clockContainer.getTimezoneOffset(modelData.id)
                                 color: Colors.muted
-                                font.pixelSize: 9
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: clockContainer.getTimeInTimezone(modelData.id)
                                 color: Colors.foreground
-                                font.pixelSize: 11
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.small
                                 font.bold: true
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -406,7 +413,7 @@ BarGroup {
                             Text {
                                 text: "󰆏"
                                 font.family: Fonts.icon
-                                font.pixelSize: 10
+                                font.pixelSize: Fonts.iconTiny
                                 color: tzArea.containsMouse ? Colors.primary : Colors.muted
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -463,14 +470,15 @@ BarGroup {
                         Text {
                             text: "Unix: " + clockContainer.timestamp
                             color: Colors.muted
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             text: "󰆏"
                             font.family: Fonts.icon
-                            font.pixelSize: 10
+                            font.pixelSize: Fonts.iconTiny
                             color: timestampArea.containsMouse ? Colors.primary : Colors.muted
                             anchors.verticalCenter: parent.verticalCenter
                         }

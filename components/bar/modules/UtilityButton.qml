@@ -24,7 +24,7 @@ Item {
     Text {
         anchors.centerIn: parent
         text: utilBtn.icon
-        font.pixelSize: 14
+        font.pixelSize: Fonts.iconMedium
         font.family: Fonts.icon
         color: mouseArea.containsMouse ? Colors.rose : Colors.foreground
     }
@@ -96,7 +96,8 @@ Item {
                 id: tooltipText
                 anchors.centerIn: parent
                 text: utilBtn.tooltip
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 color: Colors.foreground
             }
         }

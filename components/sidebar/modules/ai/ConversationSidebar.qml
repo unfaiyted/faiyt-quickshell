@@ -47,7 +47,8 @@ Item {
                 anchors.leftMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Conversations"
-                font.pixelSize: 11
+                font.family: Fonts.ui
+                font.pixelSize: Fonts.small
                 font.bold: true
                 color: Colors.foregroundAlt
             }
@@ -67,7 +68,7 @@ Item {
                     anchors.centerIn: parent
                     text: "󰐕"
                     font.family: Fonts.icon
-                    font.pixelSize: 12
+                    font.pixelSize: Fonts.iconSmall
                     color: newConvArea.containsMouse ? Colors.primary : Colors.foregroundMuted
                 }
 
@@ -145,7 +146,8 @@ Item {
                                 Text {
                                     width: parent.width - 20
                                     text: modelData.name || "Untitled"
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     font.weight: modelData.id === AIState.activeConversationId ? Font.DemiBold : Font.Normal
                                     color: modelData.id === AIState.activeConversationId ? Colors.primary : Colors.foreground
                                     elide: Text.ElideRight
@@ -156,7 +158,8 @@ Item {
                                     id: renameInput
                                     width: parent.width - 20
                                     text: modelData.name || ""
-                                    font.pixelSize: 11
+                                    font.family: Fonts.ui
+                                    font.pixelSize: Fonts.small
                                     color: Colors.foreground
                                     visible: convItem.isEditing
                                     selectByMouse: true
@@ -202,7 +205,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: "󰇙"
                                         font.family: Fonts.icon
-                                        font.pixelSize: 10
+                                        font.pixelSize: Fonts.iconTiny
                                         color: Colors.foregroundMuted
                                     }
 
@@ -230,7 +233,8 @@ Item {
                                     const time = formatRelativeTime(modelData.updatedAt)
                                     return count + " messages • " + time
                                 }
-                                font.pixelSize: 9
+                                font.family: Fonts.ui
+                                font.pixelSize: Fonts.tiny
                                 color: Colors.foregroundMuted
                             }
                         }
@@ -284,14 +288,15 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "󰍉"
                             font.family: Fonts.icon
-                            font.pixelSize: 24
+                            font.pixelSize: Fonts.iconHuge
                             color: Colors.foregroundMuted
                         }
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "No conversations"
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             color: Colors.foregroundMuted
                         }
                     }
@@ -359,14 +364,15 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "󰏫"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: Colors.foreground
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Rename"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: Colors.foreground
                     }
                 }
@@ -400,14 +406,15 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "󰆴"
                         font.family: Fonts.icon
-                        font.pixelSize: 12
+                        font.pixelSize: Fonts.iconSmall
                         color: deleteArea.containsMouse ? Colors.error : Colors.foreground
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Delete"
-                        font.pixelSize: 11
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
                         color: deleteArea.containsMouse ? Colors.error : Colors.foreground
                     }
                 }

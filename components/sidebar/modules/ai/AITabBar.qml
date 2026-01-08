@@ -62,7 +62,7 @@ Item {
                             text: tabBar.tabData[index] ? tabBar.tabData[index].icon : ""
                             color: tabButton.isActive ? Colors.primary : Colors.foregroundAlt
                             font.family: Fonts.icon
-                            font.pixelSize: 12
+                            font.pixelSize: Fonts.iconSmall
 
                             Behavior on color {
                                 ColorAnimation { duration: 100 }
@@ -74,7 +74,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: tabBar.tabData[index] ? tabBar.tabData[index].label : ""
                             color: tabButton.isActive ? Colors.primary : Colors.foregroundAlt
-                            font.pixelSize: 9
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             font.weight: tabButton.isActive ? Font.DemiBold : Font.Normal
                             visible: tabBar.tabData.length <= 5  // Hide labels if too many tabs
 

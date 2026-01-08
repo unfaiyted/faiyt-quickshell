@@ -38,7 +38,8 @@ Rectangle {
         anchors.leftMargin: 12
         anchors.rightMargin: 12
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 13
+        font.family: Fonts.ui
+        font.pixelSize: Fonts.body
         color: Colors.foreground
         selectByMouse: true
         clip: true
@@ -50,7 +51,8 @@ Rectangle {
             anchors.fill: parent
             verticalAlignment: Text.AlignVCenter
             text: settingsTextInput.placeholder
-            font.pixelSize: 13
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.body
             color: Colors.foregroundMuted
             visible: inputField.text.length === 0 && !inputField.activeFocus
         }

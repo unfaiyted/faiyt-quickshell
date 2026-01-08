@@ -162,7 +162,7 @@ BarGroup {
                 visible: !musicModule.isPlaying
                 anchors.verticalCenter: parent.verticalCenter
                 text: "󰏤"
-                font.pixelSize: 12
+                font.pixelSize: Fonts.iconSmall
                 font.family: Fonts.icon
                 color: Colors.foreground
             }
@@ -179,7 +179,8 @@ BarGroup {
                 }
                 return t
             }
-            font.pixelSize: 12
+            font.family: Fonts.ui
+            font.pixelSize: Fonts.small
             color: Colors.foreground
         }
     }
@@ -329,7 +330,7 @@ BarGroup {
                         Text {
                             anchors.centerIn: parent
                             text: "󰎆"
-                            font.pixelSize: 32
+                            font.pixelSize: Fonts.iconHuge
                             font.family: Fonts.icon
                             color: Colors.muted
                             visible: albumArt.status !== Image.Ready
@@ -345,7 +346,8 @@ BarGroup {
                         Text {
                             text: musicModule.trackTitle
                             color: Colors.foreground
-                            font.pixelSize: 13
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.body
                             font.bold: true
                             elide: Text.ElideRight
                             width: parent.width
@@ -355,7 +357,8 @@ BarGroup {
                             visible: musicModule.trackArtist.length > 0
                             text: musicModule.trackArtist
                             color: Colors.foregroundAlt
-                            font.pixelSize: 11
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.small
                             elide: Text.ElideRight
                             width: parent.width
                         }
@@ -364,7 +367,8 @@ BarGroup {
                             visible: musicModule.trackAlbum.length > 0
                             text: musicModule.trackAlbum
                             color: Colors.muted
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                             elide: Text.ElideRight
                             width: parent.width
                         }
@@ -460,14 +464,16 @@ BarGroup {
                             anchors.left: parent.left
                             text: musicModule.formatTime(musicModule.position)
                             color: Colors.muted
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                         }
 
                         Text {
                             anchors.right: parent.right
                             text: musicModule.formatTime(musicModule.length)
                             color: Colors.muted
-                            font.pixelSize: 10
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
                         }
                     }
                 }
@@ -489,7 +495,7 @@ BarGroup {
                         Text {
                             anchors.centerIn: parent
                             text: "󰒮"
-                            font.pixelSize: 16
+                            font.pixelSize: Fonts.iconMedium
                             font.family: Fonts.icon
                             color: Colors.foreground
                         }
@@ -529,7 +535,7 @@ BarGroup {
                         Text {
                             anchors.centerIn: parent
                             text: musicModule.isPlaying ? "󰏤" : "󰐊"
-                            font.pixelSize: 20
+                            font.pixelSize: Fonts.iconLarge
                             font.family: Fonts.icon
                             color: playArea.containsMouse ? Colors.background : Colors.foreground
                         }
@@ -570,7 +576,7 @@ BarGroup {
                         Text {
                             anchors.centerIn: parent
                             text: "󰒭"
-                            font.pixelSize: 16
+                            font.pixelSize: Fonts.iconMedium
                             font.family: Fonts.icon
                             color: Colors.foreground
                         }
