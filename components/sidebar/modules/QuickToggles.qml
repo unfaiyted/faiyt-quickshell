@@ -16,10 +16,12 @@ Item {
     property bool bluetoothEnabled: false
     property bool idleInhibited: false
     property bool micMuted: false
-    property bool nightLightEnabled: false
     property bool vpnConnected: false
     property bool focusModeEnabled: false
     property bool powerSaverEnabled: false
+
+    // Night light state comes from NightLightService
+    property bool nightLightEnabled: NightLightService.nightLightEnabled
 
     // Store previous bar mode for focus mode restore
     property string previousBarMode: "normal"
@@ -77,29 +79,7 @@ Item {
         }
     }
 
-    // Check Night Light status (hyprsunset running)
-    Process {
-        id: nightLightStatusProcess
-        command: ["pgrep", "-x", "hyprsunset"]
-        running: true
-        property bool foundProcess: false
-
-        stdout: SplitParser {
-            onRead: data => {
-                // pgrep outputs PID if process is found
-                if (data.trim().length > 0) {
-                    nightLightStatusProcess.foundProcess = true
-                }
-            }
-        }
-
-        onRunningChanged: {
-            if (!running) {
-                quickToggles.nightLightEnabled = foundProcess
-                foundProcess = false  // Reset for next check
-            }
-        }
-    }
+    // Night Light is now managed by NightLightService
 
     // Check VPN status
     Process {
@@ -166,28 +146,6 @@ Item {
         running: quickToggles.idleInhibited || quickToggles.focusModeEnabled
     }
 
-    // Toggle Night Light ON
-    Process {
-        id: nightLightOnProcess
-        command: ["hyprsunset", "-t", ConfigService.quickToggleNightTemp.toString()]
-        onRunningChanged: {
-            if (!running) {
-                nightLightStatusProcess.running = true
-            }
-        }
-    }
-
-    // Toggle Night Light OFF
-    Process {
-        id: nightLightOffProcess
-        command: ["pkill", "-x", "hyprsunset"]
-        onRunningChanged: {
-            if (!running) {
-                nightLightStatusProcess.running = true
-            }
-        }
-    }
-
     // Toggle VPN ON
     Process {
         id: vpnOnProcess
@@ -230,7 +188,7 @@ Item {
             wifiStatusProcess.running = true
             btStatusProcess.running = true
             micStatusProcess.running = true
-            nightLightStatusProcess.running = true
+            // Night Light status is managed by NightLightService
             if (ConfigService.quickToggleVpnName) {
                 vpnStatusProcess.running = true
             }
@@ -342,13 +300,8 @@ Item {
                 tooltip: quickToggles.nightLightEnabled ? "Disable Night Light" : "Enable Night Light (" + ConfigService.quickToggleNightTemp + "K)"
                 activeColor: Colors.gold
                 onClicked: {
-                    if (quickToggles.nightLightEnabled) {
-                        quickToggles.nightLightEnabled = false  // Optimistic update
-                        nightLightOffProcess.running = true
-                    } else {
-                        quickToggles.nightLightEnabled = true  // Optimistic update
-                        nightLightOnProcess.running = true
-                    }
+                    // Use NightLightService for toggle - handles auto mode override tracking
+                    NightLightService.onManualToggle(!quickToggles.nightLightEnabled)
                 }
             }
 

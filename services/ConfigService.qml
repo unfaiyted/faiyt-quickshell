@@ -164,7 +164,13 @@ Singleton {
                 showFocusMode: false,      // Off by default
                 showPowerSaver: false,     // Off by default
                 vpnConnectionName: "",     // User configures
-                nightLightTemp: 4500       // Kelvin temperature
+                nightLightTemp: 4500,      // Kelvin temperature
+                nightLight: {
+                    autoEnabled: false,          // Master toggle for auto scheduling
+                    startTime: "20:00",          // When to enable (24h format)
+                    endTime: "06:00",            // When to disable (24h format)
+                    manuallyDisabledUntil: null  // ISO timestamp of next window start
+                }
             }
         },
 
@@ -413,6 +419,12 @@ Singleton {
     property string quickToggleVpnName: config.sidebar?.quickToggles?.vpnConnectionName ?? ""
     property int quickToggleNightTemp: config.sidebar?.quickToggles?.nightLightTemp ?? 4500
 
+    // Night Light auto-scheduling convenience properties
+    property bool nightLightAutoEnabled: config.sidebar?.quickToggles?.nightLight?.autoEnabled ?? false
+    property string nightLightStartTime: config.sidebar?.quickToggles?.nightLight?.startTime ?? "20:00"
+    property string nightLightEndTime: config.sidebar?.quickToggles?.nightLight?.endTime ?? "06:00"
+    property var nightLightManuallyDisabledUntil: config.sidebar?.quickToggles?.nightLight?.manuallyDisabledUntil ?? null
+
     // Sticker convenience properties
     property bool stickersEnabled: config.stickers?.enabled !== false
     property var stickerPacks: config.stickers?.packs || []
@@ -529,6 +541,12 @@ Singleton {
         quickTogglePowerSaver = config.sidebar?.quickToggles?.showPowerSaver ?? false
         quickToggleVpnName = config.sidebar?.quickToggles?.vpnConnectionName ?? ""
         quickToggleNightTemp = config.sidebar?.quickToggles?.nightLightTemp ?? 4500
+
+        // Night Light auto-scheduling
+        nightLightAutoEnabled = config.sidebar?.quickToggles?.nightLight?.autoEnabled ?? false
+        nightLightStartTime = config.sidebar?.quickToggles?.nightLight?.startTime ?? "20:00"
+        nightLightEndTime = config.sidebar?.quickToggles?.nightLight?.endTime ?? "06:00"
+        nightLightManuallyDisabledUntil = config.sidebar?.quickToggles?.nightLight?.manuallyDisabledUntil ?? null
 
         // Stickers
         stickersEnabled = config.stickers?.enabled !== false

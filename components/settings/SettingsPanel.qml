@@ -1448,6 +1448,102 @@ Rectangle {
                                 }
                             }
                         }
+
+                        // Auto Night Mode subsection
+                        CollapsibleSection {
+                            visible: contentColumn.matchesSearch("night light") ||
+                                     contentColumn.matchesSearch("auto") ||
+                                     contentColumn.matchesSearch("schedule")
+                            title: "Auto Night Mode"
+                            icon: "󰔄"
+
+                            SettingRow {
+                                visible: contentColumn.matchesSearch("night light") ||
+                                         contentColumn.matchesSearch("auto") ||
+                                         contentColumn.matchesSearch("schedule")
+                                label: "Enable Auto Mode"
+                                description: "Automatically enable night light on schedule"
+
+                                ToggleSwitch {
+                                    checked: ConfigService.nightLightAutoEnabled
+                                    onToggled: (value) => {
+                                        ConfigService.setValue("sidebar.quickToggles.nightLight.autoEnabled", value)
+                                        ConfigService.saveConfig()
+                                    }
+                                }
+                            }
+
+                            SettingRow {
+                                visible: ConfigService.nightLightAutoEnabled && (
+                                         contentColumn.matchesSearch("night light") ||
+                                         contentColumn.matchesSearch("start") ||
+                                         contentColumn.matchesSearch("schedule"))
+                                label: "Start Time"
+                                description: "When to enable night light (24h format)"
+
+                                SettingsTextInput {
+                                    text: ConfigService.nightLightStartTime
+                                    placeholder: "20:00"
+                                    onTextEdited: (value) => {
+                                        // Validate 24h time format
+                                        if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
+                                            ConfigService.setValue("sidebar.quickToggles.nightLight.startTime", value)
+                                            ConfigService.saveConfig()
+                                        }
+                                    }
+                                }
+                            }
+
+                            SettingRow {
+                                visible: ConfigService.nightLightAutoEnabled && (
+                                         contentColumn.matchesSearch("night light") ||
+                                         contentColumn.matchesSearch("end") ||
+                                         contentColumn.matchesSearch("schedule"))
+                                label: "End Time"
+                                description: "When to disable night light (24h format)"
+
+                                SettingsTextInput {
+                                    text: ConfigService.nightLightEndTime
+                                    placeholder: "06:00"
+                                    onTextEdited: (value) => {
+                                        // Validate 24h time format
+                                        if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
+                                            ConfigService.setValue("sidebar.quickToggles.nightLight.endTime", value)
+                                            ConfigService.saveConfig()
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Status indicator
+                            SettingRow {
+                                visible: ConfigService.nightLightAutoEnabled
+                                label: "Current Status"
+                                description: NightLightService.isInWindow ? "Currently in scheduled window" : "Outside scheduled window"
+
+                                Rectangle {
+                                    width: statusText.width + 16
+                                    height: 24
+                                    radius: 6
+                                    color: NightLightService.isInWindow
+                                        ? Qt.rgba(Colors.gold.r, Colors.gold.g, Colors.gold.b, 0.15)
+                                        : Qt.rgba(Colors.surface.r, Colors.surface.g, Colors.surface.b, 0.3)
+                                    border.width: 1
+                                    border.color: NightLightService.isInWindow
+                                        ? Qt.rgba(Colors.gold.r, Colors.gold.g, Colors.gold.b, 0.3)
+                                        : Qt.rgba(Colors.border.r, Colors.border.g, Colors.border.b, 0.15)
+
+                                    Text {
+                                        id: statusText
+                                        anchors.centerIn: parent
+                                        text: NightLightService.isInWindow ? "󱩌 Active" : "󰖨 Inactive"
+                                        font.family: Fonts.icon
+                                        font.pixelSize: Fonts.small
+                                        color: NightLightService.isInWindow ? Colors.gold : Colors.foregroundMuted
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
