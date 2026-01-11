@@ -7,12 +7,74 @@ import Quickshell.Services.Notifications
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import "../overview"
+import "../../services" as Services
 
 Singleton {
     id: root
 
     property bool doNotDisturb: false
     property list<Notif> notifications
+
+    // Persisted notifications (restored from history)
+    property var persistedNotifications: []
+
+    // Combined list for sidebar: live tracked + persisted-only
+    readonly property var allNotifications: {
+        let combined = []
+        let liveIds = new Set()
+
+        // First add all live tracked notifications
+        if (server.trackedNotifications && server.trackedNotifications.values) {
+            for (let notif of server.trackedNotifications.values) {
+                combined.push({
+                    id: notif.historyId || "",
+                    notification: notif,
+                    isLive: true,
+                    isPersisted: false,
+                    summary: notif.summary,
+                    body: notif.body,
+                    appName: notif.appName,
+                    appIcon: notif.appIcon,
+                    image: notif.image,
+                    urgency: notif.urgency,
+                    actions: notif.actions,
+                    time: notif.time,
+                    dismiss: () => {
+                        notif.tracked = false
+                        notif.dismiss()
+                    }
+                })
+                // Track by content for deduplication
+                liveIds.add(notif.appName + "|" + notif.summary + "|" + notif.body)
+            }
+        }
+
+        // Then add persisted notifications that aren't live
+        for (let persisted of persistedNotifications) {
+            let key = persisted.appName + "|" + persisted.summary + "|" + persisted.body
+            if (!liveIds.has(key)) {
+                combined.push({
+                    id: persisted.id,
+                    notification: null,
+                    isLive: false,
+                    isPersisted: true,
+                    summary: persisted.summary,
+                    body: persisted.body,
+                    appName: persisted.appName,
+                    appIcon: persisted.appIcon,
+                    image: persisted.image,
+                    urgency: persisted.urgency,
+                    actions: [],
+                    time: new Date(persisted.timestamp),
+                    dismiss: () => {
+                        Services.NotificationHistoryService.removeNotification(persisted.id)
+                    }
+                })
+            }
+        }
+
+        return combined
+    }
 
     // Default timeout settings
     readonly property int defaultTimeoutMs: 5000
@@ -30,6 +92,17 @@ Singleton {
         onNotification: notification => {
             notification.tracked = true
 
+            // Persist the notification to history
+            const historyId = Services.NotificationHistoryService.addNotification({
+                appName: notification.appName,
+                summary: notification.summary,
+                body: notification.body,
+                appIcon: notification.appIcon,
+                image: notification.image,
+                urgency: notification.urgency
+            })
+            notification.historyId = historyId
+
             // Skip popups if DND is enabled (but still track)
             if (root.doNotDisturb) return
 
@@ -42,6 +115,27 @@ Singleton {
 
     // Expose tracked notifications for sidebar
     property alias trackedNotifications: server.trackedNotifications
+
+    // Load persisted notifications on startup
+    Connections {
+        target: Services.NotificationHistoryService
+        function onNotificationsLoaded() {
+            root.persistedNotifications = Services.NotificationHistoryService.notifications
+        }
+        function onNotificationAdded(notification) {
+            root.persistedNotifications = Services.NotificationHistoryService.notifications
+        }
+        function onNotificationRemoved(id) {
+            root.persistedNotifications = Services.NotificationHistoryService.notifications
+        }
+    }
+
+    Component.onCompleted: {
+        // If history is already loaded, sync it
+        if (Services.NotificationHistoryService.isLoaded) {
+            persistedNotifications = Services.NotificationHistoryService.notifications
+        }
+    }
 
     // Notification wrapper component
     component Notif: QtObject {
@@ -64,6 +158,10 @@ Singleton {
         }
 
         function dismiss() {
+            // Remove from history if it has a history ID
+            if (notification.historyId) {
+                Services.NotificationHistoryService.removeNotification(notification.historyId)
+            }
             notification.dismiss()
             remove()
         }
@@ -103,14 +201,17 @@ Singleton {
 
     // Helper functions
     function count() {
-        return server.trackedNotifications.values.length
+        return allNotifications.length
     }
 
     function clearAll() {
+        // Clear live notifications
         let notifs = server.trackedNotifications.values
         for (let i = notifs.length - 1; i >= 0; i--) {
             notifs[i].dismiss()
         }
+        // Clear persisted history
+        Services.NotificationHistoryService.clearAll()
     }
 
     function clearPopups() {

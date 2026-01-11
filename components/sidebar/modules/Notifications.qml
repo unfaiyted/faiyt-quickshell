@@ -21,10 +21,9 @@ Item {
         NotificationState.clearAll()
     }
 
-    // Helper to dismiss a single notification
+    // Helper to dismiss a single notification (works with both live and persisted)
     function dismissNotification(notification) {
-        if (notification) {
-            notification.tracked = false
+        if (notification && notification.dismiss) {
             notification.dismiss()
         }
     }
@@ -211,7 +210,7 @@ Item {
                 spacing: 8
 
                 Repeater {
-                    model: NotificationState.trackedNotifications
+                    model: NotificationState.allNotifications
 
                     Rectangle {
                         id: notifItem
@@ -220,6 +219,8 @@ Item {
                         radius: 12
                         color: notifArea.containsMouse ? Colors.overlay : Colors.surface
                         clip: true
+                        // Subtle visual difference for restored notifications
+                        opacity: modelData.isPersisted ? 0.85 : 1.0
 
                         property var notification: modelData
                         property bool expanded: false
@@ -259,7 +260,7 @@ Item {
                                     width: 36
                                     height: 36
                                     radius: 8
-                                    color: Colors.primary
+                                    color: notification.isPersisted ? Colors.foregroundMuted : Colors.primary
 
                                     Text {
                                         anchors.centerIn: parent
@@ -267,6 +268,26 @@ Item {
                                         font.family: Fonts.icon
                                         font.pixelSize: Fonts.xlarge
                                         color: Colors.background
+                                    }
+
+                                    // Restored indicator badge
+                                    Rectangle {
+                                        visible: notification.isPersisted
+                                        width: 12
+                                        height: 12
+                                        radius: 6
+                                        color: Colors.warning
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        anchors.margins: -2
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "󰁪"
+                                            font.family: Fonts.icon
+                                            font.pixelSize: 8
+                                            color: Colors.background
+                                        }
                                     }
                                 }
 

@@ -16,3 +16,5 @@ singleton RequirementsService 1.0 RequirementsService.qml
 singleton BrightnessService 1.0 BrightnessService.qml
 singleton KeyboardBacklightService 1.0 KeyboardBacklightService.qml
 singleton BookmarkService 1.0 BookmarkService.qml
+singleton NotificationHistoryService 1.0 NotificationHistoryService.qml
+singleton NightLightService 1.0 NightLightService.qml

@@ -83,6 +83,8 @@ All services are singletons registered in `services/qmldir`:
 | BrightnessService | Screen brightness control via brightnessctl/sysfs |
 | KeyboardBacklightService | Keyboard backlight control via sysfs |
 | BookmarkService | Browser bookmark loading with favicon caching |
+| NightLightService | Automatic night light scheduling via hyprsunset |
+| NotificationHistoryService | Notification persistence to survive shell reloads |
 
 ### State Singletons
 Component-specific state is managed by singletons within each component directory:
