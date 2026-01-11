@@ -287,12 +287,18 @@ Item {
         id: powerMenu
         anchor.window: QsWindow.window
         anchor.onAnchoring: {
-            const pos = powerBtn.mapToItem(QsWindow.window.contentItem, 0, powerBtn.height)
-            anchor.rect = Qt.rect(pos.x - 120, pos.y + 4, powerBtn.width, 1)
+            // Get button position in window coordinates
+            const pos = powerBtn.mapToItem(QsWindow.window.contentItem, 0, 0)
+            const menuWidth = 176
+            // Position at button's x (right-aligned) and below button's bottom
+            anchor.rect = Qt.rect(
+                pos.x + powerBtn.width - menuWidth,
+                pos.y + powerBtn.height + 8,
+                menuWidth,
+                1
+            )
         }
-        anchor.edges: Edges.Top
-        anchor.gravity: Edges.Top
-        anchorItem: powerBtn
+        anchor.edges: Edges.Top | Edges.Left
     }
 
     // Bottom border
