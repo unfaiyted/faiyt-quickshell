@@ -163,7 +163,9 @@ Singleton {
             quickToggles: {
                 showFocusMode: false,      // Off by default
                 showPowerSaver: false,     // Off by default
-                vpnConnectionName: "",     // User configures
+                vpnConnectionName: "",     // User configures (for nmcli)
+                vpnType: "auto",           // "auto" | "nmcli" | "wg-quick"
+                vpnInterface: "wg0",       // Interface name for wg-quick
                 nightLightTemp: 4500,      // Kelvin temperature
                 nightLight: {
                     autoEnabled: false,          // Master toggle for auto scheduling
@@ -417,6 +419,8 @@ Singleton {
     property bool quickToggleFocusMode: config.sidebar?.quickToggles?.showFocusMode ?? false
     property bool quickTogglePowerSaver: config.sidebar?.quickToggles?.showPowerSaver ?? false
     property string quickToggleVpnName: config.sidebar?.quickToggles?.vpnConnectionName ?? ""
+    property string quickToggleVpnType: config.sidebar?.quickToggles?.vpnType ?? "auto"
+    property string quickToggleVpnInterface: config.sidebar?.quickToggles?.vpnInterface ?? "wg0"
     property int quickToggleNightTemp: config.sidebar?.quickToggles?.nightLightTemp ?? 4500
 
     // Night Light auto-scheduling convenience properties
@@ -540,6 +544,8 @@ Singleton {
         quickToggleFocusMode = config.sidebar?.quickToggles?.showFocusMode ?? false
         quickTogglePowerSaver = config.sidebar?.quickToggles?.showPowerSaver ?? false
         quickToggleVpnName = config.sidebar?.quickToggles?.vpnConnectionName ?? ""
+        quickToggleVpnType = config.sidebar?.quickToggles?.vpnType ?? "auto"
+        quickToggleVpnInterface = config.sidebar?.quickToggles?.vpnInterface ?? "wg0"
         quickToggleNightTemp = config.sidebar?.quickToggles?.nightLightTemp ?? 4500
 
         // Night Light auto-scheduling

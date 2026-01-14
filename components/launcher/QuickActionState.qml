@@ -22,6 +22,7 @@ Singleton {
     property bool micMuted: false
     property bool nightLightEnabled: false
     property bool vpnConnected: false
+    property string detectedVpnType: ""  // "nmcli" or "wg-quick"
     property bool caffeineEnabled: false
     property bool dndEnabled: Notifications.NotificationState.doNotDisturb
 
@@ -109,21 +110,43 @@ Singleton {
         }
     }
 
+    // VPN status (NetworkManager)
     Process {
         id: vpnStatusProcess
         command: ["nmcli", "-t", "-f", "NAME,TYPE,STATE", "connection", "show", "--active"]
-        running: ConfigService.quickToggleVpnName !== ""
+        running: ConfigService.quickToggleVpnType !== "wg-quick"
         property string vpnName: ConfigService.quickToggleVpnName
         stdout: SplitParser {
             onRead: data => {
                 if (vpnStatusProcess.vpnName && data.includes(vpnStatusProcess.vpnName) && data.includes("activated")) {
                     root.vpnConnected = true
+                    root.detectedVpnType = "nmcli"
                 }
             }
         }
         onRunningChanged: {
-            if (!running && !vpnConnected) {
+            if (!running && !vpnConnected && ConfigService.quickToggleVpnType === "nmcli") {
                 root.vpnConnected = false
+            }
+        }
+    }
+
+    // VPN status (WireGuard wg-quick interface)
+    Process {
+        id: wgStatusProcess
+        command: ["ip", "link", "show", ConfigService.quickToggleVpnInterface]
+        running: ConfigService.quickToggleVpnType !== "nmcli"
+        onRunningChanged: {
+            if (!running) {
+                if (exitCode === 0) {
+                    root.vpnConnected = true
+                    root.detectedVpnType = "wg-quick"
+                } else if (ConfigService.quickToggleVpnType === "wg-quick") {
+                    root.vpnConnected = false
+                    root.detectedVpnType = ""
+                } else if (ConfigService.quickToggleVpnType === "auto" && !root.vpnConnected) {
+                    root.detectedVpnType = ""
+                }
             }
         }
     }
@@ -138,7 +161,17 @@ Singleton {
             btStatusProcess.running = true
             micStatusProcess.running = true
             nightLightStatusProcess.running = true
-            if (ConfigService.quickToggleVpnName) {
+
+            // VPN status check based on type config
+            const vpnType = ConfigService.quickToggleVpnType
+            if (vpnType === "auto") {
+                wgStatusProcess.running = true
+                if (ConfigService.quickToggleVpnName) {
+                    vpnStatusProcess.running = true
+                }
+            } else if (vpnType === "wg-quick") {
+                wgStatusProcess.running = true
+            } else if (vpnType === "nmcli" && ConfigService.quickToggleVpnName) {
                 vpnStatusProcess.running = true
             }
         }
@@ -178,16 +211,37 @@ Singleton {
         onRunningChanged: { if (!running) nightLightStatusProcess.running = true }
     }
 
+    // VPN ON (NetworkManager)
     Process {
         id: vpnOnProcess
         command: ["nmcli", "connection", "up", ConfigService.quickToggleVpnName]
         onRunningChanged: { if (!running) vpnStatusProcess.running = true }
     }
 
+    // VPN OFF (NetworkManager)
     Process {
         id: vpnOffProcess
         command: ["nmcli", "connection", "down", ConfigService.quickToggleVpnName]
         onRunningChanged: { if (!running) root.vpnConnected = false }
+    }
+
+    // VPN ON (WireGuard wg-quick with pkexec)
+    Process {
+        id: wgOnProcess
+        command: ["pkexec", "wg-quick", "up", ConfigService.quickToggleVpnInterface]
+        onRunningChanged: { if (!running) wgStatusProcess.running = true }
+    }
+
+    // VPN OFF (WireGuard wg-quick with pkexec)
+    Process {
+        id: wgOffProcess
+        command: ["pkexec", "wg-quick", "down", ConfigService.quickToggleVpnInterface]
+        onRunningChanged: {
+            if (!running) {
+                root.vpnConnected = false
+                root.detectedVpnType = ""
+            }
+        }
     }
 
     // Idle inhibitor process (keeps running while inhibited)
@@ -224,11 +278,30 @@ Singleton {
     }
 
     function toggleVpn() {
-        if (!ConfigService.quickToggleVpnName) return
+        const vpnType = ConfigService.quickToggleVpnType
+        const hasNmcli = ConfigService.quickToggleVpnName !== ""
+        const hasWg = ConfigService.quickToggleVpnInterface !== ""
+
+        if (!hasNmcli && !hasWg) return
+
+        const useWgQuick = vpnType === "wg-quick" ||
+                          (vpnType === "auto" && detectedVpnType === "wg-quick") ||
+                          (vpnType === "auto" && !vpnConnected && hasWg)
+
         if (vpnConnected) {
-            vpnOffProcess.running = true
+            // Disconnect
+            if (useWgQuick || detectedVpnType === "wg-quick") {
+                wgOffProcess.running = true
+            } else {
+                vpnOffProcess.running = true
+            }
         } else {
-            vpnOnProcess.running = true
+            // Connect - prefer wg-quick in auto mode if interface is configured
+            if (useWgQuick) {
+                wgOnProcess.running = true
+            } else if (hasNmcli) {
+                vpnOnProcess.running = true
+            }
         }
     }
 

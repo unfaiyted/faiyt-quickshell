@@ -1418,8 +1418,33 @@ Rectangle {
                         }
 
                         SettingRow {
-                            visible: contentColumn.matchesSearch("vpn")
-                            label: "VPN Connection"
+                            visible: contentColumn.matchesSearch("vpn") || contentColumn.matchesSearch("wireguard")
+                            label: "VPN Type"
+                            description: "VPN management method"
+
+                            DropdownSelect {
+                                model: [
+                                    {label: "Auto (detect)", value: "auto"},
+                                    {label: "NetworkManager", value: "nmcli"},
+                                    {label: "WireGuard (wg-quick)", value: "wg-quick"}
+                                ]
+                                currentIndex: {
+                                    const t = ConfigService.quickToggleVpnType
+                                    if (t === "nmcli") return 1
+                                    if (t === "wg-quick") return 2
+                                    return 0
+                                }
+                                onSelected: (index, value) => {
+                                    ConfigService.setValue("sidebar.quickToggles.vpnType", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: (contentColumn.matchesSearch("vpn") || contentColumn.matchesSearch("networkmanager")) &&
+                                     ConfigService.quickToggleVpnType !== "wg-quick"
+                            label: "VPN Connection Name"
                             description: "NetworkManager VPN connection name"
 
                             SettingsTextInput {
@@ -1427,6 +1452,22 @@ Rectangle {
                                 placeholder: "my-vpn"
                                 onTextEdited: (value) => {
                                     ConfigService.setValue("sidebar.quickToggles.vpnConnectionName", value)
+                                    ConfigService.saveConfig()
+                                }
+                            }
+                        }
+
+                        SettingRow {
+                            visible: (contentColumn.matchesSearch("vpn") || contentColumn.matchesSearch("wireguard") || contentColumn.matchesSearch("wg0")) &&
+                                     ConfigService.quickToggleVpnType !== "nmcli"
+                            label: "WireGuard Interface"
+                            description: "Interface name for wg-quick (e.g., wg0)"
+
+                            SettingsTextInput {
+                                text: ConfigService.quickToggleVpnInterface
+                                placeholder: "wg0"
+                                onTextEdited: (value) => {
+                                    ConfigService.setValue("sidebar.quickToggles.vpnInterface", value)
                                     ConfigService.saveConfig()
                                 }
                             }
