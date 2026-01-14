@@ -73,6 +73,8 @@ Singleton {
         // Quick Toggles (Optional)
         { name: "hyprsunset", category: "Quick Toggles", required: false, description: "Night light" },
         { name: "powerprofilesctl", category: "Quick Toggles", required: false, description: "Power profiles" },
+        { name: "wg-quick", category: "Quick Toggles", required: false, description: "WireGuard VPN" },
+        { name: "pkexec", category: "Quick Toggles", required: false, description: "Privilege escalation for VPN" },
 
         // Wallpaper (Optional)
         { name: "swww", category: "Wallpaper", required: false, description: "Animated wallpapers" },

@@ -116,6 +116,8 @@ declare -A ARCH_PACKAGES=(
     # Quick Toggles
     ["hyprsunset"]="hyprsunset"
     ["powerprofilesctl"]="power-profiles-daemon"
+    ["wg-quick"]="wireguard-tools"
+    ["pkexec"]="polkit"
 
     # Wallpaper
     ["swww"]="swww"
@@ -193,6 +195,8 @@ declare -A FEDORA_PACKAGES=(
     # Quick Toggles
     ["hyprsunset"]="hyprsunset"
     ["powerprofilesctl"]="power-profiles-daemon"
+    ["wg-quick"]="wireguard-tools"
+    ["pkexec"]="polkit"
 
     # Wallpaper
     ["swww"]="swww"
@@ -233,7 +237,7 @@ OPTIONAL_TOOLS=(
     "openssl" "python3"
     "sqlite3"
     "fc-list"
-    "hyprsunset" "powerprofilesctl"
+    "hyprsunset" "powerprofilesctl" "wg-quick" "pkexec"
     "swww"
     "kitty" "tmux"
     "notify-send"

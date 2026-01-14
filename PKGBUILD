@@ -68,6 +68,8 @@ optdepends=(
     # Quick toggles
     'hyprsunset: Night light / blue light filter'
     'power-profiles-daemon: Power profile switching'
+    'wireguard-tools: WireGuard VPN support (wg-quick)'
+    'polkit: Privilege escalation for VPN toggle (pkexec)'
 
     # Wallpaper
     'swww: Animated wallpaper daemon'

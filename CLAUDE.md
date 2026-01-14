@@ -203,7 +203,7 @@ GPU indicators auto-hide if nvidia-smi is not available.
 
 **Core:** QuickShell, Hyprland, Symbols Nerd Font, wl-clipboard, Pipewire
 **Screen Capture:** grim, slurp, wf-recorder, hyprpicker, napkin (annotation)
-**Quick Toggles:** hyprsunset (night light), powerprofilesctl
+**Quick Toggles:** hyprsunset (night light), powerprofilesctl, wireguard-tools (WireGuard VPN)
 **Brightness:** brightnessctl (for screen and keyboard backlight control)
 **GPU Monitoring:** nvidia-utils (provides nvidia-smi for NVIDIA GPUs)
 **Music:** cava (visualization)
