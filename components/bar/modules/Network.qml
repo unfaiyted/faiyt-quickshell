@@ -39,6 +39,25 @@ BarGroup {
                               gatewayLinkArea.containsMouse ||
                               publicIpMouseArea.containsMouse
 
+    // IPC handler for external refresh triggers
+    IpcHandler {
+        target: "network"
+
+        function refreshVpn() {
+            vpnProcess.running = true
+        }
+
+        function refreshPublicIp() {
+            geoProcess.running = true
+        }
+
+        function refresh() {
+            netProcess.running = true
+            vpnProcess.running = true
+            geoProcess.running = true
+        }
+    }
+
     // Clipboard process
     Process {
         id: copyProcess
@@ -102,10 +121,11 @@ BarGroup {
         }
     }
 
-    // VPN detection process
+    // VPN detection process (checks both NetworkManager and wg-quick interfaces)
     Process {
         id: vpnProcess
-        command: ["bash", "-c", "nmcli -t -f TYPE,NAME con show --active | grep -E '^(vpn|wireguard):' | head -1"]
+        // First try nmcli for NM-managed VPNs, then check for WireGuard interfaces
+        command: ["bash", "-c", "nmcli -t -f TYPE,NAME con show --active 2>/dev/null | grep -E '^(vpn|wireguard):' | head -1 || ip link show type wireguard 2>/dev/null | grep -oP '^\\d+: \\K[^:]+' | head -1 | xargs -I{} echo 'wg-quick:{}'"]
         running: true
 
         property string outputBuffer: ""
@@ -118,7 +138,7 @@ BarGroup {
 
         onRunningChanged: {
             if (!running) {
-                if (outputBuffer.length > 0) {
+                if (outputBuffer.length > 0 && outputBuffer.includes(":")) {
                     const parts = outputBuffer.split(":")
                     network.isVpn = true
                     network.vpnName = parts.length > 1 ? parts[1] : "VPN"

@@ -20,6 +20,9 @@ Item {
     property bool focusModeEnabled: false
     property bool powerSaverEnabled: false
 
+    // VPN type detection (for auto mode): "nmcli" or "wg-quick"
+    property string detectedVpnType: ""
+
     // Night light state comes from NightLightService
     property bool nightLightEnabled: NightLightService.nightLightEnabled
 
@@ -81,25 +84,51 @@ Item {
 
     // Night Light is now managed by NightLightService
 
-    // Check VPN status
+    // Check VPN status (NetworkManager)
     Process {
         id: vpnStatusProcess
         command: ["nmcli", "-t", "-f", "NAME,TYPE,STATE", "connection", "show", "--active"]
-        running: true
+        running: ConfigService.quickToggleVpnType !== "wg-quick"
         property string vpnName: ConfigService.quickToggleVpnName
 
         stdout: SplitParser {
             onRead: data => {
                 if (vpnStatusProcess.vpnName && data.includes(vpnStatusProcess.vpnName) && data.includes("activated")) {
                     quickToggles.vpnConnected = true
+                    quickToggles.detectedVpnType = "nmcli"
                 }
             }
         }
 
         onRunningChanged: {
-            if (!running && !vpnConnected) {
-                // Reset if no match found
+            if (!running && !vpnConnected && ConfigService.quickToggleVpnType === "nmcli") {
+                // Reset if no match found (only in nmcli-only mode)
                 quickToggles.vpnConnected = false
+            }
+        }
+    }
+
+    // Check VPN status (WireGuard wg-quick interface)
+    Process {
+        id: wgStatusProcess
+        command: ["ip", "link", "show", ConfigService.quickToggleVpnInterface]
+        running: ConfigService.quickToggleVpnType !== "nmcli"
+
+        onRunningChanged: {
+            if (!running) {
+                // exitCode 0 = interface exists = connected
+                // exitCode != 0 = interface doesn't exist = disconnected
+                if (exitCode === 0) {
+                    quickToggles.vpnConnected = true
+                    quickToggles.detectedVpnType = "wg-quick"
+                } else if (ConfigService.quickToggleVpnType === "wg-quick") {
+                    // Only reset if wg-quick only mode
+                    quickToggles.vpnConnected = false
+                    quickToggles.detectedVpnType = ""
+                } else if (ConfigService.quickToggleVpnType === "auto" && !quickToggles.vpnConnected) {
+                    // In auto mode, if wg check failed and vpn not connected via nmcli, reset
+                    quickToggles.detectedVpnType = ""
+                }
             }
         }
     }
@@ -146,26 +175,71 @@ Item {
         running: quickToggles.idleInhibited || quickToggles.focusModeEnabled
     }
 
-    // Toggle VPN ON
+    // Toggle VPN ON (NetworkManager)
     Process {
         id: vpnOnProcess
         command: ["nmcli", "connection", "up", ConfigService.quickToggleVpnName]
         onRunningChanged: {
             if (!running) {
                 vpnStatusProcess.running = true
+                // Notify bar network module to refresh after delay
+                networkRefreshTimer.restart()
             }
         }
     }
 
-    // Toggle VPN OFF
+    // Toggle VPN OFF (NetworkManager)
     Process {
         id: vpnOffProcess
         command: ["nmcli", "connection", "down", ConfigService.quickToggleVpnName]
         onRunningChanged: {
             if (!running) {
                 quickToggles.vpnConnected = false
+                // Notify bar network module to refresh after delay
+                networkRefreshTimer.restart()
             }
         }
+    }
+
+    // Toggle VPN ON (WireGuard wg-quick with pkexec)
+    Process {
+        id: wgOnProcess
+        command: ["pkexec", "wg-quick", "up", ConfigService.quickToggleVpnInterface]
+        onRunningChanged: {
+            if (!running) {
+                wgStatusProcess.running = true
+                // Notify bar network module to refresh after delay
+                networkRefreshTimer.restart()
+            }
+        }
+    }
+
+    // Toggle VPN OFF (WireGuard wg-quick with pkexec)
+    Process {
+        id: wgOffProcess
+        command: ["pkexec", "wg-quick", "down", ConfigService.quickToggleVpnInterface]
+        onRunningChanged: {
+            if (!running) {
+                quickToggles.vpnConnected = false
+                quickToggles.detectedVpnType = ""
+                // Notify bar network module to refresh after delay
+                networkRefreshTimer.restart()
+            }
+        }
+    }
+
+    // IPC call to refresh network bar module after VPN toggle
+    // Uses a timer to allow network state to settle before refreshing
+    Timer {
+        id: networkRefreshTimer
+        interval: 1500  // Wait 1.5s for VPN connection to fully establish
+        repeat: false
+        onTriggered: networkRefreshProcess.running = true
+    }
+
+    Process {
+        id: networkRefreshProcess
+        command: ["qs", "ipc", "-p", "/home/faiyt/codebase/faiyt-qs", "call", "network", "refresh"]
     }
 
     // Toggle Power Profile
@@ -189,11 +263,47 @@ Item {
             btStatusProcess.running = true
             micStatusProcess.running = true
             // Night Light status is managed by NightLightService
-            if (ConfigService.quickToggleVpnName) {
+
+            // VPN status check based on type config
+            const vpnType = ConfigService.quickToggleVpnType
+            if (vpnType === "auto") {
+                // In auto mode, check both (wg first, then nmcli)
+                wgStatusProcess.running = true
+                if (ConfigService.quickToggleVpnName) {
+                    vpnStatusProcess.running = true
+                }
+            } else if (vpnType === "wg-quick") {
+                wgStatusProcess.running = true
+            } else if (vpnType === "nmcli" && ConfigService.quickToggleVpnName) {
                 vpnStatusProcess.running = true
             }
+
             if (ConfigService.quickTogglePowerSaver) {
                 powerProfileStatusProcess.running = true
+            }
+        }
+    }
+
+    // VPN toggle function - uses the appropriate method based on config/detection
+    function toggleVpn() {
+        const vpnType = ConfigService.quickToggleVpnType
+        const useWgQuick = vpnType === "wg-quick" ||
+                          (vpnType === "auto" && detectedVpnType === "wg-quick") ||
+                          (vpnType === "auto" && !vpnConnected && ConfigService.quickToggleVpnInterface)
+
+        if (vpnConnected) {
+            // Disconnect
+            if (useWgQuick || detectedVpnType === "wg-quick") {
+                wgOffProcess.running = true
+            } else {
+                vpnOffProcess.running = true
+            }
+        } else {
+            // Connect - prefer wg-quick in auto mode if interface is configured
+            if (useWgQuick) {
+                wgOnProcess.running = true
+            } else if (ConfigService.quickToggleVpnName) {
+                vpnOnProcess.running = true
             }
         }
     }
@@ -313,18 +423,24 @@ Item {
                 active: quickToggles.vpnConnected
                 icon: quickToggles.vpnConnected ? "󰖁" : "󰖂"
                 label: "VPN"
-                tooltip: ConfigService.quickToggleVpnName === "" ? "Configure VPN in Settings" : (quickToggles.vpnConnected ? "Disconnect " + ConfigService.quickToggleVpnName : "Connect " + ConfigService.quickToggleVpnName)
-                activeColor: Colors.pine
-                enabled: ConfigService.quickToggleVpnName !== ""
-                onClicked: {
-                    if (ConfigService.quickToggleVpnName) {
-                        if (quickToggles.vpnConnected) {
-                            vpnOffProcess.running = true
-                        } else {
-                            vpnOnProcess.running = true
-                        }
+                tooltip: {
+                    const vpnType = ConfigService.quickToggleVpnType
+                    const hasNmcli = ConfigService.quickToggleVpnName !== ""
+                    const hasWg = ConfigService.quickToggleVpnInterface !== ""
+                    const name = quickToggles.detectedVpnType === "wg-quick"
+                        ? ConfigService.quickToggleVpnInterface
+                        : (ConfigService.quickToggleVpnName || ConfigService.quickToggleVpnInterface)
+
+                    if (!hasNmcli && !hasWg) {
+                        return "Configure VPN in Settings"
                     }
+                    return quickToggles.vpnConnected
+                        ? "Disconnect " + name
+                        : "Connect " + name
                 }
+                activeColor: Colors.pine
+                enabled: ConfigService.quickToggleVpnName !== "" || ConfigService.quickToggleVpnInterface !== ""
+                onClicked: quickToggles.toggleVpn()
             }
 
             ToggleButton {

@@ -38,6 +38,7 @@ qs ipc call monitors toggle|open|close
 qs ipc call recording toggle|start|stop|setMode|getMode|status
 qs ipc call sysresources setNetSpeed|getNetSpeed
 qs ipc call indicators showIndicator "volume|brightness|keyboard"|hide|status
+qs ipc call network refresh|refreshVpn|refreshPublicIp
 ```
 
 ## Architecture
