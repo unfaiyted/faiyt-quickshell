@@ -20,12 +20,24 @@ BarGroup {
     property string device: ""
     property bool popupOpen: false
 
+    // Public IP and geolocation properties
+    property string publicIp: ""
+    property string geoCity: ""
+    property string geoRegion: ""
+    property string geoCountry: ""
+    property bool publicInfoLoading: false
+
+    // VPN detection properties
+    property bool isVpn: false
+    property string vpnName: ""
+
     // Hover state tracking - at module level so accessible everywhere
     property bool hoverModule: false
     property bool hoverPopup: tooltipMouseArea.containsMouse ||
                               ipMouseArea.containsMouse ||
                               gatewayMouseArea.containsMouse ||
-                              gatewayLinkArea.containsMouse
+                              gatewayLinkArea.containsMouse ||
+                              publicIpMouseArea.containsMouse
 
     // Clipboard process
     Process {
@@ -90,11 +102,105 @@ BarGroup {
         }
     }
 
+    // VPN detection process
+    Process {
+        id: vpnProcess
+        command: ["bash", "-c", "nmcli -t -f TYPE,NAME con show --active | grep -E '^(vpn|wireguard):' | head -1"]
+        running: true
+
+        property string outputBuffer: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                vpnProcess.outputBuffer = data
+            }
+        }
+
+        onRunningChanged: {
+            if (!running) {
+                if (outputBuffer.length > 0) {
+                    const parts = outputBuffer.split(":")
+                    network.isVpn = true
+                    network.vpnName = parts.length > 1 ? parts[1] : "VPN"
+                } else {
+                    network.isVpn = false
+                    network.vpnName = ""
+                }
+                outputBuffer = ""
+            }
+        }
+    }
+
+    // Public IP and geolocation process (uses ip-api.com)
+    Process {
+        id: geoProcess
+        command: ["curl", "-s", "--connect-timeout", "5", "http://ip-api.com/json/"]
+
+        property string outputBuffer: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                geoProcess.outputBuffer += data
+            }
+        }
+
+        onRunningChanged: {
+            if (running) {
+                network.publicInfoLoading = true
+                outputBuffer = ""
+            } else {
+                network.publicInfoLoading = false
+                if (outputBuffer.length > 0) {
+                    try {
+                        const json = JSON.parse(outputBuffer)
+                        if (json.status === "success") {
+                            network.publicIp = json.query || ""
+                            network.geoCity = json.city || ""
+                            network.geoRegion = json.regionName || ""
+                            network.geoCountry = json.country || ""
+                        }
+                    } catch (e) {
+                        console.log("Failed to parse geo response:", e)
+                    }
+                }
+                outputBuffer = ""
+            }
+        }
+    }
+
+    // Local network refresh timer (10s)
     Timer {
         interval: 10000
         running: true
         repeat: true
         onTriggered: netProcess.running = true
+    }
+
+    // VPN check timer (30s)
+    Timer {
+        interval: 30000
+        running: true
+        repeat: true
+        onTriggered: vpnProcess.running = true
+    }
+
+    // Public IP and geolocation refresh timer (5 min)
+    Timer {
+        interval: 300000
+        running: true
+        repeat: true
+        onTriggered: {
+            if (network.connected) {
+                geoProcess.running = true
+            }
+        }
+    }
+
+    // Initial fetch of public info when connected
+    onConnectedChanged: {
+        if (connected && publicIp === "") {
+            geoProcess.running = true
+        }
     }
 
     // Close timer - gives time to move mouse to popup
@@ -113,8 +219,8 @@ BarGroup {
     Text {
         id: networkText
         anchors.centerIn: parent
-        text: network.status
-        color: network.connected ? Colors.foreground : Colors.error
+        text: network.isVpn ? "󱔐" : network.status
+        color: network.isVpn ? Colors.iris : (network.connected ? Colors.foreground : Colors.error)
         font.pixelSize: Fonts.iconMedium
         font.family: Fonts.icon
     }
@@ -379,6 +485,102 @@ BarGroup {
                     visible: network.device.length > 0
                     text: "󰾲 " + network.device
                     color: Colors.muted
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // Separator between local and public info
+                Rectangle {
+                    width: tooltipColumn.width
+                    height: 1
+                    color: Colors.overlay
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: network.connected && (network.publicIp.length > 0 || network.publicInfoLoading)
+                }
+
+                // Public IP row - clickable to copy
+                Rectangle {
+                    id: publicIpRowRect
+                    visible: network.publicIp.length > 0
+                    width: publicIpRow.width + 16
+                    height: 24
+                    radius: 4
+                    color: publicIpMouseArea.containsMouse ? Colors.overlay : "transparent"
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Row {
+                        id: publicIpRow
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        Text {
+                            text: "󰖟 " + network.publicIp
+                            color: publicIpMouseArea.containsMouse ? Colors.foreground : Colors.muted
+                            font.family: Fonts.ui
+                            font.pixelSize: Fonts.tiny
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "󰆏"
+                            font.family: Fonts.icon
+                            font.pixelSize: Fonts.iconTiny
+                            color: publicIpMouseArea.containsMouse ? Colors.primary : Colors.muted
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        id: publicIpMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+
+                        onEntered: closeTimer.stop()
+                        onExited: closeTimer.start()
+                        onClicked: network.copyToClipboard(network.publicIp)
+                    }
+
+                    HintTarget {
+                        targetElement: publicIpRowRect
+                        scope: "bar"
+                        enabled: tooltip.visible && network.publicIp.length > 0
+                        action: () => network.copyToClipboard(network.publicIp)
+                    }
+                }
+
+                // Loading indicator for public IP
+                Text {
+                    visible: network.publicInfoLoading && network.publicIp.length === 0
+                    text: "󰖟 Loading..."
+                    color: Colors.muted
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // Location row - not interactive
+                Text {
+                    visible: network.geoCity.length > 0 || network.geoCountry.length > 0
+                    text: {
+                        let parts = []
+                        if (network.geoCity.length > 0) parts.push(network.geoCity)
+                        if (network.geoRegion.length > 0) parts.push(network.geoRegion)
+                        if (network.geoCountry.length > 0) parts.push(network.geoCountry)
+                        return "󰒍 " + parts.join(", ")
+                    }
+                    color: Colors.muted
+                    font.family: Fonts.ui
+                    font.pixelSize: Fonts.tiny
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // VPN status row
+                Text {
+                    visible: network.connected
+                    text: network.isVpn ? ("󱔐 VPN: " + network.vpnName) : "󰿆 Direct Connection"
+                    color: network.isVpn ? Colors.foam : Colors.muted
                     font.family: Fonts.ui
                     font.pixelSize: Fonts.tiny
                     anchors.horizontalCenter: parent.horizontalCenter
