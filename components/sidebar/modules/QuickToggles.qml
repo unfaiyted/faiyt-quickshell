@@ -114,21 +114,19 @@ Item {
         command: ["ip", "link", "show", ConfigService.quickToggleVpnInterface]
         running: ConfigService.quickToggleVpnType !== "nmcli"
 
-        onRunningChanged: {
-            if (!running) {
-                // exitCode 0 = interface exists = connected
-                // exitCode != 0 = interface doesn't exist = disconnected
-                if (exitCode === 0) {
-                    quickToggles.vpnConnected = true
-                    quickToggles.detectedVpnType = "wg-quick"
-                } else if (ConfigService.quickToggleVpnType === "wg-quick") {
-                    // Only reset if wg-quick only mode
-                    quickToggles.vpnConnected = false
-                    quickToggles.detectedVpnType = ""
-                } else if (ConfigService.quickToggleVpnType === "auto" && !quickToggles.vpnConnected) {
-                    // In auto mode, if wg check failed and vpn not connected via nmcli, reset
-                    quickToggles.detectedVpnType = ""
-                }
+        onExited: (exitCode, exitStatus) => {
+            // exitCode 0 = interface exists = connected
+            // exitCode != 0 = interface doesn't exist = disconnected
+            if (exitCode === 0) {
+                quickToggles.vpnConnected = true
+                quickToggles.detectedVpnType = "wg-quick"
+            } else if (ConfigService.quickToggleVpnType === "wg-quick") {
+                // Only reset if wg-quick only mode
+                quickToggles.vpnConnected = false
+                quickToggles.detectedVpnType = ""
+            } else if (ConfigService.quickToggleVpnType === "auto" && !quickToggles.vpnConnected) {
+                // In auto mode, if wg check failed and vpn not connected via nmcli, reset
+                quickToggles.detectedVpnType = ""
             }
         }
     }

@@ -136,17 +136,15 @@ Singleton {
         id: wgStatusProcess
         command: ["ip", "link", "show", ConfigService.quickToggleVpnInterface]
         running: ConfigService.quickToggleVpnType !== "nmcli"
-        onRunningChanged: {
-            if (!running) {
-                if (exitCode === 0) {
-                    root.vpnConnected = true
-                    root.detectedVpnType = "wg-quick"
-                } else if (ConfigService.quickToggleVpnType === "wg-quick") {
-                    root.vpnConnected = false
-                    root.detectedVpnType = ""
-                } else if (ConfigService.quickToggleVpnType === "auto" && !root.vpnConnected) {
-                    root.detectedVpnType = ""
-                }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) {
+                root.vpnConnected = true
+                root.detectedVpnType = "wg-quick"
+            } else if (ConfigService.quickToggleVpnType === "wg-quick") {
+                root.vpnConnected = false
+                root.detectedVpnType = ""
+            } else if (ConfigService.quickToggleVpnType === "auto" && !root.vpnConnected) {
+                root.detectedVpnType = ""
             }
         }
     }
