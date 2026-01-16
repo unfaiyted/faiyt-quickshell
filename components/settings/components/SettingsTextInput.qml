@@ -44,7 +44,7 @@ Rectangle {
         selectByMouse: true
         clip: true
 
-        onTextChanged: settingsTextInput.textEdited(text)
+        onTextEdited: settingsTextInput.textEdited(text)
 
         // Placeholder text
         Text {
