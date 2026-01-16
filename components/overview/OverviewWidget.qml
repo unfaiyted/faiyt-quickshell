@@ -20,7 +20,7 @@ Item {
     readonly property int columns: ConfigService.overviewItemsPerRow
     readonly property int workspacesShown: ConfigService.overviewTotalItems
     readonly property int rows: Math.ceil(workspacesShown / columns)
-    readonly property int workspaceGroup: Math.floor((monitor.activeWorkspace?.id - 1) / workspacesShown)
+    readonly property int workspaceGroup: Math.floor(((monitor?.activeWorkspace?.id ?? 1) - 1) / workspacesShown)
 
     property var windows: HyprlandData.windowList
     property var windowByAddress: HyprlandData.windowByAddress
@@ -30,8 +30,8 @@ Item {
     property real workspaceSpacing: 8
 
     // Calculate workspace dimensions based on monitor
-    property real workspaceImplicitWidth: (monitor.width / monitor.scale) * root.scale
-    property real workspaceImplicitHeight: (monitor.height / monitor.scale) * root.scale
+    property real workspaceImplicitWidth: monitor ? (monitor.width / monitor.scale) * root.scale : 200
+    property real workspaceImplicitHeight: monitor ? (monitor.height / monitor.scale) * root.scale : 120
 
     // Drag state
     property int draggingFromWorkspace: -1
@@ -77,7 +77,7 @@ Item {
                             required property int index
                             property int colIndex: index
                             property int workspaceValue: root.workspaceGroup * root.workspacesShown + row.rowIndex * root.columns + colIndex + 1
-                            property bool isActive: monitor.activeWorkspace?.id === workspaceValue
+                            property bool isActive: (root.monitor?.activeWorkspace?.id ?? -1) === workspaceValue
                             property bool hoveredWhileDragging: false
 
                             implicitWidth: root.workspaceImplicitWidth | 0
@@ -179,7 +179,7 @@ Item {
                     scale: root.scale
                     availableWorkspaceWidth: root.workspaceImplicitWidth
                     availableWorkspaceHeight: root.workspaceImplicitHeight
-                    widgetMonitorId: root.monitor.id
+                    widgetMonitorId: root.monitor?.id ?? -1
 
                     property int workspaceColIndex: (winData?.workspace.id - 1) % root.columns
                     property int workspaceRowIndex: Math.floor((winData?.workspace.id - 1) % root.workspacesShown / root.columns)
@@ -241,7 +241,7 @@ Item {
             // Active workspace indicator
             Rectangle {
                 id: focusedIndicator
-                property int activeWorkspaceInGroup: root.monitor.activeWorkspace?.id - (root.workspaceGroup * root.workspacesShown)
+                property int activeWorkspaceInGroup: (root.monitor?.activeWorkspace?.id ?? 1) - (root.workspaceGroup * root.workspacesShown)
                 property int activeRowIndex: Math.floor((activeWorkspaceInGroup - 1) / root.columns)
                 property int activeColIndex: (activeWorkspaceInGroup - 1) % root.columns
 
