@@ -43,7 +43,7 @@ Item {
     // Listen for selection from overlay
     Connections {
         target: dropdown.dropdownOverlay && !dropdown.dropdownOverlay.isThemePanel ? dropdown.dropdownOverlay : null
-        enabled: dropdown.dropdownOverlay !== null && !dropdown.dropdownOverlay.isThemePanel
+        enabled: dropdown.dropdownOverlay !== null && (dropdown.dropdownOverlay.isThemePanel !== true)
         function onItemSelected(index, value) {
             if (dropdown.dropdownOverlay.activeSource === dropdown) {
                 dropdown.currentIndex = index
@@ -55,7 +55,7 @@ Item {
     // Listen for ThemePanel dropdown selection
     Connections {
         target: dropdown.dropdownOverlay && dropdown.dropdownOverlay.isThemePanel ? dropdown.dropdownOverlay.panel : null
-        enabled: dropdown.dropdownOverlay !== null && dropdown.dropdownOverlay.isThemePanel
+        enabled: dropdown.dropdownOverlay !== null && (dropdown.dropdownOverlay.isThemePanel === true)
         function onDropdownSelected(index, value) {
             if (dropdown.dropdownOverlay.panel.activeDropdownSource === dropdown) {
                 dropdown.currentIndex = index
