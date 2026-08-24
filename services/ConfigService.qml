@@ -206,6 +206,16 @@ Singleton {
             dontShowOnStartup: false
         },
 
+        // Notifications
+        notifications: {
+            sidebarLimit: 10,           // notifications rendered in the sidebar at once
+            showMoreStep: 10,           // how many more to reveal per "Show More"
+            historyLimit: 100,          // persisted notification records kept on disk
+            maxPopups: 4,               // concurrent on-screen popups
+            maxTracked: 30,             // live notifications kept resident by the server
+            dedupeWindowMs: 10000       // collapse identical notifications within this window
+        },
+
         // Indicators (OSD overlays)
         indicators: {
             enabled: true,
@@ -405,6 +415,14 @@ Singleton {
     property bool screenshotAnnotateEnabled: config.utilities?.screenshot?.annotateEnabled || false
     property string screenshotSavePath: config.utilities?.screenshot?.savePath || ""
 
+    // Notification convenience properties
+    property int notificationSidebarLimit: config.notifications?.sidebarLimit ?? 10
+    property int notificationShowMoreStep: config.notifications?.showMoreStep ?? 10
+    property int notificationHistoryLimit: config.notifications?.historyLimit ?? 100
+    property int notificationMaxPopups: config.notifications?.maxPopups ?? 4
+    property int notificationMaxTracked: config.notifications?.maxTracked ?? 30
+    property int notificationDedupeWindowMs: config.notifications?.dedupeWindowMs ?? 10000
+
     // Window enable/disable convenience properties
     property bool windowBarEnabled: config.windows?.bar?.enabled !== false
     property bool windowBarCorners: config.windows?.bar?.corners !== false
@@ -529,6 +547,14 @@ Singleton {
         aiTemperature = config.ai?.temperature || 1.0
         aiSystemPrompt = config.ai?.systemPrompt || ""
         aiMcpServers = config.ai?.mcpServers || []
+
+        // Notifications
+        notificationSidebarLimit = config.notifications?.sidebarLimit ?? 10
+        notificationShowMoreStep = config.notifications?.showMoreStep ?? 10
+        notificationHistoryLimit = config.notifications?.historyLimit ?? 100
+        notificationMaxPopups = config.notifications?.maxPopups ?? 4
+        notificationMaxTracked = config.notifications?.maxTracked ?? 30
+        notificationDedupeWindowMs = config.notifications?.dedupeWindowMs ?? 10000
 
         // Window enable/disable
         windowBarEnabled = config.windows?.bar?.enabled !== false

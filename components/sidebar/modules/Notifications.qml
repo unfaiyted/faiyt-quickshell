@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Quickshell
 import "../../../theme"
 import "../../notifications"
 import ".."
@@ -11,9 +12,37 @@ Item {
     // Use shared notification state
     property bool doNotDisturb: NotificationState.doNotDisturb
 
-    // Helper to get notification count
+    // The tab Loader stays alive while the sidebar is closed, so without this
+    // gate every incoming notification would rebuild delegates nobody can see.
+    // The grace period keeps the list intact through the slide-out animation.
+    readonly property bool panelOpen: SidebarState.rightOpen
+    property bool listPopulated: SidebarState.rightOpen
+
+    onPanelOpenChanged: {
+        if (panelOpen) {
+            depopulateTimer.stop()
+            listPopulated = true
+        } else {
+            depopulateTimer.restart()
+        }
+    }
+
+    Timer {
+        id: depopulateTimer
+        interval: 400
+        onTriggered: {
+            notifications.listPopulated = false
+            NotificationState.resetDisplayLimit()
+        }
+    }
+
+    // Helper to get notification count (visible / total)
     function notificationCount() {
-        return NotificationState.count()
+        return NotificationState.totalCount
+    }
+
+    function visibleCount() {
+        return NotificationState.visibleNotifications.length
     }
 
     // Helper to clear all notifications
@@ -22,10 +51,8 @@ Item {
     }
 
     // Helper to dismiss a single notification (works with both live and persisted)
-    function dismissNotification(notification) {
-        if (notification && notification.dismiss) {
-            notification.dismiss()
-        }
+    function dismissNotification(entry) {
+        NotificationState.dismissEntry(entry)
     }
 
     // Helper to format timestamp
@@ -76,7 +103,13 @@ Item {
 
             // Notification count
             Text {
-                text: notificationCount() > 0 ? notificationCount() + " Notification" + (notificationCount() > 1 ? "s" : "") : "Notifications"
+                text: {
+                    let total = notificationCount()
+                    if (total === 0) return "Notifications"
+                    let label = total + " Notification" + (total > 1 ? "s" : "")
+                    if (NotificationState.hasMore) label += " (" + visibleCount() + " shown)"
+                    return label
+                }
                 font.family: Fonts.ui
                 font.pixelSize: Fonts.medium
                 font.bold: true
@@ -210,7 +243,14 @@ Item {
                 spacing: 8
 
                 Repeater {
-                    model: NotificationState.allNotifications
+                    // Keyed model so a new notification inserts one delegate
+                    // instead of tearing down and rebuilding the whole list.
+                    model: ScriptModel {
+                        objectProp: "key"
+                        values: notifications.listPopulated
+                            ? NotificationState.visibleNotifications
+                            : []
+                    }
 
                     Rectangle {
                         id: notifItem
@@ -307,7 +347,27 @@ Item {
                                             font.pixelSize: Fonts.small
                                             color: Colors.foregroundAlt
                                             elide: Text.ElideRight
-                                            width: parent.width - 60
+                                            width: parent.width - 60 - (repeatBadge.visible ? repeatBadge.width + 8 : 0)
+                                        }
+
+                                        // Repeat count for collapsed duplicate notifications
+                                        Rectangle {
+                                            id: repeatBadge
+                                            visible: (notification?.repeatCount ?? 1) > 1
+                                            width: repeatText.width + 10
+                                            height: 16
+                                            radius: 8
+                                            color: Colors.overlay
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Text {
+                                                id: repeatText
+                                                anchors.centerIn: parent
+                                                text: "\u00d7" + (notification?.repeatCount ?? 1)
+                                                font.family: Fonts.ui
+                                                font.pixelSize: Fonts.tiny
+                                                color: Colors.foregroundAlt
+                                            }
                                         }
 
                                         Text {
@@ -395,8 +455,9 @@ Item {
                                 width: parent.width
                                 height: status === Image.Ready ? Math.min(implicitHeight, 180) : 0
                                 fillMode: Image.PreserveAspectFit
-                                sourceSize.width: 1920
-                                sourceSize.height: 1080
+                                asynchronous: true
+                                // Decode at display size, not at source resolution
+                                sourceSize.width: 384
                                 source: expanded && notification?.image ? (notification.image.startsWith("/") ? "file://" + notification.image : notification.image) : ""
                                 visible: status === Image.Ready
                             }
@@ -457,6 +518,31 @@ Item {
                             }
                         }
 
+                    }
+                }
+
+                // Show More button
+                Rectangle {
+                    width: notifColumn.width
+                    height: 40
+                    radius: 10
+                    color: showMoreArea.containsMouse ? Colors.overlay : Colors.surface
+                    visible: NotificationState.hasMore
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Show More (" + Math.max(0, notificationCount() - visibleCount()) + " remaining)"
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
+                        color: Colors.primary
+                    }
+
+                    MouseArea {
+                        id: showMoreArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: NotificationState.showMore()
                     }
                 }
             }

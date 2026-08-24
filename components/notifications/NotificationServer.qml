@@ -15,65 +15,132 @@ Singleton {
     property bool doNotDisturb: false
     property list<Notif> notifications
 
-    // Persisted notifications (restored from history)
-    property var persistedNotifications: []
+    // Persisted notifications (restored from history) - newest first.
+    // Every incoming notification is written here, so this doubles as the
+    // canonical chronological list for the sidebar. Bound directly rather than
+    // mirrored through signals, which previously missed clearAll() entirely.
+    readonly property var persistedNotifications: Services.NotificationHistoryService.notifications
 
-    // Combined list for sidebar: live tracked + persisted-only
-    readonly property var allNotifications: {
-        let combined = []
-        let liveIds = new Set()
+    // Maps a live Notification's numeric id to its history record id.
+    // Notification is a C++ type, so we can't stash the id on the object itself.
+    property var historyIds: ({})
 
-        // First add all live tracked notifications
-        if (server.trackedNotifications && server.trackedNotifications.values) {
-            for (let notif of server.trackedNotifications.values) {
-                combined.push({
-                    id: notif.historyId || "",
-                    notification: notif,
-                    isLive: true,
-                    isPersisted: false,
-                    summary: notif.summary,
-                    body: notif.body,
-                    appName: notif.appName,
-                    appIcon: notif.appIcon,
-                    image: notif.image,
-                    urgency: notif.urgency,
-                    actions: notif.actions,
-                    time: notif.time,
-                    dismiss: () => {
-                        notif.tracked = false
-                        notif.dismiss()
-                    }
-                })
-                // Track by content for deduplication
-                liveIds.add(notif.appName + "|" + notif.summary + "|" + notif.body)
+    // ---- Display limits -----------------------------------------------------
+    // The sidebar only ever builds `displayLimit` delegates. "Show More" grows
+    // the window in steps rather than materializing the whole history.
+    readonly property int baseLimit: Math.max(1, Services.ConfigService.notificationSidebarLimit)
+    property int extraShown: 0
+    readonly property int displayLimit: baseLimit + extraShown
+
+    readonly property int totalCount: persistedNotifications.length + orphanLive.length
+    readonly property bool hasMore: totalCount > displayLimit
+
+    function showMore() {
+        extraShown += Math.max(1, Services.ConfigService.notificationShowMoreStep)
+    }
+
+    function resetDisplayLimit() {
+        extraShown = 0
+    }
+
+    // ---- List construction --------------------------------------------------
+
+    // History id -> live Notification, for the entries that still have actions
+    readonly property var liveByHistoryId: {
+        const map = ({})
+        const tracked = server.trackedNotifications
+        if (tracked && tracked.values) {
+            for (const notif of tracked.values) {
+                const hid = root.historyIds[notif.id]
+                if (hid) map[hid] = notif
             }
         }
+        return map
+    }
 
-        // Then add persisted notifications that aren't live
-        for (let persisted of persistedNotifications) {
-            let key = persisted.appName + "|" + persisted.summary + "|" + persisted.body
-            if (!liveIds.has(key)) {
-                combined.push({
-                    id: persisted.id,
-                    notification: null,
-                    isLive: false,
-                    isPersisted: true,
-                    summary: persisted.summary,
-                    body: persisted.body,
-                    appName: persisted.appName,
-                    appIcon: persisted.appIcon,
-                    image: persisted.image,
-                    urgency: persisted.urgency,
-                    actions: [],
-                    time: new Date(persisted.timestamp),
-                    dismiss: () => {
-                        Services.NotificationHistoryService.removeNotification(persisted.id)
-                    }
-                })
-            }
+    // Live notifications with no history record (only possible if history is
+    // unavailable or configured smaller than the tracked limit). Newest first.
+    readonly property var orphanLive: {
+        const tracked = server.trackedNotifications
+        if (!tracked || !tracked.values || tracked.values.length === 0) return []
+
+        const persistedIds = new Set()
+        for (const p of root.persistedNotifications) persistedIds.add(p.id)
+
+        const out = []
+        for (const notif of tracked.values) {
+            const hid = root.historyIds[notif.id]
+            if (!hid || !persistedIds.has(hid)) out.push(notif)
+        }
+        return out.reverse()
+    }
+
+    // Only the visible window is turned into delegate-facing objects. This is
+    // what keeps a burst of notifications from rebuilding hundreds of them.
+    readonly property var visibleNotifications: {
+        const limit = root.displayLimit
+        const out = []
+
+        for (const notif of root.orphanLive) {
+            if (out.length >= limit) return out
+            out.push(root.buildLiveEntry(notif))
         }
 
-        return combined
+        const live = root.liveByHistoryId
+        for (const record of root.persistedNotifications) {
+            if (out.length >= limit) return out
+            out.push(root.buildEntry(record, live[record.id] || null))
+        }
+
+        return out
+    }
+
+    function buildEntry(record, live) {
+        return {
+            key: record.id,
+            id: record.id,
+            notification: live,
+            isLive: live !== null,
+            isPersisted: live === null,
+            summary: live ? live.summary : record.summary,
+            body: live ? live.body : record.body,
+            appName: live ? live.appName : record.appName,
+            appIcon: live ? live.appIcon : record.appIcon,
+            image: live ? live.image : record.image,
+            urgency: live ? live.urgency : record.urgency,
+            actions: live ? live.actions : [],
+            repeatCount: record.count || 1,
+            time: new Date(record.timestamp)
+        }
+    }
+
+    function buildLiveEntry(notif) {
+        return {
+            key: "live:" + notif.id,
+            id: root.historyIds[notif.id] || "",
+            notification: notif,
+            isLive: true,
+            isPersisted: false,
+            summary: notif.summary,
+            body: notif.body,
+            appName: notif.appName,
+            appIcon: notif.appIcon,
+            image: notif.image,
+            urgency: notif.urgency,
+            actions: notif.actions,
+            repeatCount: 1,
+            time: new Date()
+        }
+    }
+
+    // Dismiss an entry produced by visibleNotifications
+    function dismissEntry(entry) {
+        if (!entry) return
+        if (entry.id) Services.NotificationHistoryService.removeNotification(entry.id)
+        if (entry.notification) {
+            entry.notification.tracked = false
+            entry.notification.dismiss()
+        }
     }
 
     // Default timeout settings
@@ -92,7 +159,8 @@ Singleton {
         onNotification: notification => {
             notification.tracked = true
 
-            // Persist the notification to history
+            // Persist first: identical notifications inside the dedupe window
+            // reuse an existing record instead of adding another row.
             const historyId = Services.NotificationHistoryService.addNotification({
                 appName: notification.appName,
                 summary: notification.summary,
@@ -101,10 +169,20 @@ Singleton {
                 image: notification.image,
                 urgency: notification.urgency
             })
-            notification.historyId = historyId
+            root.historyIds[notification.id] = historyId
+            root.syncLiveState(notification.id)
 
             // Skip popups if DND is enabled (but still track)
             if (root.doNotDisturb) return
+
+            // Bound the popup stack - older popups are already in history.
+            // Spliced directly rather than looping on remove(), so a stale
+            // index can never turn this into a spin.
+            const maxPopups = Math.max(1, Services.ConfigService.notificationMaxPopups)
+            const overflow = root.notifications.length - maxPopups + 1
+            if (overflow > 0) {
+                root.notifications.splice(0, overflow)
+            }
 
             const notifObj = notifComponent.createObject(root, {
                 notification: notification
@@ -116,25 +194,36 @@ Singleton {
     // Expose tracked notifications for sidebar
     property alias trackedNotifications: server.trackedNotifications
 
-    // Load persisted notifications on startup
-    Connections {
-        target: Services.NotificationHistoryService
-        function onNotificationsLoaded() {
-            root.persistedNotifications = Services.NotificationHistoryService.notifications
-        }
-        function onNotificationAdded(notification) {
-            root.persistedNotifications = Services.NotificationHistoryService.notifications
-        }
-        function onNotificationRemoved(id) {
-            root.persistedNotifications = Services.NotificationHistoryService.notifications
-        }
-    }
+    // Drop stale history-id mappings and untrack notifications past the resident
+    // limit. Untracked notifications stay visible via their history record, they
+    // just stop holding a live object (and their actions) in memory.
+    function syncLiveState(keepId) {
+        const tracked = server.trackedNotifications
+        // Snapshot: untracking mutates trackedNotifications while we walk it
+        const values = (tracked && tracked.values) ? [...tracked.values] : []
+        const max = Math.max(1, Services.ConfigService.notificationMaxTracked)
 
-    Component.onCompleted: {
-        // If history is already loaded, sync it
-        if (Services.NotificationHistoryService.isLoaded) {
-            persistedNotifications = Services.NotificationHistoryService.notifications
+        // trackedNotifications is oldest-first, so the head is what ages out
+        const excess = values.length - max
+        const surviving = ({})
+
+        for (let i = 0; i < values.length; i++) {
+            const notif = values[i]
+            if (i < excess) {
+                notif.tracked = false
+                continue
+            }
+            const hid = root.historyIds[notif.id]
+            if (hid) surviving[notif.id] = hid
         }
+
+        // The notification being registered right now may not have landed in
+        // trackedNotifications yet - never prune the mapping we just made.
+        if (keepId !== undefined && surviving[keepId] === undefined && root.historyIds[keepId]) {
+            surviving[keepId] = root.historyIds[keepId]
+        }
+
+        root.historyIds = surviving
     }
 
     // Notification wrapper component
@@ -159,8 +248,9 @@ Singleton {
 
         function dismiss() {
             // Remove from history if it has a history ID
-            if (notification.historyId) {
-                Services.NotificationHistoryService.removeNotification(notification.historyId)
+            const historyId = root.historyIds[notification.id]
+            if (historyId) {
+                Services.NotificationHistoryService.removeNotification(historyId)
             }
             notification.dismiss()
             remove()
@@ -201,22 +291,27 @@ Singleton {
 
     // Helper functions
     function count() {
-        return allNotifications.length
+        return totalCount
     }
 
     function clearAll() {
-        // Clear live notifications
-        let notifs = server.trackedNotifications.values
-        for (let i = notifs.length - 1; i >= 0; i--) {
-            notifs[i].dismiss()
+        // Clear live notifications (snapshot first - dismissing mutates the list)
+        const tracked = server.trackedNotifications
+        if (tracked && tracked.values) {
+            const snapshot = [...tracked.values]
+            for (let i = snapshot.length - 1; i >= 0; i--) {
+                snapshot[i].dismiss()
+            }
         }
+        historyIds = ({})
         // Clear persisted history
         Services.NotificationHistoryService.clearAll()
+        resetDisplayLimit()
     }
 
     function clearPopups() {
-        while (notifications.length > 0) {
-            notifications[0].remove()
+        if (notifications.length > 0) {
+            notifications.splice(0, notifications.length)
         }
     }
 

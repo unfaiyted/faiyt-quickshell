@@ -159,6 +159,24 @@ The SystemResources bar module supports toggleable indicators via `bar.systemRes
 Temperature indicators use color coding: green (<60°C), yellow (60-80°C), red (>80°C).
 GPU indicators auto-hide if nvidia-smi is not available.
 
+### Notification Configuration
+Notification volume and cost are bounded by `notifications.*`:
+
+| Config Path | Default | Description |
+|-------------|---------|-------------|
+| `notifications.sidebarLimit` | 10 | Notifications rendered in the sidebar at once |
+| `notifications.showMoreStep` | 10 | How many more each "Show More" reveals |
+| `notifications.historyLimit` | 100 | Persisted records kept in `notifications.json` |
+| `notifications.maxPopups` | 4 | Concurrent on-screen popups (oldest drop off) |
+| `notifications.maxTracked` | 30 | Live notifications kept resident by the server |
+| `notifications.dedupeWindowMs` | 10000 | Identical notifications inside this window collapse into one record with a repeat count |
+
+`NotificationState.visibleNotifications` only ever materializes `sidebarLimit`
+entries, and the sidebar list is keyed by record id via `ScriptModel` so an
+arriving notification inserts a single delegate instead of rebuilding the list.
+Notifications past `maxTracked` are untracked but stay visible through their
+history record - they just lose their live actions.
+
 ## Adding New Features
 
 ### New Bar Module
