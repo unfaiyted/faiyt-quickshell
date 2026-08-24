@@ -256,10 +256,60 @@ Singleton {
         readonly property int urgency: notification.urgency
         readonly property var actions: notification.actions
 
+        readonly property string imageSource: {
+            const img = notification.image ?? ""
+            if (!img) return ""
+            return img.startsWith("/") ? "file://" + img : img
+        }
+
+        // Resolve the image BEFORE the popup is shown. Probing inside the
+        // delegate meant the card appeared at one size and resized a beat later,
+        // once the decode finished. Same sourceSize as the card's preview so the
+        // pixmap is already cached when the delegate asks for it.
+        readonly property Image imageProbe: Image {
+            source: notif.imageSource
+            sourceSize.width: 400
+            sourceSize.height: 400
+            asynchronous: true
+            visible: false
+        }
+
+        readonly property real imageAspect: (imageProbe.status === Image.Ready && imageProbe.implicitHeight > 0)
+            ? imageProbe.implicitWidth / imageProbe.implicitHeight
+            : 0
+
+        property bool probeExpired: false
+
+        // Popups wait for this so they render correct on their first frame
+        readonly property bool ready: imageSource === ""
+            || imageAspect > 0
+            || imageProbe.status === Image.Error
+            || probeExpired
+
+        // Never let a slow or broken image hold a notification back for long
+        readonly property Timer probeTimer: Timer {
+            running: notif.imageSource !== "" && !notif.ready
+            interval: 600
+            onTriggered: notif.probeExpired = true
+        }
+
+        // Flagged first so the card can animate out, then actually dropped.
+        // The Column that renders popups has no remove transition of its own.
+        property bool removing: false
+
         function remove() {
-            const idx = root.notifications.indexOf(notif)
-            if (idx !== -1) {
-                root.notifications.splice(idx, 1)
+            if (notif.removing) return
+            notif.removing = true
+            removeTimer.start()
+        }
+
+        readonly property Timer removeTimer: Timer {
+            interval: 200
+            onTriggered: {
+                const idx = root.notifications.indexOf(notif)
+                if (idx !== -1) {
+                    root.notifications.splice(idx, 1)
+                }
             }
         }
 
@@ -274,8 +324,9 @@ Singleton {
         }
 
         readonly property Timer timer: Timer {
-            // Critical notifications don't auto-expire
-            running: notif.urgency !== NotificationUrgency.Critical
+            // Critical notifications don't auto-expire. Held until ready so the
+            // dismiss countdown does not run while the popup is still hidden.
+            running: notif.ready && notif.urgency !== NotificationUrgency.Critical
             interval: {
                 if (notif.notification.expireTimeout > 0) {
                     return notif.notification.expireTimeout

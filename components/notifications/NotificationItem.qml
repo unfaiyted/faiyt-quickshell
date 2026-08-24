@@ -16,8 +16,15 @@ Item {
     required property int notifIndex
     required property bool isActivated
 
+    // Height of the strip each card behind collapses to
+    property int stackPeek: 10
+
     // Check if this is a critical notification
     readonly property bool isCritical: root.notif?.urgency === NotificationUrgency.Critical
+
+    // Normalized image hint. Apps send both avatars/album art and screenshots
+    // through this one hint, so the shape decides how it is laid out.
+    readonly property string imageSource: root.notif?.imageSource ?? ""
 
     // Actions to draw as buttons, minus the click-activation "default" action
     readonly property var buttonActions: NotificationState.displayActions(root.notif?.actions)
@@ -40,15 +47,51 @@ Item {
         if (root.notif) root.notif.remove()
     }
 
-    implicitHeight: childrenRect.height
+    // Resolved before the popup was ever shown, so the card is laid out
+    // correctly on its first frame instead of resizing a beat later.
+    readonly property real imageAspect: root.notif?.imageAspect ?? 0
+    readonly property bool imageProbed: imageAspect > 0
+    // Square-ish means icon/avatar/album art -> small thumbnail beside the text.
+    // Anything clearly wider or taller is a real picture -> full-width preview.
+    readonly property bool imageIsThumbnail: imageProbed && imageAspect > 0.8 && imageAspect < 1.25
+
+    // Height the wide preview occupies, known up front from the pre-resolved
+    // aspect, so the card never grows after it appears.
+    readonly property real previewHeight: {
+        if (!imageProbed || imageIsThumbnail) return 0
+        const w = Math.max(1, width - 24)
+        return Math.min(w / imageAspect, 140)
+    }
+
+    // Collapsed, only the newest card is laid out at full height; the ones
+    // behind occupy a fixed strip and clip to it. That keeps every sliver the
+    // same regardless of how tall the individual notifications are - a uniform
+    // ListView spacing cannot, since the gap between card tops is always
+    // (previous card height + spacing).
+    implicitHeight: (isActivated || notifIndex === 0) ? card.height : stackPeek
     implicitWidth: parent?.width ?? 380
+
 
     // Stack cards with z-index
     z: 100 - notifIndex
 
-    // Scale down cards when stacked (inactive)
-    scale: isActivated ? 1 : Math.max(0.8, 1 - (notifIndex * 0.05))
-    clip: true
+    // Enter and exit animations, previously supplied by the ListView's add and
+    // remove transitions. Driven by notif.removing so the card fades before it
+    // is actually dropped from the list.
+    property bool appeared: false
+    readonly property bool leaving: root.notif?.removing ?? false
+
+    opacity: (!appeared || leaving) ? 0 : 1
+    scale: leaving ? 0.92 : 1
+
+    Component.onCompleted: appeared = true
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.OutCubic
+        }
+    }
 
     Behavior on scale {
         NumberAnimation {
@@ -57,11 +100,52 @@ Item {
         }
     }
 
+    // Cards behind narrow slightly so the stack reads as depth. Horizontal
+    // only: a uniform scale would shrink them vertically too and swallow the
+    // sliver that is supposed to peek out below the card in front.
+    property real stackScale: isActivated ? 1 : Math.max(0.86, 1 - (notifIndex * 0.05))
+    clip: true
+
+    Behavior on stackScale {
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    transform: Scale {
+        origin.x: root.width / 2
+        origin.y: 0
+        xScale: root.stackScale
+        yScale: 1
+    }
+
     Rectangle {
         id: card
         implicitHeight: contentColumn.height
         implicitWidth: parent.width
         radius: 12
+
+        // Collapsed, a card behind is clipped to a stackPeek strip. Shift it up
+        // so the strip shows its foot - a stacked-paper edge - rather than a
+        // truncated header.
+        y: (root.isActivated || root.notifIndex === 0)
+            ? 0
+            : -Math.max(0, height - root.stackPeek)
+
+        // Buried cards fade back so the stack reads as depth. Applied here
+        // rather than on the delegate root, whose opacity the ListView add and
+        // remove transitions animate - a binding there would be overwritten.
+        opacity: (root.isActivated || root.notifIndex === 0)
+            ? 1
+            : Math.max(0.3, 0.75 - (root.notifIndex - 1) * 0.15)
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
 
         color: root.isCritical
             ? Qt.tint(Colors.background, Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.15))
@@ -160,57 +244,85 @@ Item {
                 color: root.isCritical ? Qt.rgba(Colors.error.r, Colors.error.g, Colors.error.b, 0.3) : Colors.border
             }
 
-            // Summary (title)
-            Text {
-                Layout.fillWidth: true
-                Layout.margins: 12
-                Layout.bottomMargin: root.notif?.body ? 4 : 12
-
-                text: root.notif?.summary ?? ""
-                font.family: Fonts.ui
-                font.pixelSize: Fonts.body
-                font.bold: true
-                color: Colors.foreground
-                elide: Text.ElideRight
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                visible: text.length > 0
-            }
-
-            // Body
-            Text {
+            // Content row: square images sit to the left of the text
+            RowLayout {
                 Layout.fillWidth: true
                 Layout.leftMargin: 12
                 Layout.rightMargin: 12
+                Layout.topMargin: 12
                 Layout.bottomMargin: notifImage.visible ? 8 : 12
-                visible: root.notif?.body?.length > 0
+                spacing: 10
 
-                text: root.notif?.body ?? ""
-                font.family: Fonts.ui
-                font.pixelSize: Fonts.small
-                color: Colors.foregroundAlt
-                elide: Text.ElideRight
-                wrapMode: Text.WordWrap
-                maximumLineCount: 4
+                // Square sources render small, beside the text. Fixed size, so
+                // its load can never move the layout.
+                Image {
+                    id: thumbImage
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 40
+                    Layout.alignment: Qt.AlignTop
+                    visible: root.imageIsThumbnail
+
+                    source: root.imageIsThumbnail ? root.imageSource : ""
+                    sourceSize.width: 128
+                    sourceSize.height: 128
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    clip: true
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+
+                    // Summary (title)
+                    Text {
+                        Layout.fillWidth: true
+
+                        text: root.notif?.summary ?? ""
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.body
+                        font.bold: true
+                        color: Colors.foreground
+                        elide: Text.ElideRight
+                        wrapMode: Text.WordWrap
+                        maximumLineCount: 2
+                        visible: text.length > 0
+                    }
+
+                    // Body
+                    Text {
+                        Layout.fillWidth: true
+                        visible: root.notif?.body?.length > 0
+
+                        text: root.notif?.body ?? ""
+                        font.family: Fonts.ui
+                        font.pixelSize: Fonts.small
+                        color: Colors.foregroundAlt
+                        elide: Text.ElideRight
+                        wrapMode: Text.WordWrap
+                        maximumLineCount: 4
+                    }
+                }
             }
 
-            // Notification image (for screenshots, etc.)
+            // Wide/tall images (screenshots) keep the full-width preview.
+            // Only loaded once the shape is known, so avatars never decode large.
             Image {
                 id: notifImage
                 Layout.fillWidth: true
-                Layout.preferredHeight: status === Image.Ready ? Math.min(sourceSize.height, 140) : 0
+                Layout.preferredHeight: root.previewHeight
                 Layout.leftMargin: 12
                 Layout.rightMargin: 12
-                Layout.bottomMargin: status === Image.Ready ? 12 : 0
+                Layout.bottomMargin: root.previewHeight > 0 ? 12 : 0
 
-                source: {
-                    let img = root.notif?.image ?? ""
-                    if (!img) return ""
-                    // Ensure file:// prefix for local paths
-                    if (img.startsWith("/")) return "file://" + img
-                    return img
-                }
+                source: (root.imageProbed && !root.imageIsThumbnail) ? root.imageSource : ""
+                // Both dimensions must be set: notif.image is an image:// provider
+                // URL, and a half-specified sourceSize makes it return a
+                // degenerate 2x1 pixmap instead of scaling.
+                sourceSize.width: 400
+                sourceSize.height: 400
                 fillMode: Image.PreserveAspectFit
+                asynchronous: true
                 visible: status === Image.Ready
             }
 
@@ -270,7 +382,10 @@ Item {
                 Layout.bottomMargin: 2
                 radius: 2
                 color: Colors.overlay
-                visible: root.notif?.timer?.running ?? false
+                // Hidden on buried cards: it is that card's own dismiss timer,
+                // and in a 10px strip it swamps the card edge with a bright bar
+                visible: (root.isActivated || root.notifIndex === 0)
+                         && (root.notif?.timer?.running ?? false)
 
                 Rectangle {
                     anchors.left: parent.left

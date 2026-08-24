@@ -456,8 +456,12 @@ Item {
                                 height: status === Image.Ready ? Math.min(implicitHeight, 180) : 0
                                 fillMode: Image.PreserveAspectFit
                                 asynchronous: true
-                                // Decode at display size, not at source resolution
+                                // Decode at display size, not at source resolution.
+                                // Both dimensions are required - notif.image is an
+                                // image:// provider URL and a half-specified
+                                // sourceSize yields a degenerate pixmap.
                                 sourceSize.width: 384
+                                sourceSize.height: 384
                                 source: expanded && notification?.image ? (notification.image.startsWith("/") ? "file://" + notification.image : notification.image) : ""
                                 visible: status === Image.Ready
                             }
