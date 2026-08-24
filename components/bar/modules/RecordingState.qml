@@ -79,7 +79,7 @@ Singleton {
     // Status check process (using pgrep directly for speed)
     Process {
         id: statusProc
-        command: ["pgrep", "-x", "wf-recorder"]
+        command: ["pgrep", "-f", "^gpu-screen-recorder"]
 
         onExited: function(exitCode, exitStatus) {
             // exitCode 0 means process found (recording active)
@@ -148,7 +148,7 @@ Singleton {
     // Stop recording process
     Process {
         id: stopProc
-        command: ["pkill", "-INT", "-x", "wf-recorder"]
+        command: ["pkill", "-INT", "-f", "^gpu-screen-recorder"]
 
         onExited: function(exitCode, exitStatus) {
             console.log("Stop process exited:", exitCode)

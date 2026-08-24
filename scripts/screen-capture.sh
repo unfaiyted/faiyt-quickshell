@@ -154,14 +154,14 @@ notify_recording() {
 }
 
 wf-recorder_check() {
-  if pgrep -x "wf-recorder" >/dev/null; then
-    pkill -INT -x wf-recorder
+  # Backwards-compatible name — now checks for gpu-screen-recorder (process name truncated to 15 chars)
+  if pgrep -f "^gpu-screen-recorder" >/dev/null; then
+    pkill -INT -f "^gpu-screen-recorder"
     local vid_path
     vid_path=$(cat /tmp/recording.txt 2>/dev/null)
-    wl-copy < "$vid_path"
-    # Wait a moment for file to be finalized, then notify
-    sleep 0.5
+    sleep 1
     if [ -f "$vid_path" ]; then
+      wl-copy < "$vid_path"
       notify_recording "$vid_path" "false"
     else
       notify-send -a "Screen Capture" "Recording Stopped" "$vid_path"
@@ -170,51 +170,65 @@ wf-recorder_check() {
   fi
 }
 
-# Function to record with standard settings (hardware-accelerated H.265 for large resolutions)
+# Unset DRI_PRIME=0 which gpu-screen-recorder rejects (wants >0 or unset)
+[ "${DRI_PRIME:-}" = "0" ] && unset DRI_PRIME
+
+# Convert slurp output ("X,Y WxH") to gpu-screen-recorder region format ("WxH+X+Y")
+slurp_to_gsr_region() {
+  local s
+  s=$(slurp) || return 1
+  local xy=${s%% *}
+  local wh=${s##* }
+  local x=${xy%,*}
+  local y=${xy#*,}
+  echo "${wh}+${x}+${y}"
+}
+
+# Record using gpu-screen-recorder. Accepts either:
+#   -w <monitor|focused|portal>
+#   -w region -region WxH+X+Y
 record_video() {
   local output_file="$1"
   shift
 
-  # Use HEVC NVENC for NVIDIA GPUs - supports resolutions up to 8K (h264_nvenc limited to 4096px width)
-  # preset=p4 is balanced speed/quality, cq=23 is good quality without huge files
-  wf-recorder "$@" -f "$output_file" \
-    -c hevc_nvenc \
-    -p preset=p4 \
-    -p rc=vbr \
-    -p cq=23 \
-    --pixel-format yuv420p
+  gpu-screen-recorder \
+    -w "$@" \
+    -f 30 \
+    -k hevc \
+    -q very_high \
+    -encoder gpu \
+    -a default_output \
+    -o "$output_file"
 }
 
-# High quality recording for YouTube (hardware-accelerated)
 record_high_quality() {
   local output_file="$1"
   shift
 
-  # Use HEVC NVENC for NVIDIA GPUs with high quality settings (supports 8K)
-  # Use codec params for bitrate control instead of -b flag
-  wf-recorder "$@" -f "$output_file" \
-    -c hevc_nvenc \
-    -r 60 \
-    -p preset=p7 \
-    -p rc=vbr \
-    -p cq=19 \
-    --pixel-format yuv420p
+  gpu-screen-recorder \
+    -w "$@" \
+    -f 60 \
+    -k hevc \
+    -q ultra \
+    -encoder gpu \
+    -a default_output \
+    -o "$output_file"
 }
 
 record_gif() {
   local output_file="$1"
   shift
 
-  # Record temporary video first
   local temp_video="/tmp/gif_recording_$(date +%s).mp4"
   echo "$temp_video" >/tmp/gif_temp_video.txt
 
-  # GIF-optimized recording (15 fps, no audio) - Use HEVC NVENC for NVIDIA GPUs (supports 8K)
-  wf-recorder "$@" -f "$temp_video" \
-    -c hevc_nvenc \
-    -r 15 \
-    --pixel-format yuv420p \
-    --no-audio
+  gpu-screen-recorder \
+    -w "$@" \
+    -f 15 \
+    -k h264 \
+    -q medium \
+    -encoder gpu \
+    -o "$temp_video"
   
   # After recording stops, convert to GIF
   if [ -f "$temp_video" ]; then
@@ -309,14 +323,15 @@ case "$COMMAND" in
       "selection")
         wf-recorder_check
         echo "$VID" >/tmp/recording.txt
-        record_video "$VID" -g "$(slurp)"
+        region=$(slurp_to_gsr_region) || exit 1
+        record_video "$VID" "$region"
         ;;
       *)
         # Dynamic monitor target - validate it exists
         if validate_monitor "$TARGET"; then
             wf-recorder_check
             echo "$VID" >/tmp/recording.txt
-            record_video "$VID" -a -o "$TARGET"
+            record_video "$VID" "$TARGET"
         else
             echo "Error: Unknown target '$TARGET'"
             echo "Available targets:"
@@ -326,7 +341,7 @@ case "$COMMAND" in
         ;;
     esac
     ;;
-  
+
   "record-hq")
     # Change file extension to mp4 for high quality recordings
     VID_HQ="${RECORDING_DIR}/$(date +%Y-%m-%d_%H-%m-%s)-hq.mp4"
@@ -339,7 +354,8 @@ case "$COMMAND" in
         wf-recorder_check
         echo "$VID_HQ" >/tmp/recording.txt
         notify-send -a "Screen Capture" "High Quality Recording" "Starting YouTube-quality recording..."
-        record_high_quality "$VID_HQ" -g "$(slurp)"
+        region=$(slurp_to_gsr_region) || exit 1
+        record_high_quality "$VID_HQ" "$region"
         ;;
       *)
         # Dynamic monitor target - validate it exists
@@ -347,7 +363,7 @@ case "$COMMAND" in
             wf-recorder_check
             echo "$VID_HQ" >/tmp/recording.txt
             notify-send -a "Screen Capture" "High Quality Recording" "Starting on $TARGET..."
-            record_high_quality "$VID_HQ" -a -o "$TARGET"
+            record_high_quality "$VID_HQ" "$TARGET"
         else
             echo "Error: Unknown target '$TARGET'"
             echo "Available targets:"
@@ -370,7 +386,8 @@ case "$COMMAND" in
         wf-recorder_check
         echo "$GIF" >/tmp/recording.txt
         notify-send -a "Screen Capture" "GIF Recording" "Starting (15 FPS)..."
-        record_gif "$GIF" -g "$(slurp)"
+        region=$(slurp_to_gsr_region) || exit 1
+        record_gif "$GIF" "$region"
         ;;
       *)
         # Dynamic monitor target - validate it exists
@@ -378,7 +395,7 @@ case "$COMMAND" in
             wf-recorder_check
             echo "$GIF" >/tmp/recording.txt
             notify-send -a "Screen Capture" "GIF Recording" "Starting on $TARGET..."
-            record_gif "$GIF" -o "$TARGET"
+            record_gif "$GIF" "$TARGET"
         else
             echo "Error: Unknown target '$TARGET'"
             echo "Available targets:"
