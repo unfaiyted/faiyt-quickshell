@@ -108,7 +108,7 @@ Singleton {
             appIcon: live ? live.appIcon : record.appIcon,
             image: live ? live.image : record.image,
             urgency: live ? live.urgency : record.urgency,
-            actions: live ? live.actions : [],
+            actions: live ? root.displayActions(live.actions) : [],
             repeatCount: record.count || 1,
             time: new Date(record.timestamp)
         }
@@ -127,10 +127,27 @@ Singleton {
             appIcon: notif.appIcon,
             image: notif.image,
             urgency: notif.urgency,
-            actions: notif.actions,
+            actions: root.displayActions(notif.actions),
             repeatCount: 1,
             time: new Date()
         }
+    }
+
+    // Actions worth drawing as buttons. The spec's "default" action is what
+    // fires when the notification body itself is clicked - it is not meant to
+    // be a button, and senders like Ghostty give it an empty label, which
+    // rendered as a blank pill.
+    function displayActions(actions) {
+        if (!actions) return []
+        const out = []
+        for (let i = 0; i < actions.length; i++) {
+            const a = actions[i]
+            if (!a) continue
+            if (a.identifier === "default") continue
+            if (!a.text || a.text.trim().length === 0) continue
+            out.push(a)
+        }
+        return out
     }
 
     // Dismiss an entry produced by visibleNotifications

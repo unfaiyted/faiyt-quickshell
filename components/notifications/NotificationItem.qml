@@ -19,6 +19,27 @@ Item {
     // Check if this is a critical notification
     readonly property bool isCritical: root.notif?.urgency === NotificationUrgency.Critical
 
+    // Actions to draw as buttons, minus the click-activation "default" action
+    readonly property var buttonActions: NotificationState.displayActions(root.notif?.actions)
+
+    // The spec's "default" action is what a click on the notification body runs
+    readonly property var defaultAction: {
+        const acts = root.notif?.actions ?? []
+        for (let i = 0; i < acts.length; i++) {
+            if (acts[i] && acts[i].identifier === "default") return acts[i]
+        }
+        return null
+    }
+
+    // Clicking the card runs the sender's default action when there is one,
+    // then focuses the app that sent it and clears the popup.
+    function activate() {
+        const appName = root.notif?.appName ?? ""
+        if (root.defaultAction) root.defaultAction.invoke()
+        NotificationState.focusAppWindow(appName)
+        if (root.notif) root.notif.remove()
+    }
+
     implicitHeight: childrenRect.height
     implicitWidth: parent?.width ?? 380
 
@@ -47,6 +68,16 @@ Item {
             : Colors.background
         border.color: root.isCritical ? Colors.error : Colors.border
         border.width: root.isCritical ? 2 : 1
+
+        // Behind the content so the close and action buttons still win
+        MouseArea {
+            id: cardArea
+            anchors.fill: parent
+            z: -1
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.activate()
+        }
 
         ColumnLayout {
             id: contentColumn
@@ -186,14 +217,14 @@ Item {
             // Action buttons
             RowLayout {
                 Layout.fillWidth: true
-                Layout.margins: root.notif?.actions?.length > 0 ? 12 : 0
+                Layout.margins: root.buttonActions.length > 0 ? 12 : 0
                 Layout.topMargin: 0
-                Layout.preferredHeight: root.notif?.actions?.length > 0 ? 32 : 0
+                Layout.preferredHeight: root.buttonActions.length > 0 ? 32 : 0
                 spacing: 8
-                visible: root.notif?.actions?.length > 0
+                visible: root.buttonActions.length > 0
 
                 Repeater {
-                    model: root.notif?.actions ?? []
+                    model: root.buttonActions
 
                     Rectangle {
                         id: actionBtn
