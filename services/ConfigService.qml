@@ -81,8 +81,9 @@ Singleton {
 
         // Battery
         battery: {
-            low: 20,
-            critical: 10
+            low: 50,                     // warning notification threshold (%)
+            critical: 20,                // first critical alert (%)
+            criticalLevels: [20, 10, 5]  // full critical ladder, each fires once per discharge
         },
 
         // Animations
@@ -290,6 +291,8 @@ Singleton {
                 try {
                     const loaded = JSON.parse(configBuffer)
                     // Deep merge with defaults
+                    // Migrate before merging so the new defaults flow in normally
+                    configService.migrateConfig(loaded)
                     configService.config = deepMerge(JSON.parse(JSON.stringify(configService.defaultConfig)), loaded)
                     console.log("ConfigService: Config loaded successfully")
                     console.log("  - Sticker packs in loaded config:", loaded.stickers?.packs?.length || 0)
@@ -324,6 +327,22 @@ Singleton {
             if (!running) {
                 console.log("ConfigService: Config saved")
             }
+        }
+    }
+
+    // One-time upgrades for configs written by older versions.
+    // `loaded` is the raw on-disk config, before defaults were merged in.
+    function migrateConfig(loaded) {
+        // Battery thresholds used to be a single low/critical pair whose
+        // defaults were 20/10. Those exact values mean the user never chose
+        // them, so drop them and let the new warning + critical-ladder
+        // defaults apply. Genuinely customized values are left alone.
+        const savedBattery = loaded.battery
+        if (savedBattery && savedBattery.criticalLevels === undefined
+            && savedBattery.low === 20 && savedBattery.critical === 10) {
+            delete savedBattery.low
+            delete savedBattery.critical
+            console.log("ConfigService: Migrated battery thresholds to warning/critical ladder")
         }
     }
 
@@ -372,8 +391,9 @@ Singleton {
     property var timezones: config.time?.timezones || []
     property string weatherCity: config.weather?.city || ""
     property string temperatureUnit: config.weather?.preferredUnit || "C"
-    property int batteryLow: config.battery?.low || 20
-    property int batteryCritical: config.battery?.critical || 10
+    property int batteryLow: config.battery?.low ?? 50
+    property int batteryCritical: config.battery?.critical ?? 20
+    property var batteryCriticalLevels: config.battery?.criticalLevels ?? [20, 10, 5]
     property int animationDuration: config.animations?.durationSmall || 200
     property int launcherMaxResults: config.launcher?.maxResults || 10
     property int overviewItemsPerRow: config.overview?.itemsPerRow || 5
@@ -497,8 +517,9 @@ Singleton {
         timezones = config.time?.timezones || []
         weatherCity = config.weather?.city || ""
         temperatureUnit = config.weather?.preferredUnit || "C"
-        batteryLow = config.battery?.low || 20
-        batteryCritical = config.battery?.critical || 10
+        batteryLow = config.battery?.low ?? 50
+        batteryCritical = config.battery?.critical ?? 20
+        batteryCriticalLevels = config.battery?.criticalLevels ?? [20, 10, 5]
         animationDuration = config.animations?.durationSmall || 200
         launcherMaxResults = config.launcher?.maxResults || 10
         overviewItemsPerRow = config.overview?.itemsPerRow || 5

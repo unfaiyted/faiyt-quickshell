@@ -1305,12 +1305,12 @@ Rectangle {
                         SettingRow {
                             visible: contentColumn.matchesSearch("low battery")
                             label: "Low Battery"
-                            description: "Low battery warning threshold (%)"
+                            description: "Warning notification threshold (%)"
 
                             NumberInput {
                                 value: ConfigService.batteryLow
-                                min: 5
-                                max: 50
+                                min: 10
+                                max: 90
                                 step: 5
                                 onValueModified: (v) => {
                                     ConfigService.setValue("battery.low", v)
@@ -1322,12 +1322,13 @@ Rectangle {
                         SettingRow {
                             visible: contentColumn.matchesSearch("critical battery")
                             label: "Critical Battery"
-                            description: "Critical battery threshold (%)"
+                            description: "First critical alert (%). Alerts repeat at each lower step: "
+                                         + BatteryService.criticalLevels.join("%, ") + "%"
 
                             NumberInput {
                                 value: ConfigService.batteryCritical
                                 min: 5
-                                max: 20
+                                max: 50
                                 step: 5
                                 onValueModified: (v) => {
                                     ConfigService.setValue("battery.critical", v)

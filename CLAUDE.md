@@ -177,6 +177,21 @@ arriving notification inserts a single delegate instead of rebuilding the list.
 Notifications past `maxTracked` are untracked but stay visible through their
 history record - they just lose their live actions.
 
+### Battery Alerts
+`BatteryService` alerts once per level as the battery drains, and re-arms the
+whole ladder as soon as the machine stops discharging.
+
+| Config Path | Default | Description |
+|-------------|---------|-------------|
+| `battery.low` | 50 | Warning notification threshold (%) |
+| `battery.critical` | 20 | First critical alert (%) |
+| `battery.criticalLevels` | `[20, 10, 5]` | Critical ladder; steps above `battery.critical` are ignored |
+
+Note: UPower reports `percentage` as a **0.0-1.0 fraction**, so every consumer
+must scale by 100. Alerts are gated on `UPowerDeviceState.Discharging` rather
+than "not charging", which also excludes the startup window where UPower
+reports 0% before the device has been read.
+
 ## Adding New Features
 
 ### New Bar Module
